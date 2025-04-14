@@ -1,19 +1,59 @@
 import { useState } from "react";
 
+const Shapes = [
+  {
+    inputValue: "Cylindrical",
+    hasInnerWidth: false,
+    english: "Cylindrical",
+    widthLabel: "Diameter",
+    area: (width) => Math.PI * width * width / 4,
+  },
+  {
+    inputValue: "HollowCylindrical",
+    hasInnerWidth: true,
+    english: "Hollow Cylindrical",
+    widthLabel: "Diameter",
+    area: (width, innerWidth) => (Math.PI * width * width / 4) - (Math.PI * innerWidth * innerWidth / 4),
+  },
+  {
+    inputValue: "Square",
+    hasInnerWidth: false,
+    english: "Square",
+    widthLabel: "Side",
+    area: (width) => width * width,
+  },
+  {
+    inputValue: "HollowSquare",
+    hasInnerWidth: true,
+    english: "Hollow Square",
+    widthLabel: "Side",
+    area: (width, innerWidth) => (width * width) - (innerWidth * innerWidth),
+  },
+  {
+    inputValue: "Hexagonal",
+    hasInnerWidth: false,
+    english: "Hexagonal",
+    widthLabel: "Side",
+    area: (width) => width * width,
+  },
+];
+
 function Materials({materials, metals, metalFamilies, addMaterial}) {
   const [isNameManual, setIsNameManual] = useState(false);
   const [name, setName] = useState("");
-  const [metal, setMetal] = useState(metals[0]);
-  const [density, setDensity] = useState(0);
+  const [metal, setMetal] = useState(metals[0] && metals[0].name);
+  const [width, setWidth] = useState(0);
+  const [innerWidth, setInnerWidth] = useState(0);
+  const [shape, setShape] = useState(Shapes[0].inputValue);
   const [rawCost, setRawCost] = useState(0);
   const [markup, setMarkup] = useState(6.5);
 
-  const effectiveCost = rawCost * markup;
+  const effectiveCost = rawCost + (rawCost * markup / 100);
 
   const log = (msg) => console.log(`[SCENARIO] ${msg}`);
 
   const tableRows = "";
-  const mfItems = metalFamilies.map(mf => 
+  const mfItems = metalFamilies.map(mf =>
     <li>{mf}</li>
   );
 
@@ -26,7 +66,57 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     setInputText("")
   }
 
-  
+  function onShapeChange(e) {
+    log(`onShapeChange ${e.target.value}`)
+    setShape(e.target.value);
+  }
+
+  const autoName = `${metal} ${width}mm`;
+  const density = metals.find(m => m.name === metal).density;
+  const shapeObj = Shapes.find(s => s.inputValue === shape);
+  const crossSectionArea = shapeObj.area(width, innerWidth);
+  const weightPerMm = density * crossSectionArea;
+
+  let nameFragment;
+  if (isNameManual) {
+     nameFragment = <input
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+    />
+  } else {
+     nameFragment = <label>{autoName}</label>;
+  }
+
+
+  const innerWidthFragment = (
+   <>
+    <label>Inner {shapeObj.widthLabel} (mm):</label>
+    <input
+      value={innerWidth}
+      onChange={(e) => setInnerWidth(parseFloat(e.target.value))}
+    />
+   </>);
+
+  const metalSelectOptions = metals.map(m => {
+     return <option value={m.name}>{m.name}</option>;
+  });
+
+  const shapeInputs = Shapes.map(s => {
+    return <>
+      <input
+        type="radio"
+        name="shape"
+        value={s.inputValue}
+        defaultChecked={shape === s.inputValue}
+      />
+      <label>{s.english}</label>
+    </>
+  });
+
+  log("top")
+  log(name);
+  log(isNameManual);
+
   return (
    <>
     <h1>Materials</h1>
@@ -34,8 +124,8 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
       <tr>
         <th>Name</th>
         <th>Metal</th>
-        <th>Size (mm)</th>
         <th>Shape</th>
+        <th>Width (mm)</th>
         <th>Density (g/mm^3)</th>
         <th>Raw Cost</th>
         <th>Markup</th>
@@ -44,10 +134,69 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
       {tableRows}
     </table>
 
-    <input onChange={handleInputTextChange}/>
+    <label>Name:</label>
+    <input
+      value={isNameManual ? name : autoName}
+      onChange={(e) => setName(e.target.value)}
+      disabled={!isNameManual}
+    />
+    &nbsp;
+    <label>Use Manual Name:</label>
+    <input
+      type="checkbox"
+      name="isNameManualCheckbox"
+      defaultChecked={isNameManual}
+      onChange={(e) => setIsNameManual(!isNameManual) }
+    />
+    <br/>
+
+    <label>Metal:</label>
+    <select
+      value={metal}
+      onChange={e => setMetal(e.target.value)}
+    >
+      {metalSelectOptions}
+    </select>
+    &nbsp;
+    <label>Density: {density} g/mm^3</label>
+    <br/>
+
+    <label>Shape:</label>
+    <div onChange={onShapeChange}>
+      {shapeInputs}
+    </div>
+    <br/>
+
+    <label>{shapeObj.widthLabel} (mm):</label>
+    <input
+      value={width}
+      onChange={(e) => setWidth(parseFloat(e.target.value))}
+    />
+    {shapeObj.hasInnerWidth && innerWidthFragment}
+    &nbsp; &nbsp;
+    <label>Cross section area (mm^2): {crossSectionArea.toFixed(4)}</label>
+    &nbsp; &nbsp;
+    <label>Weight per 1mm (g/mm): {weightPerMm.toFixed(4)}</label>
+    <br/>
+
+    <label>Raw Cost:</label>
+    <input
+      value={rawCost}
+      onChange={(e) => setRawCost(parseFloat(e.target.value))}
+    />
+    <label>Markup %:</label>
+    <input
+      value={markup}
+      onChange={(e) => setMarkup(parseFloat(e.target.value))}
+    />
+    <label>Effective Cost: {effectiveCost}</label>
+    <br/>
+
+
     <button type="submit" onClick={onSubmit}>
       Add Material
     </button>
+    <br/>
    </>
   );
 }
