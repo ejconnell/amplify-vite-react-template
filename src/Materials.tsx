@@ -42,40 +42,56 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
   const [isNameManual, setIsNameManual] = useState(false);
   const [name, setName] = useState("");
   const [metal, setMetal] = useState(metals[0] && metals[0].name);
+  const [shape, setShape] = useState(Shapes[0].inputValue);
   const [width, setWidth] = useState(0);
   const [innerWidth, setInnerWidth] = useState(0);
-  const [shape, setShape] = useState(Shapes[0].inputValue);
   const [rawCost, setRawCost] = useState(0);
   const [markup, setMarkup] = useState(6.5);
-
-  const effectiveCost = rawCost + (rawCost * markup / 100);
-
-  const log = (msg) => console.log(`[SCENARIO] ${msg}`);
-
-  const tableRows = "";
-  const mfItems = metalFamilies.map(mf =>
-    <li>{mf}</li>
-  );
-
-  function handleInputTextChange(e) {
-    setInputText(e.target.value);
-  }
-
-  function onSubmit() {
-    addMetalFamily(inputText)
-    setInputText("")
-  }
-
-  function onShapeChange(e) {
-    log(`onShapeChange ${e.target.value}`)
-    setShape(e.target.value);
-  }
 
   const autoName = `${metal} ${width}mm`;
   const density = metals.find(m => m.name === metal).density;
   const shapeObj = Shapes.find(s => s.inputValue === shape);
   const crossSectionArea = shapeObj.area(width, innerWidth);
   const weightPerMm = density * crossSectionArea;
+  const effectiveCost = rawCost + (rawCost * markup / 100);
+
+  const log = (msg) => console.log(`[SCENARIO] ${msg}`);
+
+  function onSubmit() {
+    const material = {
+      name: isNameManual ? name : autoName,
+      metal: metal,
+      shape: shape,
+      width: width,
+      weightPerMm: weightPerMm,
+      rawCost: rawCost,
+      markup: markup,
+      effectiveCost: effectiveCost,
+    };
+    if (shapeObj.hasInnerWidth) {
+      material.innerWidth = innerWidth
+    }
+    addMaterial(material);
+  };
+
+  const tableRows = materials.map(m =>
+    <tr>
+      <td>{m.name}</td>
+      <td>{m.metal}</td>
+      <td>{Shapes.find(s => s.inputValue === m.shape).english}</td>
+      <td>{m.width}</td>
+      <td>{m.innerWidth || "-"}</td>
+      <td>{m.weightPerMm.toFixed(4)}</td>
+      <td>{m.rawCost.toFixed(4)}</td>
+      <td>{m.markup}</td>
+      <td>{m.effectiveCost.toFixed(4)}</td>
+    </tr>
+  );
+
+  function onShapeChange(e) {
+    log(`onShapeChange ${e.target.value}`);
+    setShape(e.target.value);
+  }
 
   let nameFragment;
   if (isNameManual) {
@@ -126,7 +142,8 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
         <th>Metal</th>
         <th>Shape</th>
         <th>Width (mm)</th>
-        <th>Density (g/mm^3)</th>
+        <th>Inner Width (mm)</th>
+        <th>Weight per mm (g/mm)</th>
         <th>Raw Cost</th>
         <th>Markup</th>
         <th>Effective Cost</th>

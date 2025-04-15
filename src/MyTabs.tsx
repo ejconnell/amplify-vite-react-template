@@ -44,13 +44,10 @@ async function fetchMetalFamilies(ddbDocClient, setMetalFamilies) {
       ConsistentRead: true,
     },
   );
-  log(JSON.stringify(paginatedScan))
-  log("hello6");
   const families = [];
   for await (const page of paginatedScan) {
     families.push(...page.Items);
   }
-  log(JSON.stringify(families));
   setMetalFamilies(families.map((f) => f.name));
 };
 
@@ -62,14 +59,26 @@ async function fetchMetals(ddbDocClient, setMetals) {
       ConsistentRead: true,
     },
   );
-  log(JSON.stringify(paginatedScan))
-  log("hello6");
-  const metals= [];
+  const metals = [];
   for await (const page of paginatedScan) {
     metals.push(...page.Items);
   }
-  log(JSON.stringify(metals));
   setMetals(metals);
+};
+
+async function fetchMaterials(ddbDocClient, setMaterials) {
+  const paginatedScan = paginateScan(
+    { client: ddbDocClient },
+    {
+      TableName: "Materials",
+      ConsistentRead: true,
+    },
+  );
+  const materials = [];
+  for await (const page of paginatedScan) {
+    materials.push(...page.Items);
+  }
+  setMaterials(materials);
 };
 
 function getAwsCreds(auth) {
@@ -116,7 +125,7 @@ function MyTabs() {
   }
 
   async function addMetal(metal) {
-    log("addMetal() " + metal)
+    log("addMetal() " + metal.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Metals",
       Item: {
@@ -127,6 +136,16 @@ function MyTabs() {
     }));
     log(response);
     fetchMetals(ddbDocClient, setMetals)
+  }
+
+  async function addMaterial(material) {
+    log("addMaterial() " + material.name)
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "Materials",
+      Item: material,
+    }));
+    log(response);
+    fetchMaterials(ddbDocClient, setMaterials)
   }
 
   return (
@@ -151,7 +170,7 @@ function MyTabs() {
         materials={materials}
         metals={metals}
         metalFamilies={metalFamilies}
-        addMetal={addMetal}
+        addMaterial={addMaterial}
       />
     </TabPanel>
     <TabPanel>
