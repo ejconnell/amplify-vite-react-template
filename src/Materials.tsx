@@ -2,55 +2,79 @@ import { useState } from "react";
 
 const Shapes = [
   {
-    inputValue: "Cylindrical",
+    name: "Cylindrical",
     hasInnerWidth: false,
     english: "Cylindrical",
+    abbreviation: "",
     widthLabel: "Diameter",
     area: (width) => Math.PI * width * width / 4,
   },
   {
-    inputValue: "HollowCylindrical",
+    name: "HollowCylindrical",
     hasInnerWidth: true,
     english: "Hollow Cylindrical",
+    abbreviation: "",
     widthLabel: "Diameter",
     area: (width, innerWidth) => (Math.PI * width * width / 4) - (Math.PI * innerWidth * innerWidth / 4),
   },
   {
-    inputValue: "Square",
+    name: "Square",
     hasInnerWidth: false,
     english: "Square",
+    abbreviation: "Sq",
     widthLabel: "Side",
     area: (width) => width * width,
   },
   {
-    inputValue: "HollowSquare",
+    name: "HollowSquare",
     hasInnerWidth: true,
     english: "Hollow Square",
+    abbreviation: "Sq",
     widthLabel: "Side",
     area: (width, innerWidth) => (width * width) - (innerWidth * innerWidth),
   },
   {
-    inputValue: "Hexagonal",
+    name: "Hexagonal",
     hasInnerWidth: false,
     english: "Hexagonal",
+    abbreviation: "Hex",
     widthLabel: "Side",
     area: (width) => width * width,
   },
 ];
 
+function buildAutoName(metal, shapeObj, width, innerWidth) {
+  console.log("SSSSSSSSSSS")
+  let str = `${metal} ${width}`;
+  console.log(str);
+  console.log(JSON.stringify(shapeObj));
+  if (shapeObj.hasInnerWidth) {
+    console.log("QQQQQQ");
+    str += `-${innerWidth}`
+  }
+  console.log(str);
+  str += "mm"
+  console.log(str);
+  if (shapeObj.abbreviation) {
+    str += ` ${shapeObj.abbreviation}`
+  }
+  console.log(str);
+  return str;
+}
+
 function Materials({materials, metals, metalFamilies, addMaterial}) {
   const [isNameManual, setIsNameManual] = useState(false);
   const [name, setName] = useState("");
   const [metal, setMetal] = useState(metals[0] && metals[0].name);
-  const [shape, setShape] = useState(Shapes[0].inputValue);
+  const [shape, setShape] = useState(Shapes[0].name);
   const [width, setWidth] = useState(0);
   const [innerWidth, setInnerWidth] = useState(0);
   const [rawCost, setRawCost] = useState(0);
   const [markup, setMarkup] = useState(6.5);
 
-  const autoName = `${metal} ${width}mm`;
+  const shapeObj = Shapes.find(s => s.name === shape);
+  const autoName = buildAutoName(metal, shapeObj, width, innerWidth);
   const density = metals.find(m => m.name === metal).density;
-  const shapeObj = Shapes.find(s => s.inputValue === shape);
   const crossSectionArea = shapeObj.area(width, innerWidth);
   const weightPerMm = density * crossSectionArea;
   const effectiveCost = rawCost + (rawCost * markup / 100);
@@ -78,7 +102,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     <tr>
       <td>{m.name}</td>
       <td>{m.metal}</td>
-      <td>{Shapes.find(s => s.inputValue === m.shape).english}</td>
+      <td>{Shapes.find(s => s.name === m.shape).english}</td>
       <td>{m.width}</td>
       <td>{m.innerWidth || "-"}</td>
       <td>{m.weightPerMm.toFixed(4)}</td>
@@ -122,8 +146,8 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
       <input
         type="radio"
         name="shape"
-        value={s.inputValue}
-        defaultChecked={shape === s.inputValue}
+        value={s.name}
+        defaultChecked={shape === s.name}
       />
       <label>{s.english}</label>
     </>
@@ -144,9 +168,9 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
         <th>Width (mm)</th>
         <th>Inner Width (mm)</th>
         <th>Weight per mm (g/mm)</th>
-        <th>Raw Cost</th>
-        <th>Markup</th>
-        <th>Effective Cost</th>
+        <th>Raw Cost ($/kg)</th>
+        <th>Markup %</th>
+        <th>Effective Cost ($/kg)</th>
       </tr>
       {tableRows}
     </table>
@@ -193,7 +217,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     &nbsp; &nbsp;
     <label>Cross section area (mm^2): {crossSectionArea.toFixed(4)}</label>
     &nbsp; &nbsp;
-    <label>Weight per 1mm (g/mm): {weightPerMm.toFixed(4)}</label>
+    <label>Weight per mm (g/mm): {weightPerMm.toFixed(4)}</label>
     <br/>
 
     <label>Raw Cost:</label>

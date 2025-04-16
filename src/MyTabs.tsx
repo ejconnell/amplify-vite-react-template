@@ -81,6 +81,21 @@ async function fetchMaterials(ddbDocClient, setMaterials) {
   setMaterials(materials);
 };
 
+async function fetchStandardSetups(ddbDocClient, setStandardSetups) {
+  const paginatedScan = paginateScan(
+    { client: ddbDocClient },
+    {
+      TableName: "StandardSetups",
+      ConsistentRead: true,
+    },
+  );
+  const standardSetups = [];
+  for await (const page of paginatedScan) {
+    standardSetups.push(...page.Items);
+  }
+  setStandardSetups(standardSetups);
+};
+
 function getAwsCreds(auth) {
   //const auth = useAuth();
   const COGNITO_ID = "cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_VQ0eXINVn";
@@ -98,6 +113,7 @@ function MyTabs() {
   const [materials, setMaterials] = useState([]);
   const [metals, setMetals] = useState([]);
   const [metalFamilies, setMetalFamilies] = useState([]);
+  const [standardSetups, setStandardSetups] = useState([]);
 
   const auth = useAuth();
 
@@ -110,6 +126,8 @@ function MyTabs() {
   useEffect(() => {
     fetchMetalFamilies(ddbDocClient, setMetalFamilies)
     fetchMetals(ddbDocClient, setMetals)
+    fetchMaterials(ddbDocClient, setMaterials)
+    fetchStandardSetups(ddbDocClient, setStandardSetups)
   }, [])
 
   async function addMetalFamily(metalFamily) {
@@ -148,6 +166,16 @@ function MyTabs() {
     fetchMaterials(ddbDocClient, setMaterials)
   }
 
+  async function addStandardSetup(standardSetup) {
+    log("addStandardSetup() " + standardSetup.name)
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "StandardSetups",
+      Item: standardSetup,
+    }));
+    log(response);
+    fetchStandardSetups(ddbDocClient, setStandardSetups)
+  }
+
   return (
   <Tabs>
     <TabList>
@@ -163,7 +191,10 @@ function MyTabs() {
     </TabList>
 
     <TabPanel>
-      <Items />
+      <Items
+        materials={materials}
+        standardSetups={standardSetups}
+      />
     </TabPanel>
     <TabPanel>
       <Materials
@@ -196,7 +227,10 @@ function MyTabs() {
       <Outsourced />
     </TabPanel>
     <TabPanel>
-      <StandardSetups />
+      <StandardSetups
+        standardSetups={standardSetups}
+        addStandardSetup={addStandardSetup}
+      />
     </TabPanel>
     <TabPanel>
       <Todos />
