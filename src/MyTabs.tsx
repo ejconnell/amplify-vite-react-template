@@ -96,6 +96,30 @@ async function fetchStandardSetups(ddbDocClient, setStandardSetups) {
   setStandardSetups(standardSetups);
 };
 
+async function fetchInHouses(ddbDocClient, setInHouses) {
+  await fetchTable(ddbDocClient, setInHouses, "InHouses")
+};
+
+async function fetchItems(ddbDocClient, setItems) {
+  await fetchTable(ddbDocClient, setItems, "Items")
+};
+
+async function fetchTable(ddbDocClient, setter, tableName) {
+  console.log(`fetchTable("${tableName}")`)
+  const paginatedScan = paginateScan(
+    { client: ddbDocClient },
+    {
+      TableName: tableName,
+      ConsistentRead: true,
+    },
+  );
+  const acc = [];
+  for await (const page of paginatedScan) {
+    acc.push(...page.Items);
+  }
+  setter(acc);
+}
+
 function getAwsCreds(auth) {
   //const auth = useAuth();
   const COGNITO_ID = "cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_VQ0eXINVn";
@@ -114,6 +138,8 @@ function MyTabs() {
   const [metals, setMetals] = useState([]);
   const [metalFamilies, setMetalFamilies] = useState([]);
   const [standardSetups, setStandardSetups] = useState([]);
+  const [inHouses, setInHouses] = useState([]);
+  const [items, setItems] = useState([]);
 
   const auth = useAuth();
 
@@ -124,10 +150,12 @@ function MyTabs() {
   const ddbDocClient = DynamoDBDocumentClient.from(client);
 
   useEffect(() => {
-    fetchMetalFamilies(ddbDocClient, setMetalFamilies)
-    fetchMetals(ddbDocClient, setMetals)
-    fetchMaterials(ddbDocClient, setMaterials)
-    fetchStandardSetups(ddbDocClient, setStandardSetups)
+    fetchMetalFamilies(ddbDocClient, setMetalFamilies);
+    fetchMetals(ddbDocClient, setMetals);
+    fetchMaterials(ddbDocClient, setMaterials);
+    fetchStandardSetups(ddbDocClient, setStandardSetups);
+    fetchInHouses(ddbDocClient, setInHouses);
+    fetchItems(ddbDocClient, setItems);
   }, [])
 
   async function addMetalFamily(metalFamily) {
@@ -173,7 +201,27 @@ function MyTabs() {
       Item: standardSetup,
     }));
     log(response);
-    fetchStandardSetups(ddbDocClient, setStandardSetups)
+    fetchStandardSetups(ddbDocClient, setStandardSetups);
+  }
+
+  async function addInHouse(inHouse) {
+    log("addInHouse() " + inHouse.name)
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "InHouses",
+      Item: inHouse,
+    }));
+    log(response);
+    fetchInHouses(ddbDocClient, setInHouses);
+  }
+
+  async function addItem(item) {
+    log("addItem() " + item.name)
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "Items",
+      Item: item,
+    }));
+    log(response);
+    fetchInHouses(ddbDocClient, setItems);
   }
 
   return (
@@ -192,8 +240,11 @@ function MyTabs() {
 
     <TabPanel>
       <Items
+        items={items}
         materials={materials}
         standardSetups={standardSetups}
+        inHouses={inHouses}
+        addItem={addItem}
       />
     </TabPanel>
     <TabPanel>
@@ -221,7 +272,10 @@ function MyTabs() {
       <VolumePricing />
     </TabPanel>
     <TabPanel>
-      <InHouse />
+      <InHouse
+        inHouses={inHouses}
+        addInHouse={addInHouse}
+      />
     </TabPanel>
     <TabPanel>
       <Outsourced />
