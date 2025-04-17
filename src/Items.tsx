@@ -16,36 +16,75 @@ function Items({materials, standardSetups}) {
   const costPerUnit = gramsPerUnit * material.effectiveCost / 1000;
   const unitLength = gramsPerUnit / material.weightPerMm;
 
+  const setupsSum = setups.map(s => s.cost).reduce((acc, cost) => acc+cost, 0);
+
   const materialSelectOptions = materials.map(m => {
      return <option value={m.name}>{m.name}</option>;
   });
 
-  function handleStandardSetupSelect(value, index) {
+  function handleSetupStandardNameSelect(value, index) {
+    console.log("handleSetupStandardNameSelect()");
     const nextSetups = setups.map((s, i) => {
       if (i === index) {
         return {
-          name: value,
-          custom: s.custom,
+          standardName: value,
+          customName: s.customName,
+          isCustom: s.isCustom,
           cost: s.cost,
         }
       } else {
-        return s;
+        return {...s};
+      };
+    });
+    console.log(JSON.stringify(nextSetups));
+    setSetups(nextSetups);
+  }
+
+  function handleSetupCustomNameInput(value, index) {
+    console.log("handleSetupStandardNameSelect()");
+    const nextSetups = setups.map((s, i) => {
+      if (i === index) {
+        return {
+          standardName: s.standardName,
+          customName: value,
+          isCustom: s.isCustom,
+          cost: s.cost,
+        }
+      } else {
+        return {...s};
+      };
+    });
+    console.log(JSON.stringify(nextSetups));
+    setSetups(nextSetups);
+  }
+
+  function handleSetupCustomNameCheckbox(index) {
+    const nextSetups = setups.map((s, i) => {
+      if (i === index) {
+        return {
+          standardName: s.standardName,
+          customName: s.customName,
+          isCustom: !s.isCustom,
+          cost: s.cost,
+        }
+      } else {
+        return {...s};
       };
     });
     setSetups(nextSetups);
   }
 
-  function handleCustomSetupNameCheckbox(index) {
-    console.log("XXXXX")
+  function handleSetupCostChange(value, index) {
     const nextSetups = setups.map((s, i) => {
       if (i === index) {
         return {
-          name: s.name,
-          custom: !s.custom,
-          cost: s.cost,
+          standardName: s.standardName,
+          customName: s.customName,
+          isCustom: s.isCustom,
+          cost: parseFloat(value),
         }
       } else {
-        return s;
+        return {...s};
       };
     });
     setSetups(nextSetups);
@@ -57,28 +96,35 @@ function Items({materials, standardSetups}) {
     });
     return <>
       <select
-        value={setups[i].name}
-        onChange={e => handleStandardSetupSelect(e.target.value, i)}
+        value={setups[i].standardName}
+        onChange={e => handleSetupStandardNameSelect(e.target.value, i)}
+        style={{width: "157px"}}
       >
         {standardSetupsSelectOptions}
       </select>
     </>;
   };
 
-  const setupsFrag = setups.map((s, i) => {
-    const manualSetupNameInputFrag = <input
-      name="name"
-      value={s.name}
-      onChange={(e) => handleStandardSetupSelect(e.target.value, i)}
+  const setupsLoopFrag = setups.map((s, i) => {
+    const customSetupNameInputFrag = <input
+      name="customName"
+      value={s.customName}
+      onChange={(e) => handleSetupCustomNameInput(e.target.value, i)}
+      style={{width: "150px"}}
     />
     return <>
-      <label>{s.name}</label><br/>
-      {s.custom ? manualSetupNameInputFrag : standardSetupSelectFrag(i)}
+      &nbsp; &nbsp; &nbsp;
+      {s.isCustom ? customSetupNameInputFrag : standardSetupSelectFrag(i)}
       <input
         type="checkbox"
         name="isCustomSetupNameCheckbox"
-        checked={s.custom}
-        onChange={() => handleCustomSetupNameCheckbox(i)}
+        checked={s.isCustom}
+        onChange={() => handleSetupCustomNameCheckbox(i)}
+      />
+      <input
+        name="setupCost"
+        value={s.cost}
+        onChange={(e) => handleSetupCostChange(e.target.value, i)}
       />
       <br/>
     </>
@@ -86,7 +132,8 @@ function Items({materials, standardSetups}) {
 
   function blankSetup() {
     return {
-      name: standardSetups[0].name,
+      standardName: standardSetups[0].name,
+      customName: "",
       custom: false,
       cost: 0,
     };
@@ -126,9 +173,12 @@ function Items({materials, standardSetups}) {
     <label>Unit Length (mm): {unitLength.toFixed(4)}</label>
     <br/>
 
-    <label>Setups:</label><br/>
-    {setupsFrag}
+    <label>Setup costs:</label><br/>
+    {setupsLoopFrag}
+    &nbsp; &nbsp; &nbsp;
     <button type="button" onClick={addSetup}> + </button>
+    &nbsp; &nbsp; &nbsp;
+    <label style={{width: "150px"}}>Total:</label><label>{setupsSum}</label>
    </>
   );
 }
