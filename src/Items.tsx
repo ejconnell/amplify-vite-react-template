@@ -23,7 +23,6 @@ function Items({items, materials, standardSetups, inHouses, addItem}) {
 
   const setupsSum = setups.map(s => s.cost).reduce((acc, cost) => acc+cost, 0);
 
-  //debugger
   const itemRowsFrag = items.map(item => {
     return <tr>
       <td>{item.name}</td>

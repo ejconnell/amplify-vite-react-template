@@ -5,7 +5,7 @@ import Items from './Items.tsx';
 import Materials from './Materials.tsx';
 import MetalFamilies from './MetalFamilies.tsx';
 import Metals from './Metals.tsx';
-import VolumePricing from './VolumePricing.tsx';
+import Quotes from './Quotes.tsx';
 import InHouse from './InHouse.tsx';
 import Outsourced from './Outsourced.tsx';
 import StandardSetups from './StandardSetups.tsx';
@@ -231,7 +231,7 @@ function MyTabs() {
       <Tab>Materials</Tab>
       <Tab>Metals</Tab>
       <Tab>Metal Families</Tab>
-      <Tab>Volume Pricing</Tab>
+      <Tab>Quotes</Tab>
       <Tab>In House</Tab>
       <Tab>Outsourced</Tab>
       <Tab>Standard Setups</Tab>
@@ -269,7 +269,9 @@ function MyTabs() {
       />
     </TabPanel>
     <TabPanel>
-      <VolumePricing />
+      <Quotes
+        items={items}
+      />
     </TabPanel>
     <TabPanel>
       <InHouse
