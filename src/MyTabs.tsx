@@ -221,7 +221,7 @@ function MyTabs() {
       Item: item,
     }));
     log(response);
-    fetchInHouses(ddbDocClient, setItems);
+    fetchItems(ddbDocClient, setItems);
   }
 
   return (
@@ -271,6 +271,7 @@ function MyTabs() {
     <TabPanel>
       <Quotes
         items={items}
+        materials={materials}
       />
     </TabPanel>
     <TabPanel>

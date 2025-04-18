@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ItemInHousesModel } from "./ItemInHouses"
 
 let quoteItemKey = 0;
 
@@ -6,13 +7,35 @@ function blankQuoteItem() {
   return {key: quoteItemKey++};
 };
 
-function Quotes({items}) {
+class QuoteItemsModel {
+  constructor(items, materials, quoteItems) {
+    this.rows = quoteItems.map(qi => {
+      const item = items.find(_item => _item.name === qi.name);
+      if (!item) return {};
+      const material = materials.find(m => m.name === item.materialName);
+      const materialCostPerUnit = item.gramsPerUnit * material.effectiveCost / 1000;
+      return {
+        material: material,
+        materialCostPerUnit: materialCostPerUnit,
+      };
+    });
+  }
+}
+
+function Quotes({items, materials}) {
   const [quoteItems, setQuoteItems] = useState([blankQuoteItem()]);
 
   const quoteItemsDerived = quoteItems.map(qi => {
+    const item = items.find(_item => _item.name === qi.name);
+    if (!item) return {};
+    const material = materials.find(m => m.name === item.materialName);
+    const materialCostPerUnit = item.gramsPerUnit * material.effectiveCost / 1000;
     return {
     };
   });
+
+  const quoteItemsModel = new QuoteItemsModel(items, materials, quoteItems);
+
   function handleQuoteItemNameChange(value, index) {
     console.log(`handleQuoteItemNameChange(${value}, ${index})`);
     const nextQuoteItems = quoteItems.map((qi, i) => {
@@ -91,6 +114,8 @@ function Quotes({items}) {
     return <tr key={qi.key}>
       <td>{quoteItemSelectFrag}</td>
       <td>{quoteItemQuantityFrag}</td>
+      <td>{quoteItemsModel.rows[i].materialCostPerUnit}</td>
+      <td>{quoteItemsModel.rows[i].materialCostPerUnit}</td>
       <td><button type="button" onClick={() => deleteQuoteItem(i)}> - </button></td>
       <td><button type="button" onClick={() => addQuoteItem(i)}> + </button></td>
     </tr>
@@ -105,6 +130,8 @@ function Quotes({items}) {
         <tr>
           <th>Item</th>
           <th>Quantity</th>
+          <th>Material Cost</th>
+          <th>Setup Cost</th>
           <th>Delete</th>
           <th>Add</th>
         </tr>

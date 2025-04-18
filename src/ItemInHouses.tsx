@@ -1,16 +1,22 @@
 import { useState } from "react";
 
-function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
-  const iihDerived = itemInHouses.map(iih => {
-    const costPer1k = inHouses.find(ih => ih.name === iih.name)?.cost;
-    const cost = costPer1k * iih?.quantity / 1000;
-    return {
-      costPer1k: costPer1k,
-      cost: cost,
-    }
-  });
+export class ItemInHousesModel {
+  constructor(inHouses, itemInHouses) {
+    this.rows = itemInHouses.map(iih => {
+      const costPer1k = inHouses.find(ih => ih.name === iih.name)?.cost;
+      const cost = costPer1k * iih?.quantity / 1000;
+      return {
+        costPer1k: costPer1k,
+        cost: cost,
+      }
+    });
 
-  const itemInHousesSum = iihDerived.map(iih => iih.cost).reduce((acc, cost) => acc+cost, 0);
+    this.totalCost = this.rows.map(row => row.cost).reduce((acc, cost) => acc+cost, 0);
+  }
+}
+
+function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
+  const iihModel = new ItemInHousesModel(inHouses, itemInHouses);
 
   function handleItemInHouseNameChange(value, index) {
     console.log("handleItemInHouseNameChange()");
@@ -89,8 +95,8 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
         value={iih.quantity}
         onChange={(e) => handleItemInHouseQuantityChange(parseFloat(e.target.value), i)}
       /></td>
-      <td>{iihDerived[i].costPer1k}</td>
-      <td>{iihDerived[i].cost}</td>
+      <td>{iihModel.rows[i].costPer1k}</td>
+      <td>{iihModel.rows[i].cost}</td>
       <td><button type="button" onClick={() => deleteItemInHouse(i)}> - </button></td>
       <td><button type="button" onClick={() => addItemInHouse(i)}> + </button></td>
      </tr>
@@ -100,7 +106,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     <td><b>Total</b></td>
     <td></td>
     <td></td>
-    <td><b>{itemInHousesSum.toFixed(2)}</b></td>
+    <td><b>{iihModel.totalCost.toFixed(2)}</b></td>
   </tr>
 
   return (
