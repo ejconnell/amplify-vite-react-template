@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ItemSetupsModel } from "./ItemSetups"
 import { ItemInHousesModel } from "./ItemInHouses"
 
 let quoteItemKey = 0;
@@ -8,33 +9,30 @@ function blankQuoteItem() {
 };
 
 class QuoteItemsModel {
-  constructor(items, materials, quoteItems) {
+  constructor(items, materials, inHouses, quoteItems) {
     this.rows = quoteItems.map(qi => {
       const item = items.find(_item => _item.name === qi.name);
       if (!item) return {};
       const material = materials.find(m => m.name === item.materialName);
       const materialCostPerUnit = item.gramsPerUnit * material.effectiveCost / 1000;
+      const itemSetupsModel = new ItemSetupsModel(item.itemSetups);
+      const itemInHousesModel = new ItemInHousesModel(inHouses, item.itemInHouses);
+      const setupCostPerUnit = itemSetupsModel.totalJobCost / qi.quantity;
+
       return {
         material: material,
         materialCostPerUnit: materialCostPerUnit,
+        setupCostPerUnit: setupCostPerUnit,
+        inHouseCostPerUnit: itemInHousesModel.totalCost,
       };
     });
   }
 }
 
-function Quotes({items, materials}) {
+function Quotes({items, materials, inHouses}) {
   const [quoteItems, setQuoteItems] = useState([blankQuoteItem()]);
 
-  const quoteItemsDerived = quoteItems.map(qi => {
-    const item = items.find(_item => _item.name === qi.name);
-    if (!item) return {};
-    const material = materials.find(m => m.name === item.materialName);
-    const materialCostPerUnit = item.gramsPerUnit * material.effectiveCost / 1000;
-    return {
-    };
-  });
-
-  const quoteItemsModel = new QuoteItemsModel(items, materials, quoteItems);
+  const quoteItemsModel = new QuoteItemsModel(items, materials, inHouses, quoteItems);
 
   function handleQuoteItemNameChange(value, index) {
     console.log(`handleQuoteItemNameChange(${value}, ${index})`);
@@ -115,7 +113,8 @@ function Quotes({items, materials}) {
       <td>{quoteItemSelectFrag}</td>
       <td>{quoteItemQuantityFrag}</td>
       <td>{quoteItemsModel.rows[i].materialCostPerUnit}</td>
-      <td>{quoteItemsModel.rows[i].materialCostPerUnit}</td>
+      <td>{quoteItemsModel.rows[i].setupCostPerUnit}</td>
+      <td>{quoteItemsModel.rows[i].inHouseCostPerUnit}</td>
       <td><button type="button" onClick={() => deleteQuoteItem(i)}> - </button></td>
       <td><button type="button" onClick={() => addQuoteItem(i)}> + </button></td>
     </tr>
@@ -132,6 +131,7 @@ function Quotes({items, materials}) {
           <th>Quantity</th>
           <th>Material Cost</th>
           <th>Setup Cost</th>
+          <th>In House Cost</th>
           <th>Delete</th>
           <th>Add</th>
         </tr>

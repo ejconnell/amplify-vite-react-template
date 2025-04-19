@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export class ItemSetupsModel {
   constructor(itemSetups) {
-    this.totalJobCost = itemSetups.map(s => s.cost).reduce((acc, cost) => acc+cost, 0);
+    this.totalJobCost = itemSetups.map(s => s.cost || 0).reduce((acc, cost) => acc+cost, 0);
   }
 }
 

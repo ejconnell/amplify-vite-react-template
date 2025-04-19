@@ -134,6 +134,7 @@ function getAwsCreds(auth) {
 }
 
 function MyTabs() {
+  const [fetchesComplete, setFetchesComplete] = useState(false);
   const [materials, setMaterials] = useState([]);
   const [metals, setMetals] = useState([]);
   const [metalFamilies, setMetalFamilies] = useState([]);
@@ -150,12 +151,15 @@ function MyTabs() {
   const ddbDocClient = DynamoDBDocumentClient.from(client);
 
   useEffect(() => {
-    fetchMetalFamilies(ddbDocClient, setMetalFamilies);
-    fetchMetals(ddbDocClient, setMetals);
-    fetchMaterials(ddbDocClient, setMaterials);
-    fetchStandardSetups(ddbDocClient, setStandardSetups);
-    fetchInHouses(ddbDocClient, setInHouses);
-    fetchItems(ddbDocClient, setItems);
+    console.log(`fetchesComplete 1: ${fetchesComplete}`);
+    Promise.all([
+      fetchMetalFamilies(ddbDocClient, setMetalFamilies),
+      fetchMetals(ddbDocClient, setMetals),
+      fetchMaterials(ddbDocClient, setMaterials),
+      fetchStandardSetups(ddbDocClient, setStandardSetups),
+      fetchInHouses(ddbDocClient, setInHouses),
+      fetchItems(ddbDocClient, setItems),
+    ]).then(() => setFetchesComplete(true));
   }, [])
 
   async function addMetalFamily(metalFamily) {
@@ -224,6 +228,10 @@ function MyTabs() {
     fetchItems(ddbDocClient, setItems);
   }
 
+  if (!fetchesComplete) {
+    return <h1>Loading...</h1>
+  }
+
   return (
   <Tabs>
     <TabList>
@@ -272,6 +280,7 @@ function MyTabs() {
       <Quotes
         items={items}
         materials={materials}
+        inHouses={inHouses}
       />
     </TabPanel>
     <TabPanel>

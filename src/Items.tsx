@@ -2,28 +2,22 @@ import { useState } from "react";
 import ItemSetups from "./ItemSetups"
 import ItemInHouses from "./ItemInHouses"
 
+class ItemModel {
+  constructor(materials, materialName, gramsPerUnit) {
+    const material = materials.find(m => m.name === materialName);
+    this.costPerUnit = gramsPerUnit * material.effectiveCost / 1000;
+    this.unitLength = gramsPerUnit / material.weightPerMm;
+  }
+}
+
 function Items({items, materials, standardSetups, inHouses, addItem}) {
-  if (items.length === 0) {
-    //return "";
-  };
-  if (materials.length === 0) {
-    return "";
-  };
-  if (standardSetups.length === 0) {
-    return "";
-  };
-  if (inHouses.length === 0) {
-    return "";
-  };
   const [itemName, setItemName] = useState("");
   const [materialName, setMaterialName] = useState(materials[0].name);
   const [gramsPerUnit, setGramsPerUnit] = useState(0);
   const [itemSetups, setItemSetups] = useState([{isCustom:false}]);
   const [itemInHouses, setItemInHouses] = useState([{}]);
 
-  const material = materials.find(m => m.name === materialName);
-  const costPerUnit = gramsPerUnit * material.effectiveCost / 1000;
-  const unitLength = gramsPerUnit / material.weightPerMm;
+  const itemModel = new ItemModel(materials, materialName, gramsPerUnit);
 
   const itemRowsFrag = items.map(item => {
     return <tr>
@@ -86,9 +80,9 @@ function Items({items, materials, standardSetups, inHouses, addItem}) {
       onChange={(e) => setGramsPerUnit(parseFloat(e.target.value))}
     />
     &nbsp;
-    <label>Cost per Unit: {costPerUnit.toFixed(4)}</label>
+    <label>Cost per Unit: {itemModel.costPerUnit.toFixed(4)}</label>
     &nbsp;
-    <label>Unit Length (mm): {unitLength.toFixed(4)}</label>
+    <label>Unit Length (mm): {itemModel.unitLength.toFixed(4)}</label>
     <br/>
 
     <ItemSetups
