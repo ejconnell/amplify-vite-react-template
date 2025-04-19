@@ -48,7 +48,7 @@ async function fetchMetalFamilies(ddbDocClient, setMetalFamilies) {
   for await (const page of paginatedScan) {
     families.push(...page.Items);
   }
-  setMetalFamilies(families.map((f) => f.name));
+  setMetalFamilies(families);
 };
 
 async function fetchMetals(ddbDocClient, setMetals) {
@@ -163,26 +163,22 @@ function MyTabs() {
   }, [])
 
   async function addMetalFamily(metalFamily) {
-    log("addMetalFamily() " + metalFamily)
+    log("addMetalFamily() " + metalFamily.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "MetalFamilies",
       Item: {
-         name: metalFamily,
+         name: metalFamily.name,
       },
     }));
-    log(response);
-    fetchMetalFamilies(ddbDocClient, setMetalFamilies)
+    log(JSON.stringify(response));
+    fetchMetalFamilies(ddbDocClient, setMetalFamilies);
   }
 
   async function addMetal(metal) {
     log("addMetal() " + metal.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Metals",
-      Item: {
-         name: metal.name,
-         metalFamily: metal.metalFamily,
-         density: metal.density,
-      },
+      Item: metal,
     }));
     log(response);
     fetchMetals(ddbDocClient, setMetals)
@@ -235,9 +231,9 @@ function MyTabs() {
   return (
   <Tabs>
     <TabList>
+      <Tab>Metals</Tab>
       <Tab>Items</Tab>
       <Tab>Materials</Tab>
-      <Tab>Metals</Tab>
       <Tab>Metal Families</Tab>
       <Tab>Quotes</Tab>
       <Tab>In House</Tab>
@@ -246,6 +242,13 @@ function MyTabs() {
       <Tab>Todos</Tab>
     </TabList>
 
+    <TabPanel>
+      <Metals
+        metals={metals}
+        metalFamilies={metalFamilies}
+        addMetal={addMetal}
+      />
+    </TabPanel>
     <TabPanel>
       <Items
         items={items}
@@ -261,13 +264,6 @@ function MyTabs() {
         metals={metals}
         metalFamilies={metalFamilies}
         addMaterial={addMaterial}
-      />
-    </TabPanel>
-    <TabPanel>
-      <Metals
-        metals={metals}
-        metalFamilies={metalFamilies}
-        addMetal={addMetal}
       />
     </TabPanel>
     <TabPanel>

@@ -4,15 +4,13 @@ const Shapes = [
   {
     name: "Cylindrical",
     hasInnerWidth: false,
-    english: "Cylindrical",
     abbreviation: "",
     widthLabel: "Diameter",
     area: (width) => Math.PI * width * width / 4,
   },
   {
-    name: "HollowCylindrical",
+    name: "Hollow Cylindrical",
     hasInnerWidth: true,
-    english: "Hollow Cylindrical",
     abbreviation: "",
     widthLabel: "Diameter",
     area: (width, innerWidth) => (Math.PI * width * width / 4) - (Math.PI * innerWidth * innerWidth / 4),
@@ -20,15 +18,13 @@ const Shapes = [
   {
     name: "Square",
     hasInnerWidth: false,
-    english: "Square",
     abbreviation: "Sq",
     widthLabel: "Side",
     area: (width) => width * width,
   },
   {
-    name: "HollowSquare",
+    name: "Hollow Square",
     hasInnerWidth: true,
-    english: "Hollow Square",
     abbreviation: "Sq",
     widthLabel: "Side",
     area: (width, innerWidth) => (width * width) - (innerWidth * innerWidth),
@@ -36,56 +32,46 @@ const Shapes = [
   {
     name: "Hexagonal",
     hasInnerWidth: false,
-    english: "Hexagonal",
     abbreviation: "Hex",
     widthLabel: "Side",
-    area: (width) => width * width,
+    area: (width) => Math.sqrt(3) / 2 * width * width,
   },
 ];
 
-function buildAutoName(metal, shapeObj, width, innerWidth) {
-  console.log("SSSSSSSSSSS")
-  let str = `${metal} ${width}`;
-  console.log(str);
-  console.log(JSON.stringify(shapeObj));
+function buildAutoName(metalName, shapeObj, width, innerWidth) {
+  let str = `${metalName} ${width}`;
   if (shapeObj.hasInnerWidth) {
-    console.log("QQQQQQ");
     str += `-${innerWidth}`
   }
-  console.log(str);
   str += "mm"
-  console.log(str);
   if (shapeObj.abbreviation) {
     str += ` ${shapeObj.abbreviation}`
   }
-  console.log(str);
   return str;
 }
 
 function Materials({materials, metals, metalFamilies, addMaterial}) {
   const [isNameManual, setIsNameManual] = useState(false);
   const [name, setName] = useState("");
-  const [metal, setMetal] = useState(metals[0] && metals[0].name);
-  const [shape, setShape] = useState(Shapes[0].name);
+  const [metalName, setMetalName] = useState("");
+  const [shapeName, setShapeName] = useState(Shapes[0].name);
   const [width, setWidth] = useState(0);
   const [innerWidth, setInnerWidth] = useState(0);
   const [rawCost, setRawCost] = useState(0);
   const [markup, setMarkup] = useState(6.5);
 
-  const shapeObj = Shapes.find(s => s.name === shape);
-  const autoName = buildAutoName(metal, shapeObj, width, innerWidth);
-  const density = metals.find(m => m.name === metal).density;
+  const shapeObj = Shapes.find(s => s.name === shapeName) || Shapes[0];
+  const autoName = buildAutoName(metalName, shapeObj, width, innerWidth);
+  const density = metals.find(m => m.name === metalName)?.density;
   const crossSectionArea = shapeObj.area(width, innerWidth);
   const weightPerMm = density * crossSectionArea;
   const effectiveCost = rawCost + (rawCost * markup / 100);
 
-  const log = (msg) => console.log(`[SCENARIO] ${msg}`);
-
-  function onSubmit() {
+  function handleAddMaterial() {
     const material = {
       name: isNameManual ? name : autoName,
-      metal: metal,
-      shape: shape,
+      metalName: metalName,
+      shapeName: shapeName,
       width: width,
       weightPerMm: weightPerMm,
       rawCost: rawCost,
@@ -98,24 +84,32 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     addMaterial(material);
   };
 
-  const tableRows = materials.map(m =>
-    <tr>
+  function handleViewEdit(index) {
+     const material = materials[index];
+     setName(material.name);
+     setIsNameManual(material.isNameManual || false);
+     setMetalName(material.metalName);
+     setShapeName(material.shapeName);
+     setWidth(material.width);
+     setInnerWidth(material.innerWidth || 0);
+     setRawCost(material.rawCost);
+     setMarkup(material.markup);
+  };
+
+  const tableRows = materials.map((m, i) =>
+    <tr key={m.name}>
       <td>{m.name}</td>
-      <td>{m.metal}</td>
-      <td>{Shapes.find(s => s.name === m.shape).english}</td>
+      <td>{m.metalName}</td>
+      <td>{m.shapeName}</td>
       <td>{m.width}</td>
       <td>{m.innerWidth || "-"}</td>
       <td>{m.weightPerMm.toFixed(4)}</td>
       <td>{m.rawCost.toFixed(4)}</td>
       <td>{m.markup}</td>
       <td>{m.effectiveCost.toFixed(4)}</td>
+      <td><button type="button" onClick={() => handleViewEdit(i)}>View/Edit</button></td>
     </tr>
   );
-
-  function onShapeChange(e) {
-    log(`onShapeChange ${e.target.value}`);
-    setShape(e.target.value);
-  }
 
   let nameFragment;
   if (isNameManual) {
@@ -127,7 +121,6 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
      nameFragment = <label>{autoName}</label>;
   }
 
-
   const innerWidthFragment = (
    <>
     <label>Inner {shapeObj.widthLabel} (mm):</label>
@@ -138,41 +131,33 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
    </>);
 
   const metalSelectOptions = metals.map(m => {
-     return <option value={m.name}>{m.name}</option>;
+     return <option value={m.name} key={m.name}>{m.name}</option>;
   });
 
-  const shapeInputs = Shapes.map(s => {
-    return <>
-      <input
-        type="radio"
-        name="shape"
-        value={s.name}
-        defaultChecked={shape === s.name}
-      />
-      <label>{s.english}</label>
-    </>
+  const shapeSelectOptions = Shapes.map(s => {
+     return <option value={s.name} key={s.name}>{s.name}</option>;
   });
-
-  log("top")
-  log(name);
-  log(isNameManual);
 
   return (
    <>
     <h1>Materials</h1>
     <table border="1px solid black">
-      <tr>
-        <th>Name</th>
-        <th>Metal</th>
-        <th>Shape</th>
-        <th>Width (mm)</th>
-        <th>Inner Width (mm)</th>
-        <th>Weight per mm (g/mm)</th>
-        <th>Raw Cost ($/kg)</th>
-        <th>Markup %</th>
-        <th>Effective Cost ($/kg)</th>
-      </tr>
-      {tableRows}
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Metal</th>
+          <th>Shape</th>
+          <th>Width (mm)</th>
+          <th>Inner Width (mm)</th>
+          <th>Weight per mm (g/mm)</th>
+          <th>Raw Cost ($/kg)</th>
+          <th>Markup %</th>
+          <th>Effective Cost ($/kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows}
+      </tbody>
     </table>
 
     <label>Name:</label>
@@ -185,7 +170,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     <label>Use Manual Name:</label>
     <input
       type="checkbox"
-      name="isNameManualCheckbox"
+      name="isNameManual"
       defaultChecked={isNameManual}
       onChange={(e) => setIsNameManual(!isNameManual) }
     />
@@ -193,8 +178,8 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
 
     <label>Metal:</label>
     <select
-      value={metal}
-      onChange={e => setMetal(e.target.value)}
+      value={metalName}
+      onChange={e => setMetalName(e.target.value)}
     >
       {metalSelectOptions}
     </select>
@@ -203,10 +188,14 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     <br/>
 
     <label>Shape:</label>
-    <div onChange={onShapeChange}>
-      {shapeInputs}
-    </div>
+    <select
+      value={shapeName}
+      onChange={e => setShapeName(e.target.value)}
+    >
+      {shapeSelectOptions}
+    </select>
     <br/>
+   
 
     <label>{shapeObj.widthLabel} (mm):</label>
     <input
@@ -234,7 +223,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     <br/>
 
 
-    <button type="submit" onClick={onSubmit}>
+    <button type="submit" onClick={handleAddMaterial}>
       Add Material
     </button>
     <br/>
