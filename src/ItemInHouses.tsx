@@ -4,25 +4,28 @@ export class ItemInHousesModel {
   constructor(inHouses, itemInHouses) {
     this.rows = itemInHouses.map(iih => {
       const costPer1k = inHouses.find(ih => ih.name === iih.name)?.cost;
-      const cost = costPer1k * iih?.quantity / 1000;
+      const costPerUnit = costPer1k * iih?.quantity / 1000;
       return {
         costPer1k: costPer1k,
-        cost: cost,
+        costPerUnit: costPerUnit,
       }
     });
 
-    this.totalCost = this.rows.map(row => row.cost).reduce((acc, cost) => acc+cost, 0);
+    this.totalCostPerUnit = this.rows.map(row => row.costPerUnit).reduce((acc, cost) => acc+cost, 0);
   }
 }
 
 function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
   const iihModel = new ItemInHousesModel(inHouses, itemInHouses);
 
+  console.log(`ItemInHouses() ${JSON.stringify(itemInHouses)}`);
+
   function handleItemInHouseNameChange(value, index) {
     console.log("handleItemInHouseNameChange()");
     const nextItemInHouses = itemInHouses.map((iih, i) => {
       if (i === index) {
         return {
+          key: iih.key,
           name: value,
           quantity: iih.quantity,
         }
@@ -39,6 +42,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     const nextItemInHouses = itemInHouses.map((iih, i) => {
       if (i === index) {
         return {
+          key: iih.key,
           name: iih.name,
           quantity: value,
         }
@@ -53,14 +57,16 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
   function addItemInHouse(index) {
     const nextItemInHouses = [
       ...itemInHouses.slice(0, index+1),
-      {},
+      {
+        key: crypto.randomUUID(),
+        quantity: 0,
+      },
       ...itemInHouses.slice(index+1),
     ];
     setItemInHouses(nextItemInHouses);
   }
 
   function deleteItemInHouse(index) {
-    if (itemInHouses.length === 1) return;
     const nextItemInHouses = [
       ...itemInHouses.slice(0, index),
       ...itemInHouses.slice(index+1),
@@ -70,7 +76,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
 
   function itemInHouseSelectFrag(i) {
     const inHousesSelectOptions = inHouses.map(ih => {
-      return <option value={ih.name}>{ih.name}</option>;
+      return <option value={ih.name} key={ih.name}>{ih.name}</option>;
     });
     return <>
       <select
@@ -85,8 +91,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
   };
 
   const itemInHousesRowsFrag = itemInHouses.map((iih, i) => {
-    return <>
-     <tr>
+    return <tr key={iih.key}>
       <td>
         {itemInHouseSelectFrag(i)}
       </td>
@@ -96,18 +101,25 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
         onChange={(e) => handleItemInHouseQuantityChange(parseFloat(e.target.value), i)}
       /></td>
       <td>{iihModel.rows[i].costPer1k}</td>
-      <td>{iihModel.rows[i].cost}</td>
+      <td>{iihModel.rows[i].costPerUnit.toFixed(2)}</td>
       <td><button type="button" onClick={() => deleteItemInHouse(i)}> - </button></td>
       <td><button type="button" onClick={() => addItemInHouse(i)}> + </button></td>
-     </tr>
-    </>
+    </tr>
   });
-  const itemInHousesTotalRowFrag = <tr>
+  const itemInHousesEmptyRowFrag = <tr key="empty row">
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td><button type="button" onClick={() => addItemInHouse(-1)}> + </button></td>
+  </tr>;
+  const itemInHousesTotalRowFrag = <tr key="total row">
     <td><b>Total</b></td>
     <td></td>
     <td></td>
-    <td><b>{iihModel.totalCost.toFixed(2)}</b></td>
-  </tr>
+    <td><b>{iihModel.totalCostPerUnit.toFixed(2)}</b></td>
+  </tr>;
 
   return (
    <>
@@ -118,13 +130,13 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
           <th>Name</th>
           <th>Quantity</th>
           <th>Cost Per 1k</th>
-          <th>Cost</th>
+          <th>Cost Per Unit</th>
           <th>Delete</th>
           <th>Add</th>
         </tr>
       </thead>
       <tbody>
-        {itemInHousesRowsFrag}
+        {itemInHouses.length === 0 ? itemInHousesEmptyRowFrag : itemInHousesRowsFrag}
         {itemInHousesTotalRowFrag}
       </tbody>
     </table>

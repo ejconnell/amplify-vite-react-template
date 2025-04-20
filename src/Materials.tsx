@@ -44,7 +44,7 @@ export class MaterialModel {
     const shape = Shapes.find(s => s.name === shapeName)
 
     this.autoName = this.buildAutoName(metalName, shape, width, innerWidth);
-    this.density = metal?.density || "-";
+    this.density = metal?.density || 0;
     this.hasInnerWidth = shape?.hasInnerWidth || false;
     this.widthLabel = shape?.widthLabel || "-";
     this.crossSectionArea = shape?.area(width, innerWidth) || 0;
@@ -222,7 +222,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
       {metalSelectOptions}
     </select>
     &nbsp;
-    <label>Density: {materialModel.density} g/mm^3</label>
+    <label>Density: {materialModel.density || "-"} g/mm^3</label>
     <br/>
 
     <label>Shape:</label>

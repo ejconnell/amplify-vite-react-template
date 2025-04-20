@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export class ItemSetupsModel {
   constructor(itemSetups) {
-    this.totalJobCost = itemSetups.map(s => s.cost || 0).reduce((acc, cost) => acc+cost, 0);
+    this.totalCostPerJob = itemSetups.map(s => Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
   }
 }
 
@@ -14,10 +14,11 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
+          key: s.key,
           standardName: value,
-          customName: s.customName || "",
-          isCustom: s.isCustom || false,
-          cost: s.cost,
+          customName: s.customName,
+          isCustomName: s.isCustomName,
+          costPerJob: s.costPerJob,
         }
       } else {
         return {...s};
@@ -32,10 +33,11 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
-          standardName: s.standardName || "",
+          key: s.key,
+          standardName: s.standardName,
           customName: value,
-          isCustom: s.isCustom || false,
-          cost: s.cost,
+          isCustomName: s.isCustomName,
+          costPerJob: s.costPerJob,
         }
       } else {
         return {...s};
@@ -50,10 +52,11 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
+          key: s.key,
           standardName: s.standardName,
           customName: s.customName,
-          isCustom: !s.isCustom,
-          cost: s.cost,
+          isCustomName: !s.isCustomName,
+          costPerJob: s.costPerJob,
         }
       } else {
         return {...s};
@@ -68,10 +71,11 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
+          key: s.key,
           standardName: s.standardName,
           customName: s.customName,
-          isCustom: s.isCustom,
-          cost: parseFloat(value),
+          isCustomName: s.isCustomName,
+          costPerJob: value,
         }
       } else {
         return {...s};
@@ -84,14 +88,19 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
   function addItemSetup(index) {
     const nextItemSetups = [
       ...itemSetups.slice(0, index+1),
-      {},
+      {
+        key: crypto.randomUUID(),
+        standardName: "",
+        customName: "",
+        isCustomName: false,
+        costPerJob: 0,
+      },
       ...itemSetups.slice(index+1),
     ];
     setItemSetups(nextItemSetups);
   }
 
   function deleteItemSetup(index) {
-    if (itemSetups.length === 1) return;
     const nextItemSetups = [
       ...itemSetups.slice(0, index),
       ...itemSetups.slice(index+1),
@@ -101,7 +110,7 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
 
   function standardSetupSelectFrag(i) {
     const standardSetupsSelectOptions = standardSetups.map(ss => {
-      return <option value={ss.name}>{ss.name}</option>;
+      return <option value={ss.name} key={ss.name}>{ss.name}</option>;
     });
     return <>
       <select
@@ -122,47 +131,50 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
       onChange={(e) => handleCustomNameChange(e.target.value, i)}
       style={{width: "150px"}}
     />
-    return <>
-     <tr>
+    return <tr key={is.key}>
       <td>
-        {is.isCustom ? setupCustomNameInputFrag : standardSetupSelectFrag(i)}
+        {is.isCustomName ? setupCustomNameInputFrag : standardSetupSelectFrag(i)}
         <input
           type="checkbox"
           name="isSetupCustomNameCheckbox"
-          checked={is.isCustom}
+          checked={is.isCustomName}
           onChange={() => handleCustomNameCheckboxChange(i)}
         />
-
       </td>
       <td><input
-        name="cost"
-        value={is.cost}
-        onChange={(e) => handleCostChange(parseFloat(e.target.value), i)}
+        name="costPerJob"
+        value={is.costPerJob}
+        onChange={(e) => handleCostChange(e.target.value, i)}
       /></td>
       <td><button type="button" onClick={() => deleteItemSetup(i)}> - </button></td>
       <td><button type="button" onClick={() => addItemSetup(i)}> + </button></td>
-     </tr>
-    </>
+    </tr>
   });
-  const itemSetupsTotalRowFrag = <tr>
+  const itemSetupsEmptyRowFrag = <tr key="empty row">
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td><button type="button" onClick={() => addItemSetup(-1)}> + </button></td>
+  </tr>;
+  const itemSetupsTotalRowFrag = <tr key="total row">
     <td><b>Total</b></td>
-    <td><b>{isModel.totalJobCost.toFixed(2)}</b></td>
+    <td><b>{isModel.totalCostPerJob.toFixed(2)}</b></td>
   </tr>
 
   return (
    <>
-    <h3>Setups:</h3>
+    <h3>Setup:</h3>
     <table border="1px solid black">
       <thead>
         <tr>
           <th>Name (check box for custom)</th>
-          <th>Cost</th>
+          <th>Cost per Job</th>
           <th>Delete</th>
           <th>Add</th>
         </tr>
       </thead>
       <tbody>
-        {itemSetupsRowsFrag}
+        {itemSetups.length === 0 ? itemSetupsEmptyRowFrag : itemSetupsRowsFrag}
         {itemSetupsTotalRowFrag}
       </tbody>
     </table>

@@ -253,6 +253,7 @@ function MyTabs() {
       <Items
         items={items}
         materials={materials}
+        metals={metals}
         standardSetups={standardSetups}
         inHouses={inHouses}
         addItem={addItem}

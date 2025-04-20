@@ -1,34 +1,54 @@
 import { useState } from "react";
 import ItemSetups from "./ItemSetups"
 import ItemInHouses from "./ItemInHouses"
+import ItemWastage from "./ItemWastage"
+import { MaterialModel } from "./Materials"
+import { ItemSetupsModel } from "./ItemSetups"
+import { ItemInHousesModel } from "./ItemInHouses"
+import { ItemWastageModel, ItemWastageStartingRange } from "./ItemWastage"
 
 class ItemModel {
-  constructor(materials, materialName, gramsPerUnit) {
+  constructor(materials, metals, inHouses, materialName, gramsPerUnit, itemSetups, itemInHouses) {
+//debugger
     const material = materials.find(m => m.name === materialName);
-    this.costPerUnit = gramsPerUnit * material.effectiveCost / 1000;
-    this.unitLength = gramsPerUnit / material.weightPerMm;
+    if (!material) return;
+    const materialModel = new MaterialModel(metals, material.metalName, material.shapeName, material.width, material.innerWidth, material.rawCost, material.markup);
+    const itemSetupsModel = new ItemSetupsModel(itemSetups);
+    const itemInHousesModel = new ItemInHousesModel(inHouses, itemInHouses);
+    this.materialCostPerUnit = gramsPerUnit * materialModel.effectiveCost / 1000;
+    this.unitLength = gramsPerUnit / materialModel.weightPerMm;
+    this.setupCostPerJob = itemSetupsModel.totalCostPerJob;
+    this.inHouseCostPerUnit = itemInHousesModel.totalCostPerUnit;
   }
 }
 
-function Items({items, materials, standardSetups, inHouses, addItem}) {
+function Items({items, materials, metals, standardSetups, inHouses, addItem}) {
+  const [exampleQuantity, setExampleQuantity] = useState(300);
   const [itemName, setItemName] = useState("");
-  const [materialName, setMaterialName] = useState(materials[0].name);
+  const [materialName, setMaterialName] = useState("");
   const [gramsPerUnit, setGramsPerUnit] = useState(0);
-  const [itemSetups, setItemSetups] = useState([{isCustom:false}]);
-  const [itemInHouses, setItemInHouses] = useState([{}]);
+  const [itemSetups, setItemSetups] = useState([]);
+  const [itemInHouses, setItemInHouses] = useState([]);
+  const [itemWastage, setItemWastage] = useState([ItemWastageStartingRange()]);
 
-  const itemModel = new ItemModel(materials, materialName, gramsPerUnit);
+  const itemModel = new ItemModel(materials, metals, inHouses, materialName, Number(gramsPerUnit), itemSetups, itemInHouses);
 
-  const itemRowsFrag = items.map(item => {
-    return <tr>
+  const itemsModels = items.map(item => {
+    return new ItemModel(materials, metals, inHouses, item.materialName, item.gramsPerUnit, item.itemSetups, item.itemInHouses);
+  });
+
+  const itemRowsFrag = items.map((item, i) => {
+    return <tr key={item.name}>
       <td>{item.name}</td>
       <td>{item.materialName}</td>
-      <td>{JSON.stringify(item.itemSetups, (k, v) => v === undefined ? "AAAA" : v)}</td>
-      <td>{JSON.stringify(item.itemInHouses, (k, v) => v === undefined ? "AAAA" : v)}</td>
+      <td>{itemsModels[i].materialCostPerUnit.toFixed(2)}</td>
+      <td>{itemsModels[i].inHouseCostPerUnit.toFixed(2)}</td>
+      <td>{itemsModels[i].setupCostPerJob.toFixed(2)}</td>
+      <td></td>
     </tr>
   });
   const materialSelectOptions = materials.map(m => {
-     return <option value={m.name}>{m.name}</option>;
+     return <option value={m.name} key={m.name}>{m.name}</option>;
   });
 
   function handleSaveItem() {
@@ -52,6 +72,11 @@ function Items({items, materials, standardSetups, inHouses, addItem}) {
       <thead>
         <tr>
           <th>Name</th>
+          <th>Metal</th>
+          <th>Material per Unit</th>
+          <th>In House per Unit</th>
+          <th>Setup per Job</th>
+          <th>View/Edit</th>
         </tr>
       </thead>
       <tbody>
@@ -71,18 +96,19 @@ function Items({items, materials, standardSetups, inHouses, addItem}) {
       value={materialName}
       onChange={e => setMaterialName(e.target.value)}
     >
+      <option value="" key="blank"></option>;
       {materialSelectOptions}
     </select>
     &nbsp;
     <label>Grams per Unit:</label>
     <input
       value={gramsPerUnit}
-      onChange={(e) => setGramsPerUnit(parseFloat(e.target.value))}
+      onChange={(e) => setGramsPerUnit(e.target.value)}
     />
     &nbsp;
-    <label>Cost per Unit: {itemModel.costPerUnit.toFixed(4)}</label>
+    <label>Cost per Unit: {itemModel.materialCostPerUnit?.toFixed(4)}</label>
     &nbsp;
-    <label>Unit Length (mm): {itemModel.unitLength.toFixed(4)}</label>
+    <label>Unit Length (mm): {itemModel.unitLength?.toFixed(4)}</label>
     <br/>
 
     <ItemSetups
@@ -97,6 +123,14 @@ function Items({items, materials, standardSetups, inHouses, addItem}) {
       setItemInHouses={setItemInHouses}
     />
 
+    <ItemWastage
+      itemWastage={itemWastage}
+      exampleQuantity={exampleQuantity}
+      setItemWastage={setItemWastage}
+    />
+
+    <br/>
+    <br/>
     <button type="submit" onClick={handleSaveItem}>
       Add Item
     </button>
