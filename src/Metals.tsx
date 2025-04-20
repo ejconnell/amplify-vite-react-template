@@ -21,7 +21,7 @@ function Metals({metals, metalFamilies, addMetal}) {
     addMetal({
       name: name,
       metalFamilyName: metalFamilyName,
-      density: parseFloat(density),
+      density: Number(density),
     })
   };
 
