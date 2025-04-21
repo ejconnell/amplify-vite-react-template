@@ -2,10 +2,12 @@ import { useState } from "react";
 import ItemSetups from "./ItemSetups"
 import ItemInHouses from "./ItemInHouses"
 import ItemWastage from "./ItemWastage"
+import ItemOverhead from "./ItemOverhead"
 import { MaterialModel } from "./Materials"
 import { ItemSetupsModel } from "./ItemSetups"
 import { ItemInHousesModel } from "./ItemInHouses"
 import { ItemWastageModel, ItemWastageStartingRange } from "./ItemWastage"
+import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
 
 class ItemModel {
   constructor(materials, metals, inHouses, materialName, gramsPerUnit, itemSetups, itemInHouses) {
@@ -29,7 +31,8 @@ function Items({items, materials, metals, standardSetups, inHouses, addItem}) {
   const [gramsPerUnit, setGramsPerUnit] = useState(0);
   const [itemSetups, setItemSetups] = useState([]);
   const [itemInHouses, setItemInHouses] = useState([]);
-  const [itemWastage, setItemWastage] = useState([ItemWastageStartingRange()]);
+  const [itemWastageRanges, setItemWastageRanges] = useState([ItemWastageStartingRange()]);
+  const [itemOverheadRanges, setItemOverheadRanges] = useState([ItemOverheadStartingRange()]);
 
   const itemModel = new ItemModel(materials, metals, inHouses, materialName, Number(gramsPerUnit), itemSetups, itemInHouses);
 
@@ -124,9 +127,15 @@ function Items({items, materials, metals, standardSetups, inHouses, addItem}) {
     />
 
     <ItemWastage
-      itemWastage={itemWastage}
+      itemWastageRanges={itemWastageRanges}
       exampleQuantity={exampleQuantity}
-      setItemWastage={setItemWastage}
+      setItemWastageRanges={setItemWastageRanges}
+    />
+
+    <ItemOverhead
+      itemOverheadRanges={itemOverheadRanges}
+      exampleQuantity={exampleQuantity}
+      setItemOverheadRanges={setItemOverheadRanges}
     />
 
     <br/>

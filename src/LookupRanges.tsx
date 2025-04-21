@@ -1,0 +1,151 @@
+import { useState } from "react";
+
+export class LookupRangesModel {
+  constructor(ranges) {
+    this.ranges = ranges;
+  }
+}
+
+export function LookupRangesStartingRange() {
+  return {
+    key: crypto.randomUUID(),
+    starting: 0,
+    ending: Infinity,
+    value: 0,
+  };
+}
+
+function LookupRanges({ranges, exampleQuantity, setRanges, title, valueLabel}) {
+  const [splitRangeAt, setSplitRangeAt] = useState("");
+  const [rangePairSelectIndex, setRangePairSelectIndex] = useState(-1);
+
+  const iwModel = new LookupRangesModel(ranges);
+
+  function handleValueChange(value, index) {
+    const nextLookupRanges = ranges.map((iw, i) => {
+      if (i === index) {
+        return {
+          key: iw.key,
+          starting: iw.starting,
+          ending: iw.ending,
+          value: value,
+        }
+      } else {
+        return {...iw};
+      };
+    });
+    setRanges(nextLookupRanges);
+  }
+
+  function handleSplitRange() {
+    const startingNumber = Number(splitRangeAt);
+    if (!Number.isInteger(startingNumber)) {
+      alert("'Spllit range at' value must be integer");
+      return;
+    }
+    const nextLookupRanges = [];
+    for (const range of ranges) {
+      if ((startingNumber > range.starting) && (startingNumber < range.ending)) {
+        nextLookupRanges.push({
+          key: crypto.randomUUID(),
+          starting: startingNumber,
+          ending: range.ending,
+          value: range.value,
+        });
+        nextLookupRanges.push({
+          key: range.key,
+          starting: range.starting,
+          ending: startingNumber - 1,
+          value: range.value,
+        });
+      } else {
+        nextLookupRanges.push(range);
+      }
+    }
+    setRanges(nextLookupRanges);
+  };
+
+  function handleMergeRanges(isKeepUpper) {
+    if (rangePairSelectIndex === -1) {
+      return;  // No range selected
+    }
+    const nextLookupRanges = [];
+    ranges.forEach((range, i) => {
+      if (rangePairSelectIndex === i) {
+        nextLookupRanges.push({
+          key: range.key,
+          starting: ranges[i+1].starting,
+          ending: range.ending,
+          value: isKeepUpper ? range.value : ranges[i+1].value,
+        });
+      } else if (rangePairSelectIndex+1 === i) {
+        // Don't pass lower range pair on to next round
+      } else {
+        nextLookupRanges.push(range);
+      }
+    });
+    setRanges(nextLookupRanges);
+    setRangePairSelectIndex(Math.min(rangePairSelectIndex, nextLookupRanges.length-2));
+  };
+
+  const rangePairSelectOptions = []
+  for (let i = 0; i < ranges.length - 1; i++) {
+    const hi = ranges[i];
+    const lo = ranges[i+1];
+    rangePairSelectOptions.push(
+      <option value={i} key={i}>
+         ({hi.starting}-{hi.ending}) &amp; ({lo.starting}-{lo.ending}) &rarr; ({lo.starting}-{hi.ending})
+      </option>
+    );
+  }
+  const rangePairSelectFrag =
+    <select
+      value={rangePairSelectIndex}
+      onChange={e => setRangePairSelectIndex(Number(e.target.value))}
+    >
+      <option value={-1} key="blank row"></option>
+      {rangePairSelectOptions}
+    </select>;
+
+  const rangesRowsFrag = ranges.map((iw, i) => {
+    return <tr key={iw.key}>
+      <td>{iw.starting}</td>
+      <td>{iw.ending}</td>
+      <td><input
+        name="value"
+        value={iw.value}
+        onChange={(e) => handleValueChange(e.target.value, i)}
+      /></td>
+    </tr>
+  });
+
+  return (
+   <>
+    <h3>{title}:</h3>
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>Range Start</th>
+          <th>Range End</th>
+          <th>{valueLabel}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rangesRowsFrag}
+      </tbody>
+    </table>
+
+    <input
+      value={splitRangeAt}
+      onChange={e => setSplitRangeAt(e.target.value)}
+    />
+    <button type="button" onClick={handleSplitRange}>Split Range At</button>
+    <br/>
+    {rangePairSelectFrag}
+    <button type="button" onClick={e => handleMergeRanges(true)}>Merge Ranges (keep upper)</button>
+    <button type="button" onClick={e => handleMergeRanges(false)}>Merge Ranges (keep lower)</button>
+   </>
+  );
+}
+
+export default LookupRanges;
