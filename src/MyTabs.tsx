@@ -203,9 +203,9 @@ function MyTabs() {
   return (
   <Tabs>
     <TabList>
-      <Tab>Metals</Tab>
       <Tab>Items</Tab>
       <Tab>Materials</Tab>
+      <Tab>Metals</Tab>
       <Tab>Metal Families</Tab>
       <Tab>Quotes</Tab>
       <Tab>In Houses</Tab>
@@ -215,19 +215,13 @@ function MyTabs() {
     </TabList>
 
     <TabPanel>
-      <Metals
-        metals={metals}
-        metalFamilies={metalFamilies}
-        saveMetal={saveMetal}
-      />
-    </TabPanel>
-    <TabPanel>
       <Items
         items={items}
         materials={materials}
         metals={metals}
         standardSetups={standardSetups}
         inHouses={inHouses}
+        outsourcings={outsourcings}
         saveItem={saveItem}
       />
     </TabPanel>
@@ -237,6 +231,13 @@ function MyTabs() {
         metals={metals}
         metalFamilies={metalFamilies}
         saveMaterial={saveMaterial}
+      />
+    </TabPanel>
+    <TabPanel>
+      <Metals
+        metals={metals}
+        metalFamilies={metalFamilies}
+        saveMetal={saveMetal}
       />
     </TabPanel>
     <TabPanel>

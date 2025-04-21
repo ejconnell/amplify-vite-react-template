@@ -3,14 +3,16 @@ import ItemSetups from "./ItemSetups"
 import ItemInHouses from "./ItemInHouses"
 import ItemWastage from "./ItemWastage"
 import ItemOverhead from "./ItemOverhead"
+import ItemOutsourcings from "./ItemOutsourcings"
 import { MaterialModel } from "./Materials"
 import { ItemSetupsModel } from "./ItemSetups"
 import { ItemInHousesModel } from "./ItemInHouses"
 import { ItemWastageModel, ItemWastageStartingRange } from "./ItemWastage"
 import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
+import { ItemOutsourcingsModel } from "./ItemOutsourcings"
 
 class ItemModel {
-  constructor(materials, metals, inHouses, materialName, gramsPerUnit, itemSetups, itemInHouses) {
+  constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings}) {
 //debugger
     const material = materials.find(m => m.name === materialName);
     if (!material) return;
@@ -24,21 +26,66 @@ class ItemModel {
   }
 }
 
-function Items({items, materials, metals, standardSetups, inHouses, saveItem}) {
+function Items({items, materials, metals, standardSetups, inHouses, outsourcings, saveItem}) {
   const [exampleQuantity, setExampleQuantity] = useState(300);
-  const [itemName, setItemName] = useState("");
+  const [name, setName] = useState("");
   const [materialName, setMaterialName] = useState("");
   const [gramsPerUnit, setGramsPerUnit] = useState(0);
   const [itemSetups, setItemSetups] = useState([]);
   const [itemInHouses, setItemInHouses] = useState([]);
   const [itemWastageRanges, setItemWastageRanges] = useState([ItemWastageStartingRange()]);
   const [itemOverheadRanges, setItemOverheadRanges] = useState([ItemOverheadStartingRange()]);
+  const [itemOutsourcings, setItemOutsourcings] = useState([]);
 
-  const itemModel = new ItemModel(materials, metals, inHouses, materialName, Number(gramsPerUnit), itemSetups, itemInHouses);
+  const lookupTables = {
+    materials: materials,
+    metals: metals,
+    inHouses: inHouses,
+    outsourcings: outsourcings,
+  };
+
+  const itemModel = new ItemModel({
+    ...lookupTables,
+    materialName: materialName,
+    gramsPerUnit: Number(gramsPerUnit),
+    itemSetups: itemSetups,
+    itemInHouses: itemInHouses,
+    itemWastageRanges: itemWastageRanges,
+    itemOverheadRanges: itemOverheadRanges,
+    itemOutsourcings: itemOutsourcings,
+  });
 
   const itemsModels = items.map(item => {
-    return new ItemModel(materials, metals, inHouses, item.materialName, item.gramsPerUnit, item.itemSetups, item.itemInHouses);
+    return new ItemModel({...lookupTables, ...item});
   });
+
+  function handleSaveItem() {
+    console.log("handleSaveItem()");
+    const item = {
+      name: name,
+      materialName: materialName,
+      gramsPerUnit: gramsPerUnit,
+      itemSetups: itemSetups,
+      itemInHouses: itemInHouses,
+      itemWastageRanges: itemWastageRanges,
+      itemOverheadRanges: itemOverheadRanges,
+      itemOutsourcings: itemOutsourcings,
+    };
+    console.log(JSON.stringify(item, (k, v) => v === undefined ? "AAAA" : v));
+    saveItem(item);
+  }
+
+  function handleLoadItem(index) {
+    const item = items[index];
+    setName(item.name);
+    setMaterialName(item.materialName);
+    setGramsPerUnit(item.gramsPerUnit);
+    setItemSetups(item.itemSetups || []);
+    setItemInHouses(item.itemInHouses || []);
+    setItemWastageRanges(item.itemWastageRanges || [ItemWastageStartingRange()]);
+    setItemOverheadRanges(item.itemOverheadRanges || [ItemOverheadStartingRange()]);
+    setItemOutsourcings(item.itemOutsourcings || []);
+  }
 
   const itemRowsFrag = items.map((item, i) => {
     return <tr key={item.name}>
@@ -47,25 +94,14 @@ function Items({items, materials, metals, standardSetups, inHouses, saveItem}) {
       <td>{itemsModels[i].materialCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].inHouseCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].setupCostPerJob.toFixed(2)}</td>
-      <td></td>
+      <td>
+        <button type="button" onClick={() => handleLoadItem(i)}>Load</button>
+      </td>
     </tr>
   });
   const materialSelectOptions = materials.map(m => {
      return <option value={m.name} key={m.name}>{m.name}</option>;
   });
-
-  function handleSaveItem() {
-    console.log("handleSaveItem()");
-    const item = {
-      name: itemName,
-      materialName: materialName,
-      gramsPerUnit: gramsPerUnit,
-      itemSetups: itemSetups,
-      itemInHouses: itemInHouses,
-    };
-    console.log(JSON.stringify(item, (k, v) => v === undefined ? "AAAA" : v));
-    saveItem(item);
-  }
 
   return (
    <>
@@ -79,7 +115,7 @@ function Items({items, materials, metals, standardSetups, inHouses, saveItem}) {
           <th>Material per Unit</th>
           <th>In House per Unit</th>
           <th>Setup per Job</th>
-          <th>View/Edit</th>
+          <th>Load</th>
         </tr>
       </thead>
       <tbody>
@@ -87,10 +123,10 @@ function Items({items, materials, metals, standardSetups, inHouses, saveItem}) {
       </tbody>
     </table>
 
-    <label>Item Name:</label>
+    <label>Name:</label>
     <input
-      value={itemName}
-      onChange={(e) => setItemName(e.target.value)}
+      value={name}
+      onChange={(e) => setName(e.target.value)}
     />
     <br/>
 
@@ -113,6 +149,13 @@ function Items({items, materials, metals, standardSetups, inHouses, saveItem}) {
     &nbsp;
     <label>Unit Length (mm): {itemModel.unitLength?.toFixed(4)}</label>
     <br/>
+
+    <ItemOutsourcings
+      outsourcings={outsourcings}
+      itemOutsourcings={itemOutsourcings}
+      exampleQuantity={exampleQuantity}
+      setItemOutsourcings={setItemOutsourcings}
+    />
 
     <ItemSetups
       standardSetups={standardSetups}

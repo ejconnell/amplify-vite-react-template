@@ -10,7 +10,7 @@ export function LookupRangesStartingRange() {
   return {
     key: crypto.randomUUID(),
     starting: 0,
-    ending: Infinity,
+    ending: 99999,
     value: 0,
   };
 }

@@ -112,16 +112,16 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
     const standardSetupsSelectOptions = standardSetups.map(ss => {
       return <option value={ss.name} key={ss.name}>{ss.name}</option>;
     });
-    return <>
+    return (
       <select
         value={itemSetups[i].standardName}
         onChange={e => handleStandardNameChange(e.target.value, i)}
         style={{width: "157px"}}
       >
-        <option value=""></option>
+        <option value="" key="blank option"></option>
         {standardSetupsSelectOptions}
       </select>
-    </>;
+    );
   };
 
   const itemSetupsRowsFrag = itemSetups.map((is, i) => {

@@ -1,11 +1,26 @@
 import { useState } from "react";
 
-class OutsourcingModel {
-  constructor({isPricedByUnit, variableCost, minCost}) {
+export class OutsourcingModel {
+  constructor({isPricedByUnit, variableCost, minCostPerJob, gramsPerUnit, numUnits}) {
     //this.isPricedByUnit = isPricedByUnit;
     //this.variableCost = variableCost;
-    //this.minCost = minCost;
-    this.pricingCutover = minCost / variableCost;
+    //this.minCostPerJob = minCostPerJob;
+    
+    if (isPricedByUnit) {
+      this.minCostPerUnit = variableCost
+      this.costCutoverUnits = minCostPerJob / this.minCostPerUnit;
+    } else {
+      this.minCostPerKilogram = variableCost;
+      this.minCostPerUnit = this.minCostPerKilogram / 1000 * gramsPerUnit
+      this.costCutoverUnits = minCostPerJob / this.minCostPerUnit;
+    }
+    if (numUnits > this.costCutoverUnits) {
+      this.costPerUnit = this.minCostPerUnit;
+      this.costPerJob = this.costPerUnit * numUnits;
+    } else {
+      this.costPerJob = minCostPerJob;
+      this.costPerUnit = minCostPerJob / numUnits;
+    }
   }
 }
 
@@ -13,14 +28,18 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
   const [name, setName] = useState("");
   const [isPricedByUnit, setIsPricedByUnit] = useState(false);
   const [variableCost, setVariableCost] = useState(0);
-  const [minCost, setMinCost] = useState(0);
+  const [minCostPerJob, setMinCostPerJob] = useState(0);
+  const [exampleGramsPerUnit, setExampleGramsPerUnit] = useState(0);
+  const [exampleNumUnits, setExampleNumUnits] = useState(0);
 
   const variableCostLabel = isPricedByUnit ? "unit" : "kilogram";
 
   const outsourcingModel = new OutsourcingModel({
     isPricedByUnit: isPricedByUnit,
     variableCost: variableCost,
-    minCost: minCost,
+    minCostPerJob: minCostPerJob,
+    gramsPerUnit: exampleGramsPerUnit,
+    numUnits: exampleNumUnits,
   });
 
   function handleSaveOutsourcing() {
@@ -32,7 +51,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       alert(`Need a numeric cost per ${variableCostLabel}`);
       return;
     }
-    if (isNaN(minCost)) {
+    if (isNaN(minCostPerJob)) {
       alert("Need a numeric minimum cost");
       return;
     }
@@ -40,7 +59,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       name: name,
       isPricedByUnit: isPricedByUnit,
       variableCost: Number(variableCost),
-      minCost: Number(minCost),
+      minCostPerJob: Number(minCostPerJob),
     };
     saveOutsourcing(outsourcing);
   };
@@ -50,22 +69,28 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
      setName(os.name);
      setIsPricedByUnit(os.isPricedByUnit);
      setVariableCost(os.variableCost);
-     setMinCost(os.minCost);
+     setMinCostPerJob(os.minCostPerJob);
   }
 
   const outsourcingsRowsFrag = outsourcings.map((os, i) => {
-    const osModel = new OutsourcingModel(os);
-    const formattedCutover = isNaN(osModel.pricingCutover) ? "-" : osModel.pricingCutover.toFixed(4);
+    const osModel = new OutsourcingModel({
+       ...os,
+       gramsPerUnit: exampleGramsPerUnit,
+       numUnits: exampleNumUnits,
+    });
+    //const formattedCutover = isNaN(osModel.pricingCutover) ? "-" : osModel.pricingCutover.toFixed(4);
     return <tr key={os.name}>
       <td>{os.name}</td>
+      <td>{os.minCostPerJob}</td>
       <td>{os.isPricedByUnit ? "Unit" : "Kilogram"}</td>
-      <td>{os.minCost}</td>
-      <td>{os.isPricedByUnit ? "-" : os.variableCost}</td>
-      <td>{os.isPricedByUnit ? "-" : formattedCutover }</td>
-      <td>{os.isPricedByUnit ? os.variableCost : "-"}</td>
-      <td>{os.isPricedByUnit ? formattedCutover || "-": "-"}</td>
+      <td>{os.variableCost}</td>
+      <td>{osModel.minCostPerKilogram}</td>
+      <td>{osModel.minCostPerUnit.toFixed(4)}</td>
+      <td>{osModel.costCutoverUnits.toFixed(1)}</td>
+      <td>{osModel.costPerUnit.toFixed(4)}</td>
+      <td>{osModel.costPerJob.toFixed(0)}</td>
       <td>
-        <button type="button" onClick={() => handleLoadOutsourcing(i)}>View/Edit</button>
+        <button type="button" onClick={() => handleLoadOutsourcing(i)}>Load</button>
       </td>
     </tr>
   });
@@ -73,17 +98,32 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
   return (
    <>
     <h1>Outsourcings page</h1>
+
+    <label>Example grams per unit:</label>
+    <input
+      value={exampleGramsPerUnit}
+      onChange={(e) => setExampleGramsPerUnit(e.target.value)}
+    />
+
+    <label>Example num units:</label>
+    <input
+      value={exampleNumUnits}
+      onChange={(e) => setExampleNumUnits(e.target.value)}
+    />
+
     <table border="1px solid black">
       <thead>
         <tr>
           <th>Name</th>
+          <th>Minimum cost per job</th>
           <th>Priced by</th>
-          <th>Minimum cost</th>
-          <th>Cost per kilogram</th>
-          <th>Pricing cutover kilograms</th>
+          <th>Variable cost</th>
+          <th>Minimum Cost per kilogram</th>
+          <th>Minimum Cost per unit</th>
+          <th>Cost cutover units</th>
           <th>Cost per unit</th>
-          <th>Pricing cutover units</th>
-          <th>View/Edit</th>
+          <th>Cost per job</th>
+          <th>Load</th>
         </tr>
       </thead>
       <tbody>
@@ -98,10 +138,10 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     />
     <br/>
 
-    <label>Minimum Cost:</label>
+    <label>Minimum Cost per job:</label>
     <input
-      value={minCost}
-      onChange={(e) => setMinCost(e.target.value)}
+      value={minCostPerJob}
+      onChange={(e) => setMinCostPerJob(e.target.value)}
     />
     <br/>
 
@@ -113,13 +153,22 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       onChange={(e) => setIsPricedByUnit(!isPricedByUnit) }
     />
 
-    <label>Cost per {variableCostLabel}:</label>
+    <label>Minimum cost per {variableCostLabel}:</label>
     <input
       value={variableCost}
       onChange={(e) => setVariableCost(e.target.value)}
     />
 
-    <label>Pricing cutover {variableCostLabel}s: {outsourcingModel.pricingCutover.toFixed(4)} </label>
+    <br/>
+    <label>Minimum cost per kilogram: {outsourcingModel.minCostPerKilogram?.toFixed(0)} </label>
+    <br/>
+    <label>Minimum cost per unit: {outsourcingModel.minCostPerUnit.toFixed(4)} </label>
+    <br/>
+    <label>Cost cutover units: {outsourcingModel.costCutoverUnits.toFixed(1)} </label>
+    <br/>
+    <label>Cost per unit: {outsourcingModel.costPerUnit.toFixed(4)} </label>
+    <br/>
+    <label>Cost per job: {outsourcingModel.costPerJob.toFixed(0)} </label>
     <br/>
 
     <button type="submit" onClick={handleSaveOutsourcing}>
