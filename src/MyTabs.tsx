@@ -6,8 +6,8 @@ import Materials from './Materials.tsx';
 import MetalFamilies from './MetalFamilies.tsx';
 import Metals from './Metals.tsx';
 import Quotes from './Quotes.tsx';
-import InHouse from './InHouse.tsx';
-import Outsourced from './Outsourced.tsx';
+import InHouses from './InHouses.tsx';
+import Outsourcings from './Outsourcings.tsx';
 import StandardSetups from './StandardSetups.tsx';
 import Todos from './Todos.js';
 
@@ -37,67 +37,27 @@ import {
 import { useAuth } from "react-oidc-context";
 
 async function fetchMetalFamilies(ddbDocClient, setMetalFamilies) {
-  const paginatedScan = paginateScan(
-    { client: ddbDocClient },
-    {
-      TableName: "MetalFamilies",
-      ConsistentRead: true,
-    },
-  );
-  const families = [];
-  for await (const page of paginatedScan) {
-    families.push(...page.Items);
-  }
-  setMetalFamilies(families);
+  await fetchTable(ddbDocClient, setMetalFamilies, "MetalFamilies")
 };
 
 async function fetchMetals(ddbDocClient, setMetals) {
-  const paginatedScan = paginateScan(
-    { client: ddbDocClient },
-    {
-      TableName: "Metals",
-      ConsistentRead: true,
-    },
-  );
-  const metals = [];
-  for await (const page of paginatedScan) {
-    metals.push(...page.Items);
-  }
-  setMetals(metals);
+  await fetchTable(ddbDocClient, setMetals, "Metals")
 };
 
 async function fetchMaterials(ddbDocClient, setMaterials) {
-  const paginatedScan = paginateScan(
-    { client: ddbDocClient },
-    {
-      TableName: "Materials",
-      ConsistentRead: true,
-    },
-  );
-  const materials = [];
-  for await (const page of paginatedScan) {
-    materials.push(...page.Items);
-  }
-  setMaterials(materials);
+  await fetchTable(ddbDocClient, setMaterials, "Materials")
 };
 
 async function fetchStandardSetups(ddbDocClient, setStandardSetups) {
-  const paginatedScan = paginateScan(
-    { client: ddbDocClient },
-    {
-      TableName: "StandardSetups",
-      ConsistentRead: true,
-    },
-  );
-  const standardSetups = [];
-  for await (const page of paginatedScan) {
-    standardSetups.push(...page.Items);
-  }
-  setStandardSetups(standardSetups);
+  await fetchTable(ddbDocClient, setStandardSetups, "StandardSetups")
 };
 
 async function fetchInHouses(ddbDocClient, setInHouses) {
   await fetchTable(ddbDocClient, setInHouses, "InHouses")
+};
+
+async function fetchOutsourcings(ddbDocClient, setOutsourcings) {
+  await fetchTable(ddbDocClient, setOutsourcings, "Outsourcings")
 };
 
 async function fetchItems(ddbDocClient, setItems) {
@@ -140,6 +100,7 @@ function MyTabs() {
   const [metalFamilies, setMetalFamilies] = useState([]);
   const [standardSetups, setStandardSetups] = useState([]);
   const [inHouses, setInHouses] = useState([]);
+  const [outsourcings, setOutsourcings] = useState([]);
   const [items, setItems] = useState([]);
 
   const auth = useAuth();
@@ -158,6 +119,7 @@ function MyTabs() {
       fetchMaterials(ddbDocClient, setMaterials),
       fetchStandardSetups(ddbDocClient, setStandardSetups),
       fetchInHouses(ddbDocClient, setInHouses),
+      fetchOutsourcings(ddbDocClient, setOutsourcings),
       fetchItems(ddbDocClient, setItems),
     ]).then(() => setFetchesComplete(true));
   }, [])
@@ -214,6 +176,16 @@ function MyTabs() {
     fetchInHouses(ddbDocClient, setInHouses);
   }
 
+  async function addOutsourcing(outsourcing) {
+    log("addOutsourcing() " + outsourcing.name)
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "Outsourcings",
+      Item: outsourcing,
+    }));
+    log(response);
+    fetchOutsourcings(ddbDocClient, setOutsourcings);
+  }
+
   async function addItem(item) {
     log("addItem() " + item.name)
     const response = await ddbDocClient.send(new PutCommand({
@@ -236,8 +208,8 @@ function MyTabs() {
       <Tab>Materials</Tab>
       <Tab>Metal Families</Tab>
       <Tab>Quotes</Tab>
-      <Tab>In House</Tab>
-      <Tab>Outsourced</Tab>
+      <Tab>In Houses</Tab>
+      <Tab>Outsourcings</Tab>
       <Tab>Standard Setups</Tab>
       <Tab>Todos</Tab>
     </TabList>
@@ -281,13 +253,16 @@ function MyTabs() {
       />
     </TabPanel>
     <TabPanel>
-      <InHouse
+      <InHouses
         inHouses={inHouses}
         addInHouse={addInHouse}
       />
     </TabPanel>
     <TabPanel>
-      <Outsourced />
+      <Outsourcings
+        outsourcings={outsourcings}
+        addOutsourcing={addOutsourcing}
+      />
     </TabPanel>
     <TabPanel>
       <StandardSetups

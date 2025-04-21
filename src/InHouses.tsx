@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-function InHouse({inHouses, addInHouse}) {
+function InHouses({inHouses, addInHouse}) {
   const [name, setName] = useState("");
   const [cost, setCost] = useState(0);
 
   const tableRows = inHouses.map(m =>
-    <tr>
+    <tr key={m.name}>
       <td>{m.name}</td>
       <td>{m.cost}</td>
     </tr>
@@ -20,11 +20,13 @@ function InHouse({inHouses, addInHouse}) {
   }
 
   return (<>
-    <h1>In House Costs</h1>
+    <h1>In Houses</h1>
     <table border="1px solid black">
       <thead>
         <th>Name</th>
         <th>Cost</th>
+        <th>View/Edit TODO</th>
+        <th>Validation TODO</th>
       </thead>
       <tbody>
         {tableRows}
@@ -43,4 +45,4 @@ function InHouse({inHouses, addInHouse}) {
   </>);
 }
 
-export default InHouse;
+export default InHouses;
