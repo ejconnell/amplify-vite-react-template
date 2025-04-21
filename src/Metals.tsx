@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-function Metals({metals, metalFamilies, addMetal}) {
+function Metals({metals, metalFamilies, saveMetal}) {
   const [name, setName] = useState("");
   const [metalFamilyName, setMetalFamilyName] = useState("");
   const [density, setDensity] = useState(0);
 
-  function handleAddMetal() {
+  function handleSaveMetal() {
     if (!name) {
       alert("Need a Name");
       return;
@@ -18,7 +18,7 @@ function Metals({metals, metalFamilies, addMetal}) {
       alert("Need a numeric density");
       return;
     }
-    addMetal({
+    saveMetal({
       name: name,
       metalFamilyName: metalFamilyName,
       density: Number(density),
@@ -84,8 +84,8 @@ function Metals({metals, metalFamilies, addMetal}) {
         onChange={e => setDensity(e.target.value)}
       />
 
-      <button type="submit" onClick={handleAddMetal}>
-        Add Metal
+      <button type="submit" onClick={handleSaveMetal}>
+        Save Metal
       </button>
      </div>
    </>

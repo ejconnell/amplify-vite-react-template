@@ -1,16 +1,16 @@
 import { useState } from "react";
 
-function StandardSetups({standardSetups, addStandardSetup}) {
+function StandardSetups({standardSetups, saveStandardSetup}) {
   const [standardSetupName, setStandardSetupName] = useState("");
 
-  function onSubmit() {
-    addStandardSetup({
+  function handleSaveStandardSetup() {
+    saveStandardSetup({
       name: standardSetupName,
     });
   }
 
   const tableRows = standardSetups.map(ss =>
-    <tr>
+    <tr key={ss.name}>
       <td>{ss.name}</td>
     </tr>
   );
@@ -20,10 +20,14 @@ function StandardSetups({standardSetups, addStandardSetup}) {
     <h1>Standard Setups page</h1>
 
     <table border="1px solid black">
-      <tr>
-        <th>Name</th>
-      </tr>
-      {tableRows}
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows}
+      </tbody>
     </table>
 
     <label>Standard Setup Name:</label>
@@ -31,8 +35,8 @@ function StandardSetups({standardSetups, addStandardSetup}) {
       value={standardSetupName}
       onChange={(e) => setStandardSetupName(e.target.value)}
     />
-    <button type="submit" onClick={onSubmit}>
-      Add Standard Setup
+    <button type="submit" onClick={handleSaveStandardSetup}>
+      Save Standard Setup
     </button>
    </>
   );

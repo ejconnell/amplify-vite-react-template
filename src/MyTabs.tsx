@@ -36,36 +36,36 @@ import {
 
 import { useAuth } from "react-oidc-context";
 
-async function fetchMetalFamilies(ddbDocClient, setMetalFamilies) {
-  await fetchTable(ddbDocClient, setMetalFamilies, "MetalFamilies")
+async function loadMetalFamilies(ddbDocClient, setMetalFamilies) {
+  await loadTable(ddbDocClient, setMetalFamilies, "MetalFamilies")
 };
 
-async function fetchMetals(ddbDocClient, setMetals) {
-  await fetchTable(ddbDocClient, setMetals, "Metals")
+async function loadMetals(ddbDocClient, setMetals) {
+  await loadTable(ddbDocClient, setMetals, "Metals")
 };
 
-async function fetchMaterials(ddbDocClient, setMaterials) {
-  await fetchTable(ddbDocClient, setMaterials, "Materials")
+async function loadMaterials(ddbDocClient, setMaterials) {
+  await loadTable(ddbDocClient, setMaterials, "Materials")
 };
 
-async function fetchStandardSetups(ddbDocClient, setStandardSetups) {
-  await fetchTable(ddbDocClient, setStandardSetups, "StandardSetups")
+async function loadStandardSetups(ddbDocClient, setStandardSetups) {
+  await loadTable(ddbDocClient, setStandardSetups, "StandardSetups")
 };
 
-async function fetchInHouses(ddbDocClient, setInHouses) {
-  await fetchTable(ddbDocClient, setInHouses, "InHouses")
+async function loadInHouses(ddbDocClient, setInHouses) {
+  await loadTable(ddbDocClient, setInHouses, "InHouses")
 };
 
-async function fetchOutsourcings(ddbDocClient, setOutsourcings) {
-  await fetchTable(ddbDocClient, setOutsourcings, "Outsourcings")
+async function loadOutsourcings(ddbDocClient, setOutsourcings) {
+  await loadTable(ddbDocClient, setOutsourcings, "Outsourcings")
 };
 
-async function fetchItems(ddbDocClient, setItems) {
-  await fetchTable(ddbDocClient, setItems, "Items")
+async function loadItems(ddbDocClient, setItems) {
+  await loadTable(ddbDocClient, setItems, "Items")
 };
 
-async function fetchTable(ddbDocClient, setter, tableName) {
-  console.log(`fetchTable("${tableName}")`)
+async function loadTable(ddbDocClient, setter, tableName) {
+  console.log(`loadTable("${tableName}")`)
   const paginatedScan = paginateScan(
     { client: ddbDocClient },
     {
@@ -94,7 +94,7 @@ function getAwsCreds(auth) {
 }
 
 function MyTabs() {
-  const [fetchesComplete, setFetchesComplete] = useState(false);
+  const [loadsComplete, setFetchesComplete] = useState(false);
   const [materials, setMaterials] = useState([]);
   const [metals, setMetals] = useState([]);
   const [metalFamilies, setMetalFamilies] = useState([]);
@@ -112,20 +112,20 @@ function MyTabs() {
   const ddbDocClient = DynamoDBDocumentClient.from(client);
 
   useEffect(() => {
-    console.log(`fetchesComplete 1: ${fetchesComplete}`);
+    console.log(`loadsComplete 1: ${loadsComplete}`);
     Promise.all([
-      fetchMetalFamilies(ddbDocClient, setMetalFamilies),
-      fetchMetals(ddbDocClient, setMetals),
-      fetchMaterials(ddbDocClient, setMaterials),
-      fetchStandardSetups(ddbDocClient, setStandardSetups),
-      fetchInHouses(ddbDocClient, setInHouses),
-      fetchOutsourcings(ddbDocClient, setOutsourcings),
-      fetchItems(ddbDocClient, setItems),
+      loadMetalFamilies(ddbDocClient, setMetalFamilies),
+      loadMetals(ddbDocClient, setMetals),
+      loadMaterials(ddbDocClient, setMaterials),
+      loadStandardSetups(ddbDocClient, setStandardSetups),
+      loadInHouses(ddbDocClient, setInHouses),
+      loadOutsourcings(ddbDocClient, setOutsourcings),
+      loadItems(ddbDocClient, setItems),
     ]).then(() => setFetchesComplete(true));
   }, [])
 
-  async function addMetalFamily(metalFamily) {
-    log("addMetalFamily() " + metalFamily.name)
+  async function saveMetalFamily(metalFamily) {
+    log("saveMetalFamily() " + metalFamily.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "MetalFamilies",
       Item: {
@@ -133,70 +133,70 @@ function MyTabs() {
       },
     }));
     log(JSON.stringify(response));
-    fetchMetalFamilies(ddbDocClient, setMetalFamilies);
+    loadMetalFamilies(ddbDocClient, setMetalFamilies);
   }
 
-  async function addMetal(metal) {
-    log("addMetal() " + metal.name)
+  async function saveMetal(metal) {
+    log("saveMetal() " + metal.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Metals",
       Item: metal,
     }));
     log(response);
-    fetchMetals(ddbDocClient, setMetals)
+    loadMetals(ddbDocClient, setMetals)
   }
 
-  async function addMaterial(material) {
-    log("addMaterial() " + material.name)
+  async function saveMaterial(material) {
+    log("saveMaterial() " + material.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Materials",
       Item: material,
     }));
     log(response);
-    fetchMaterials(ddbDocClient, setMaterials)
+    loadMaterials(ddbDocClient, setMaterials)
   }
 
-  async function addStandardSetup(standardSetup) {
-    log("addStandardSetup() " + standardSetup.name)
+  async function saveStandardSetup(standardSetup) {
+    log("saveStandardSetup() " + standardSetup.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "StandardSetups",
       Item: standardSetup,
     }));
     log(response);
-    fetchStandardSetups(ddbDocClient, setStandardSetups);
+    loadStandardSetups(ddbDocClient, setStandardSetups);
   }
 
-  async function addInHouse(inHouse) {
-    log("addInHouse() " + inHouse.name)
+  async function saveInHouse(inHouse) {
+    log("saveInHouse() " + inHouse.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "InHouses",
       Item: inHouse,
     }));
     log(response);
-    fetchInHouses(ddbDocClient, setInHouses);
+    loadInHouses(ddbDocClient, setInHouses);
   }
 
-  async function addOutsourcing(outsourcing) {
-    log("addOutsourcing() " + outsourcing.name)
+  async function saveOutsourcing(outsourcing) {
+    log("saveOutsourcing() " + outsourcing.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Outsourcings",
       Item: outsourcing,
     }));
     log(response);
-    fetchOutsourcings(ddbDocClient, setOutsourcings);
+    loadOutsourcings(ddbDocClient, setOutsourcings);
   }
 
-  async function addItem(item) {
-    log("addItem() " + item.name)
+  async function saveItem(item) {
+    log("saveItem() " + item.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Items",
       Item: item,
     }));
     log(response);
-    fetchItems(ddbDocClient, setItems);
+    loadItems(ddbDocClient, setItems);
   }
 
-  if (!fetchesComplete) {
+  if (!loadsComplete) {
     return <h1>Loading...</h1>
   }
 
@@ -218,7 +218,7 @@ function MyTabs() {
       <Metals
         metals={metals}
         metalFamilies={metalFamilies}
-        addMetal={addMetal}
+        saveMetal={saveMetal}
       />
     </TabPanel>
     <TabPanel>
@@ -228,7 +228,7 @@ function MyTabs() {
         metals={metals}
         standardSetups={standardSetups}
         inHouses={inHouses}
-        addItem={addItem}
+        saveItem={saveItem}
       />
     </TabPanel>
     <TabPanel>
@@ -236,13 +236,13 @@ function MyTabs() {
         materials={materials}
         metals={metals}
         metalFamilies={metalFamilies}
-        addMaterial={addMaterial}
+        saveMaterial={saveMaterial}
       />
     </TabPanel>
     <TabPanel>
       <MetalFamilies
         metalFamilies={metalFamilies}
-        addMetalFamily={addMetalFamily}
+        saveMetalFamily={saveMetalFamily}
       />
     </TabPanel>
     <TabPanel>
@@ -255,19 +255,19 @@ function MyTabs() {
     <TabPanel>
       <InHouses
         inHouses={inHouses}
-        addInHouse={addInHouse}
+        saveInHouse={saveInHouse}
       />
     </TabPanel>
     <TabPanel>
       <Outsourcings
         outsourcings={outsourcings}
-        addOutsourcing={addOutsourcing}
+        saveOutsourcing={saveOutsourcing}
       />
     </TabPanel>
     <TabPanel>
       <StandardSetups
         standardSetups={standardSetups}
-        addStandardSetup={addStandardSetup}
+        saveStandardSetup={saveStandardSetup}
       />
     </TabPanel>
     <TabPanel>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function MetalFamilies({metalFamilies, addMetalFamily}) {
+function MetalFamilies({metalFamilies, saveMetalFamily}) {
   const [name, setName] = useState("");
 
   const mfRowsFrag = metalFamilies.map(mf => {
@@ -9,11 +9,11 @@ function MetalFamilies({metalFamilies, addMetalFamily}) {
     </tr>
   });
 
-  function handleAddMetalFamily() {
+  function handleSaveMetalFamily() {
     const metalFamily = {
       name: name,
     };
-    addMetalFamily(metalFamily)
+    saveMetalFamily(metalFamily)
   };
 
   return (
@@ -34,8 +34,8 @@ function MetalFamilies({metalFamilies, addMetalFamily}) {
       value={name}
       onChange={e => setName(e.target.value)}
     />
-    <button type="submit" onClick={handleAddMetalFamily}>
-      Add Metal Family
+    <button type="submit" onClick={handleSaveMetalFamily}>
+      Save Metal Family
     </button>
    </>
   );

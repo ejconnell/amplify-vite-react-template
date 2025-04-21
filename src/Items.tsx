@@ -24,7 +24,7 @@ class ItemModel {
   }
 }
 
-function Items({items, materials, metals, standardSetups, inHouses, addItem}) {
+function Items({items, materials, metals, standardSetups, inHouses, saveItem}) {
   const [exampleQuantity, setExampleQuantity] = useState(300);
   const [itemName, setItemName] = useState("");
   const [materialName, setMaterialName] = useState("");
@@ -64,7 +64,7 @@ function Items({items, materials, metals, standardSetups, inHouses, addItem}) {
       itemInHouses: itemInHouses,
     };
     console.log(JSON.stringify(item, (k, v) => v === undefined ? "AAAA" : v));
-    addItem(item);
+    saveItem(item);
   }
 
   return (
@@ -141,7 +141,7 @@ function Items({items, materials, metals, standardSetups, inHouses, addItem}) {
     <br/>
     <br/>
     <button type="submit" onClick={handleSaveItem}>
-      Add Item
+      Save Item
     </button>
    </>
   );

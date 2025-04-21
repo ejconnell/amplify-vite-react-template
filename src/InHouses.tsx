@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-function InHouses({inHouses, addInHouse}) {
+function InHouses({inHouses, saveInHouse}) {
   const [name, setName] = useState("");
   const [cost, setCost] = useState(0);
 
@@ -12,8 +12,8 @@ function InHouses({inHouses, addInHouse}) {
     </tr>
   );
 
-  function onSubmit() {
-    addInHouse({
+  function handleSaveInHouse() {
+    saveInHouse({
       name: name,
       cost: cost,
     });
@@ -39,8 +39,8 @@ function InHouses({inHouses, addInHouse}) {
     <label>Cost:</label>
     <input value={cost} onChange={(e) => setCost(parseFloat(e.target.value))}/>
     <br/>
-    <button type="submit" onClick={onSubmit}>
-      Add In House
+    <button type="submit" onClick={handleSaveInHouse}>
+      Save In House
     </button>
   </>);
 }

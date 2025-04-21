@@ -9,7 +9,7 @@ class OutsourcingModel {
   }
 }
 
-function Outsourcings({outsourcings, addOutsourcing}) {
+function Outsourcings({outsourcings, saveOutsourcing}) {
   const [name, setName] = useState("");
   const [isPricedByUnit, setIsPricedByUnit] = useState(false);
   const [variableCost, setVariableCost] = useState(0);
@@ -23,7 +23,7 @@ function Outsourcings({outsourcings, addOutsourcing}) {
     minCost: minCost,
   });
 
-  function handleAddOutsourcing() {
+  function handleSaveOutsourcing() {
     if (!name) {
       alert("Need a Name");
       return;
@@ -32,13 +32,17 @@ function Outsourcings({outsourcings, addOutsourcing}) {
       alert(`Need a numeric cost per ${variableCostLabel}`);
       return;
     }
+    if (isNaN(minCost)) {
+      alert("Need a numeric minimum cost");
+      return;
+    }
     const outsourcing = {
       name: name,
       isPricedByUnit: isPricedByUnit,
-      variableCost: variableCost,
-      minCost: minCost,
+      variableCost: Number(variableCost),
+      minCost: Number(minCost),
     };
-    addOutsourcing(outsourcing);
+    saveOutsourcing(outsourcing);
   };
 
   function handleLoadOutsourcing(index) {
@@ -118,7 +122,7 @@ function Outsourcings({outsourcings, addOutsourcing}) {
     <label>Pricing cutover {variableCostLabel}s: {outsourcingModel.pricingCutover.toFixed(4)} </label>
     <br/>
 
-    <button type="submit" onClick={handleAddOutsourcing}>
+    <button type="submit" onClick={handleSaveOutsourcing}>
       Save Outsourcing
     </button>
    </>

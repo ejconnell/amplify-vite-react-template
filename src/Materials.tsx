@@ -68,7 +68,7 @@ export class MaterialModel {
   }
 }
 
-function Materials({materials, metals, metalFamilies, addMaterial}) {
+function Materials({materials, metals, metalFamilies, saveMaterial}) {
   const [isNameManual, setIsNameManual] = useState(false);
   const [name, setName] = useState("");
   const [metalName, setMetalName] = useState("");
@@ -86,7 +86,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     return new MaterialModel(metals, m.metalName, m.shapeName, m.width, m.innerWidth, m.rawCost, m.markup);
   });
 
-  function handleAddMaterial() {
+  function handleSaveMaterial() {
     if (!mergedName) {
       alert("Need a Name");
       return;
@@ -128,7 +128,7 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     if (materialModel.hasInnerWidth) {
       material.innerWidth = Number(innerWidth);
     }
-    addMaterial(material);
+    saveMaterial(material);
   };
 
   function handleViewEdit(index) {
@@ -259,8 +259,8 @@ function Materials({materials, metals, metalFamilies, addMaterial}) {
     <label>Effective Cost: {materialModel.effectiveCost}</label>
     <br/>
 
-    <button type="submit" onClick={handleAddMaterial}>
-      Add Material
+    <button type="submit" onClick={handleSaveMaterial}>
+      Save Material
     </button>
     <br/>
    </>
