@@ -11,7 +11,7 @@ import { ItemWastageModel, ItemWastageStartingRange } from "./ItemWastage"
 import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
 import { ItemOutsourcingsModel } from "./ItemOutsourcings"
 
-class ItemModel {
+export class ItemModel {
   constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity}) {
     const material = materials.find(m => m.name === materialName);
     if (!material) return;
@@ -25,16 +25,10 @@ class ItemModel {
     this.unitLength = gramsPerUnit / materialModel.weightPerMm;
     this.inHouseCostPerUnit = itemInHousesModel.totalCostPerUnit;
     this.outsourcingCostPerUnit = itemOutsourcingsModel.totalCostPerUnit;
-    this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.outsourcingCostPerUnit;
+    //this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.outsourcingCostPerUnit;
     this.wastagePercent = Number(itemWastageModel.value);
-    this.postWastageCostPerUnit = this.baseCostPerUnit * (1 + (this.wastagePercent / 100));
-    this.postLaborCostPerUnit = this.postWastageCostPerUnit * 1.03;
     this.setupCostPerUnit = itemSetupsModel.totalCostPerUnit;
-    this.postSetupCostPerUnit = this.postLaborCostPerUnit + this.setupCostPerUnit;
-    this.postTaxCostPerUnit = this.postSetupCostPerUnit * 1.03;
     this.overheadPercent = Number(itemOverheadModel.value);
-    this.postOverheadCostPerUnit = this.postTaxCostPerUnit * (1 + (this.overheadPercent / 100));
-    this.postProfitCostPerUnit = this.postOverheadCostPerUnit * 1.06;
   }
 }
 

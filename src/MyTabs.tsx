@@ -249,7 +249,9 @@ function MyTabs() {
       <Quotes
         items={items}
         materials={materials}
+        metals={metals}
         inHouses={inHouses}
+        outsourcings={outsourcings}
       />
     </TabPanel>
     <TabPanel>
