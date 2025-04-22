@@ -1,8 +1,9 @@
 import { useState } from "react";
 
 export class LookupRangesModel {
-  constructor(ranges) {
-    this.ranges = ranges;
+  constructor(ranges, quantity) {
+    const range = ranges.find(r => (r.starting <= quantity) && (quantity <= r.ending))
+    this.value = range?.value;
   }
 }
 
@@ -15,11 +16,11 @@ export function LookupRangesStartingRange() {
   };
 }
 
-function LookupRanges({ranges, exampleQuantity, setRanges, title, valueLabel}) {
+function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
   const [splitRangeAt, setSplitRangeAt] = useState("");
   const [rangePairSelectIndex, setRangePairSelectIndex] = useState(-1);
 
-  const iwModel = new LookupRangesModel(ranges);
+  const lookupRangesModel = new LookupRangesModel(ranges, quantity);
 
   function handleValueChange(value, index) {
     const nextLookupRanges = ranges.map((iw, i) => {
@@ -122,6 +123,7 @@ function LookupRanges({ranges, exampleQuantity, setRanges, title, valueLabel}) {
   return (
    <>
     <h3>{title}:</h3>
+    <p>Quantity {quantity || 0} &rarr; {lookupRangesModel.value} {valueLabel}</p>
     <table border="1px solid black">
       <thead>
         <tr>

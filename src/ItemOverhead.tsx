@@ -8,14 +8,14 @@ export function ItemOverheadStartingRange() {
   return LookupRangesStartingRange();
 }
 
-function ItemOverhead({itemOverheadRanges, exampleQuantity, setItemOverheadRanges}) {
+function ItemOverhead({itemOverheadRanges, exampleUnitQuantity, setItemOverheadRanges}) {
 
   //const iwModel = new ItemWastageModel(itemWastage);
 
   return (
     <LookupRanges
        ranges={itemOverheadRanges}
-       exampleQuantity={exampleQuantity}
+       quantity={exampleUnitQuantity}
        setRanges={setItemOverheadRanges}
        title="Overhead"
        valueLabel="Overhead percentage"

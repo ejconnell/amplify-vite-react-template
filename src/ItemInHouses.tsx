@@ -18,10 +18,7 @@ export class ItemInHousesModel {
 function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
   const iihModel = new ItemInHousesModel(inHouses, itemInHouses);
 
-  console.log(`ItemInHouses() ${JSON.stringify(itemInHouses)}`);
-
   function handleItemInHouseNameChange(value, index) {
-    console.log("handleItemInHouseNameChange()");
     const nextItemInHouses = itemInHouses.map((iih, i) => {
       if (i === index) {
         return {
@@ -33,12 +30,10 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
         return {...iih};
       };
     });
-    console.log(JSON.stringify(nextItemInHouses));
     setItemInHouses(nextItemInHouses);
   }
 
   function handleItemInHouseQuantityChange(value, index) {
-    console.log("handleItemInHouseQuantityChange()");
     const nextItemInHouses = itemInHouses.map((iih, i) => {
       if (i === index) {
         return {
@@ -50,7 +45,6 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
         return {...iih};
       };
     });
-    console.log(JSON.stringify(nextItemInHouses));
     setItemInHouses(nextItemInHouses);
   }
 

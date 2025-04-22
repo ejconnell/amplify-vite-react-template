@@ -12,22 +12,34 @@ import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
 import { ItemOutsourcingsModel } from "./ItemOutsourcings"
 
 class ItemModel {
-  constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings}) {
-//debugger
+  constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity}) {
     const material = materials.find(m => m.name === materialName);
     if (!material) return;
     const materialModel = new MaterialModel(metals, material.metalName, material.shapeName, material.width, material.innerWidth, material.rawCost, material.markup);
-    const itemSetupsModel = new ItemSetupsModel(itemSetups);
     const itemInHousesModel = new ItemInHousesModel(inHouses, itemInHouses);
+    const itemOutsourcingsModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, unitQuantity);
+    const itemWastageModel = new ItemWastageModel(itemWastageRanges, unitQuantity);
+    const itemSetupsModel = new ItemSetupsModel(itemSetups, unitQuantity);
+    const itemOverheadModel = new ItemOverheadModel(itemOverheadRanges, unitQuantity);
     this.materialCostPerUnit = gramsPerUnit * materialModel.effectiveCost / 1000;
     this.unitLength = gramsPerUnit / materialModel.weightPerMm;
-    this.setupCostPerJob = itemSetupsModel.totalCostPerJob;
     this.inHouseCostPerUnit = itemInHousesModel.totalCostPerUnit;
+    this.outsourcingCostPerUnit = itemOutsourcingsModel.totalCostPerUnit;
+    this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.outsourcingCostPerUnit;
+    this.wastagePercent = Number(itemWastageModel.value);
+    this.postWastageCostPerUnit = this.baseCostPerUnit * (1 + (this.wastagePercent / 100));
+    this.postLaborCostPerUnit = this.postWastageCostPerUnit * 1.03;
+    this.setupCostPerUnit = itemSetupsModel.totalCostPerUnit;
+    this.postSetupCostPerUnit = this.postLaborCostPerUnit + this.setupCostPerUnit;
+    this.postTaxCostPerUnit = this.postSetupCostPerUnit * 1.03;
+    this.overheadPercent = Number(itemOverheadModel.value);
+    this.postOverheadCostPerUnit = this.postTaxCostPerUnit * (1 + (this.overheadPercent / 100));
+    this.postProfitCostPerUnit = this.postOverheadCostPerUnit * 1.06;
   }
 }
 
 function Items({items, materials, metals, standardSetups, inHouses, outsourcings, saveItem}) {
-  const [exampleQuantity, setExampleQuantity] = useState(300);
+  const [exampleUnitQuantity, setExampleUnitQuantity] = useState(300);
   const [name, setName] = useState("");
   const [materialName, setMaterialName] = useState("");
   const [gramsPerUnit, setGramsPerUnit] = useState(0);
@@ -53,10 +65,15 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     itemWastageRanges: itemWastageRanges,
     itemOverheadRanges: itemOverheadRanges,
     itemOutsourcings: itemOutsourcings,
+    unitQuantity: exampleUnitQuantity,
   });
 
   const itemsModels = items.map(item => {
-    return new ItemModel({...lookupTables, ...item});
+    return new ItemModel({
+       ...lookupTables,
+       ...item,
+       unitQuantity: exampleUnitQuantity,
+    });
   });
 
   function handleSaveItem() {
@@ -93,7 +110,10 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       <td>{item.materialName}</td>
       <td>{itemsModels[i].materialCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].inHouseCostPerUnit.toFixed(2)}</td>
-      <td>{itemsModels[i].setupCostPerJob.toFixed(2)}</td>
+      <td>{itemsModels[i].outsourcingCostPerUnit.toFixed(2)}</td>
+      <td>{itemsModels[i].wastagePercent.toFixed(2)}%</td>
+      <td>{itemsModels[i].setupCostPerUnit.toFixed(2)}</td>
+      <td>{itemsModels[i].overheadPercent.toFixed(2)}%</td>
       <td>
         <button type="button" onClick={() => handleLoadItem(i)}>Load</button>
       </td>
@@ -107,14 +127,25 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
    <>
     <h1>Items page</h1>
 
+    <label>Example unit quantity:</label>
+    <input
+      value={exampleUnitQuantity}
+      onChange={(e) => setExampleUnitQuantity(e.target.value)}
+    />
+    <br/>
+    <br/>
+
     <table border="1px solid black">
       <thead>
         <tr>
           <th>Name</th>
           <th>Metal</th>
-          <th>Material per Unit</th>
-          <th>In House per Unit</th>
-          <th>Setup per Job</th>
+          <th>Material cost</th>
+          <th>In House cost</th>
+          <th>Outsourcing cost</th>
+          <th>Wastage percent</th>
+          <th>Setup cost</th>
+          <th>Overhead percent</th>
           <th>Load</th>
         </tr>
       </thead>
@@ -150,34 +181,35 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     <label>Unit Length (mm): {itemModel.unitLength?.toFixed(4)}</label>
     <br/>
 
-    <ItemOutsourcings
-      outsourcings={outsourcings}
-      itemOutsourcings={itemOutsourcings}
-      exampleQuantity={exampleQuantity}
-      setItemOutsourcings={setItemOutsourcings}
-    />
-
-    <ItemSetups
-      standardSetups={standardSetups}
-      itemSetups={itemSetups}
-      setItemSetups={setItemSetups}
-    />
-
     <ItemInHouses
       inHouses={inHouses}
       itemInHouses={itemInHouses}
       setItemInHouses={setItemInHouses}
     />
 
+    <ItemOutsourcings
+      outsourcings={outsourcings}
+      itemOutsourcings={itemOutsourcings}
+      exampleUnitQuantity={exampleUnitQuantity}
+      setItemOutsourcings={setItemOutsourcings}
+    />
+
     <ItemWastage
       itemWastageRanges={itemWastageRanges}
-      exampleQuantity={exampleQuantity}
+      exampleUnitQuantity={exampleUnitQuantity}
       setItemWastageRanges={setItemWastageRanges}
+    />
+
+    <ItemSetups
+      standardSetups={standardSetups}
+      itemSetups={itemSetups}
+      setItemSetups={setItemSetups}
+      exampleUnitQuantity={exampleUnitQuantity}
     />
 
     <ItemOverhead
       itemOverheadRanges={itemOverheadRanges}
-      exampleQuantity={exampleQuantity}
+      exampleUnitQuantity={exampleUnitQuantity}
       setItemOverheadRanges={setItemOverheadRanges}
     />
 

@@ -1,24 +1,50 @@
-import { OutsourcingModel } from "./Outsourcings";
-
 export class ItemOutsourcingsModel {
-  constructor({outsourcings, itemOutsourcings}) {
+  constructor(outsourcings, itemOutsourcings, unitQuantity) {
+    this.totalCostPerUnit = 0;
+    this.totalCostPerJob = 0;
     this.rows = itemOutsourcings.map(io => {
       const outsourcing = outsourcings.find(o => o.name === io.name);
       if (!outsourcing) { return {}; }
-      const outsourcingModel = new OutsourcingModel(outsourcing)
 
-      return {
-        isPricedByUnit: outsourcing.isPricedByUnit,
- 
+      let minCostPerUnit;
+      let minCostPerKilogram;
+      let costCutoverUnitQuantity;
+      if (outsourcing.isPricedByUnit) {
+        minCostPerUnit = outsourcing.variableCost;
+        costCutoverUnitQuantity = outsourcing.minCostPerJob / minCostPerUnit;
+      } else {
+        minCostPerKilogram = outsourcing.variableCost;
+        minCostPerUnit = minCostPerKilogram / 1000 * io.gramsPerUnit;
+        costCutoverUnitQuantity = outsourcing.minCostPerJob / minCostPerUnit;
       }
 
+      let costPerUnit;
+      let costPerJob;
+      if (unitQuantity > costCutoverUnitQuantity) {
+        costPerUnit = minCostPerUnit;
+        costPerJob = costPerUnit * unitQuantity;
+      } else {
+        costPerJob = outsourcing.minCostPerJob;
+        costPerUnit = outsourcing.minCostPerJob / unitQuantity;
+      }
+
+      this.totalCostPerUnit += costPerUnit;
+      this.totalCostPerJob += costPerJob;
+
+      return {
+        minCostPerUnit: minCostPerUnit,
+        minCostPerKilogram: minCostPerKilogram,
+        costCutoverUnitQuantity: costCutoverUnitQuantity,
+        costPerUnit: costPerUnit,
+        costPerJob: costPerJob,
+      }
     });
   }
 }
 
-function ItemOutsourcings({outsourcings, itemOutsourcings, exampleQuantity, setItemOutsourcings}) {
+function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, setItemOutsourcings}) {
 
-  //const iwModel = new ItemWastageModel(itemWastage);
+  const ioModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, exampleUnitQuantity);
 
   function addItemOutsourcing(index) {
     const nextItemOutsourcings = [
@@ -42,7 +68,6 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleQuantity, setI
   }
 
   function handleNameChange(value, index) {
-    console.log(`handleNameChange ${value} ${index}`);
     const nextItemOutsourcings = itemOutsourcings.map((io, i) => {
       if (i === index) {
         return {
@@ -54,7 +79,6 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleQuantity, setI
         return {...io};
       };
     });
-    console.log(`handleNameChange  ${JSON.stringify(nextItemOutsourcings)}`);
     setItemOutsourcings(nextItemOutsourcings);
   }
 
@@ -79,15 +103,20 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleQuantity, setI
     <td>&rarr;</td>
     <td>&rarr;</td>
     <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
+    <td>&rarr;</td>
     <td><button type="button" onClick={() => addItemOutsourcing(-1)}> + </button></td>
   </tr>;
 
-  const outsourcingsSelectOptions = outsourcings.map(os => 
+  const outsourcingsSelectOptions = outsourcings.map(os =>
     <option value={os.name} key={os.name}>{os.name}</option>
   );
 
   const itemOutsourcingsRowsFrag = itemOutsourcings.map((io, i) => {
     const outsourcing = outsourcings.find(o => o.name === io.name);
+    const modelRow = ioModel.rows[i];
 
     const nameSelectFrag = <select
       value={io.name}
@@ -97,33 +126,52 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleQuantity, setI
       {outsourcingsSelectOptions}
     </select>
 
-    const gramsPerUnitInputFrag = outsourcing?.isPricedByUnit ? "-" : <input
+    const gramsPerUnitInputFrag = outsourcing?.isPricedByUnit ? "---" : <input
       value={io.gramsPerUnit}
       onChange={e => handleGramsPerUnitChange(e.target.value, i)}
+      style={{width: "90px"}}
     />
 
     return <tr key={io.key}>
       <td>{nameSelectFrag}</td>
       <td>{gramsPerUnitInputFrag}</td>
-      <td></td>
-      <td></td>
+      <td>{modelRow.minCostPerKilogram}</td>
+      <td>{modelRow.minCostPerUnit.toFixed(4)}</td>
+      <td>{outsourcing?.minCostPerJob}</td>
+      <td>{modelRow.costCutoverUnitQuantity.toFixed(1)}</td>
+      <td>{modelRow.costPerUnit.toFixed(4)}</td>
+      <td>{modelRow.costPerJob.toFixed(1)}</td>
       <td><button type="button" onClick={() => deleteItemOutsourcing(i)}> - </button></td>
       <td><button type="button" onClick={() => addItemOutsourcing(i)}> + </button></td>
     </tr>
   });
 
-  const itemOutsourcingsTotalRowFrag = "";
+  const itemOutsourcingsTotalRowFrag = <tr key="total row">
+    <td><b>Total</b></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td><b>{ioModel.totalCostPerUnit.toFixed(4)}</b></td>
+    <td>{ioModel.totalCostPerJob.toFixed(1)}</td>
+  </tr>;
 
   return (
     <>
       <h3>Outsourcing:</h3>
+      <p>Quantity: {exampleUnitQuantity} &rarr; Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
       <table border="1px solid black">
         <thead>
           <tr>
             <th>Name</th>
             <th>Grams per Unit</th>
-            <th>Cost Per 1k</th>
-            <th>Cost Per Unit</th>
+            <th>Minimum Cost<br/>per kg</th>
+            <th>Minimum Cost<br/>per unit</th>
+            <th>Minimum Cost<br/>per job</th>
+            <th>Cost cutover<br/>unit quantity</th>
+            <th>Cost per unit</th>
+            <th>Cost per {exampleUnitQuantity || 0}<br/>unit job</th>
             <th>Delete</th>
             <th>Add</th>
           </tr>

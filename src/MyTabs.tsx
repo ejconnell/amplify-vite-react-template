@@ -13,7 +13,7 @@ import Todos from './Todos.js';
 
 import {fromCognitoIdentityPool} from "@aws-sdk/credential-providers";
 
-const log = (msg) => console.log(`[SCENARIO] ${msg}`);
+const log = (msg) => console.log(`[MyTabs] ${msg}`);
 
 import {
   BillingMode,
@@ -65,7 +65,7 @@ async function loadItems(ddbDocClient, setItems) {
 };
 
 async function loadTable(ddbDocClient, setter, tableName) {
-  console.log(`loadTable("${tableName}")`)
+  log(`loadTable("${tableName}")`)
   const paginatedScan = paginateScan(
     { client: ddbDocClient },
     {
@@ -112,7 +112,6 @@ function MyTabs() {
   const ddbDocClient = DynamoDBDocumentClient.from(client);
 
   useEffect(() => {
-    console.log(`loadsComplete 1: ${loadsComplete}`);
     Promise.all([
       loadMetalFamilies(ddbDocClient, setMetalFamilies),
       loadMetals(ddbDocClient, setMetals),

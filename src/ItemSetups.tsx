@@ -1,16 +1,16 @@
 import { useState } from "react";
 
 export class ItemSetupsModel {
-  constructor(itemSetups) {
+  constructor(itemSetups, unitQuantity) {
     this.totalCostPerJob = itemSetups.map(s => Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
+    this.totalCostPerUnit = this.totalCostPerJob / unitQuantity;
   }
 }
 
-function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
-  const isModel = new ItemSetupsModel(itemSetups);
+function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSetups}) {
+  const isModel = new ItemSetupsModel(itemSetups, exampleUnitQuantity);
 
   function handleStandardNameChange(value, index) {
-    console.log("handleStandardNameChange()");
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -24,12 +24,10 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
         return {...s};
       };
     });
-    console.log(JSON.stringify(nextItemSetups));
     setItemSetups(nextItemSetups);
   }
 
   function handleCustomNameChange(value, index) {
-    console.log("handleCustomNameChange()");
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -43,12 +41,10 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
         return {...s};
       };
     });
-    console.log(JSON.stringify(nextItemSetups));
     setItemSetups(nextItemSetups);
   }
 
   function handleCustomNameCheckboxChange(index) {
-    console.log("handleCustomNameCheckboxChange()");
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -62,12 +58,10 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
         return {...s};
       };
     });
-    console.log(JSON.stringify(nextItemSetups));
     setItemSetups(nextItemSetups);
   }
 
   function handleCostChange(value, index) {
-    console.log("handleCostChange()");
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -81,7 +75,6 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
         return {...s};
       };
     });
-    console.log(JSON.stringify(nextItemSetups));
     setItemSetups(nextItemSetups);
   }
 
@@ -164,6 +157,7 @@ function ItemSetups({standardSetups, itemSetups, setItemSetups}) {
   return (
    <>
     <h3>Setup:</h3>
+    <p>Quantity: {exampleUnitQuantity} &rarr; Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
     <table border="1px solid black">
       <thead>
         <tr>

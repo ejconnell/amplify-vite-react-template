@@ -48,7 +48,6 @@ export class MaterialModel {
     this.hasInnerWidth = shape?.hasInnerWidth || false;
     this.widthLabel = shape?.widthLabel || "-";
     this.crossSectionArea = shape?.area(width, innerWidth) || 0;
-    console.log(`${shape.name} ${width} ${innerWidth} ${this.crossSectionArea}`);
     this.weightPerMm = (this.density * this.crossSectionArea) || 0;
     this.effectiveCost = (rawCost + (rawCost * markup / 100)) || 0;
   }
