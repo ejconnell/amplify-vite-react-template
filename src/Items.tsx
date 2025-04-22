@@ -12,10 +12,9 @@ import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
 import { ItemOutsourcingsModel } from "./ItemOutsourcings"
 
 export class ItemModel {
-  constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity}) {
-    const material = materials.find(m => m.name === materialName);
-    if (!material) return;
-    const materialModel = new MaterialModel(metals, material.metalName, material.shapeName, material.width, material.innerWidth, material.rawCost, material.markup);
+  constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups=[], itemInHouses=[], itemWastageRanges=[], itemOverheadRanges=[], itemOutsourcings=[], unitQuantity}) {
+    const material = materials.find(m => m.name === materialName) || {};
+    const materialModel = new MaterialModel({metals: metals, ...material});
     const itemInHousesModel = new ItemInHousesModel(inHouses, itemInHouses);
     const itemOutsourcingsModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, unitQuantity);
     const itemWastageModel = new ItemWastageModel(itemWastageRanges, unitQuantity);

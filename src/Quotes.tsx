@@ -9,8 +9,7 @@ function blankQuoteItem() {
 
 class QuoteItemModel {
   constructor({items, materials, metals, inHouses, outsourcings, quoteItem}) {
-    const item = items.find(i => i.name === quoteItem.name);
-    if (!item) return {};
+    const item = items.find(i => i.name === quoteItem.name) || {};
 
     const im = new ItemModel({
       materials: materials,
@@ -121,6 +120,7 @@ function Quotes({items, materials, metals, inHouses, outsourcings}) {
       name="quantity"
       value={qi[i]?.quantity}
       onChange={(e) => {handleQuoteItemQuantityChange(parseFloat(e.target.value), i)}}
+      style={{width: "60px"}}
     />;
 
     return <tr key={qi.key}>

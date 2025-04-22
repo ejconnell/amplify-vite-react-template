@@ -39,7 +39,7 @@ const Shapes = [
 ];
 
 export class MaterialModel {
-  constructor(metals, metalName, shapeName, width, innerWidth, rawCost, markup) {
+  constructor({metals, metalName, shapeName, width, innerWidth, rawCost, markup}) {
     const metal = metals.find(m => m.name === metalName)
     const shape = Shapes.find(s => s.name === shapeName)
 
@@ -78,11 +78,22 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
   const [markup, setMarkup] = useState(6.5);
 
 
-  const materialModel = new MaterialModel(metals, metalName, shapeName, width, innerWidth, Number(rawCost), markup);
+  const materialModel = new MaterialModel({
+    metals: metals,
+    metalName: metalName,
+    shapeName: shapeName,
+    width: width,
+    innerWidth: innerWidth,
+    rawCost: Number(rawCost),
+    markup: markup,
+  });
   const mergedName = isNameManual ? name : materialModel.autoName;
 
-  const materialsModels = materials.map(m => {
-    return new MaterialModel(metals, m.metalName, m.shapeName, m.width, m.innerWidth, m.rawCost, m.markup);
+  const materialsModels = materials.map(material => {
+    return new MaterialModel({
+      metals: metals,
+      ...material,
+    });
   });
 
   function handleSaveMaterial() {
@@ -130,7 +141,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
     saveMaterial(material);
   };
 
-  function handleViewEdit(index) {
+  function handleLoadMaterial(index) {
      const material = materials[index];
      setName(material.name);
      setIsNameManual(material.isNameManual);
@@ -153,7 +164,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
       <td>{m.rawCost.toFixed(4)}</td>
       <td>{m.markup}</td>
       <td>{materialsModels[i].effectiveCost.toFixed(4)}</td>
-      <td><button type="button" onClick={() => handleViewEdit(i)}>View/Edit</button></td>
+      <td><button type="button" onClick={() => handleLoadMaterial(i)}>Load</button></td>
     </tr>
   );
 
@@ -189,6 +200,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
           <th>Raw Cost ($/kg)</th>
           <th>Markup %</th>
           <th>Effective Cost ($/kg)</th>
+          <th>Load</th>
         </tr>
       </thead>
       <tbody>
