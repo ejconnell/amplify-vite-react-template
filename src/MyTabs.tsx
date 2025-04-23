@@ -64,6 +64,10 @@ async function loadItems(ddbDocClient, setItems) {
   await loadTable(ddbDocClient, setItems, "Items")
 };
 
+async function loadQuotes(ddbDocClient, setQuotes) {
+  await loadTable(ddbDocClient, setQuotes, "Quotes")
+};
+
 async function loadTable(ddbDocClient, setter, tableName) {
   log(`loadTable("${tableName}")`)
   const paginatedScan = paginateScan(
@@ -102,6 +106,7 @@ function MyTabs() {
   const [inHouses, setInHouses] = useState([]);
   const [outsourcings, setOutsourcings] = useState([]);
   const [items, setItems] = useState([]);
+  const [quotes, setQuotes] = useState([]);
 
   const auth = useAuth();
 
@@ -120,6 +125,7 @@ function MyTabs() {
       loadInHouses(ddbDocClient, setInHouses),
       loadOutsourcings(ddbDocClient, setOutsourcings),
       loadItems(ddbDocClient, setItems),
+      loadQuotes(ddbDocClient, setQuotes),
     ]).then(() => setFetchesComplete(true));
   }, [])
 
@@ -195,6 +201,17 @@ function MyTabs() {
     loadItems(ddbDocClient, setItems);
   }
 
+  async function saveQuote(quote) {
+    log(`saveQuote() ${quote.name} - ${quote.timestamp}`);
+log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "Quotes",
+      Item: quote,
+    }));
+    log(response);
+    loadQuotes(ddbDocClient, setQuotes);
+  }
+
   if (!loadsComplete) {
     return <h1>Loading...</h1>
   }
@@ -247,11 +264,13 @@ function MyTabs() {
     </TabPanel>
     <TabPanel>
       <Quotes
+        quotes={quotes}
         items={items}
         materials={materials}
         metals={metals}
         inHouses={inHouses}
         outsourcings={outsourcings}
+        saveQuote={saveQuote}
       />
     </TabPanel>
     <TabPanel>

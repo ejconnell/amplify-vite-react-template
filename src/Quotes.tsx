@@ -4,7 +4,11 @@ import { ItemInHousesModel } from "./ItemInHouses"
 import { ItemModel } from "./Items"
 
 function blankQuoteItem() {
-  return {key: crypto.randomUUID()};
+  return {
+    key: crypto.randomUUID(),
+    name: "",
+    quantity: 0,
+  };
 };
 
 class QuoteItemModel {
@@ -34,10 +38,83 @@ class QuoteItemModel {
     this.postOverheadCostPerUnit = this.postTaxCostPerUnit * (1 + (this.overheadPercent / 100));
     this.postProfitCostPerUnit = this.postOverheadCostPerUnit * 1.06;
   }
+
+  results() {
+    return {
+      materialCostPerUnit: this.materialCostPerUnit,
+      inHouseCostPerUnit: this.inHouseCostPerUnit,
+      outsourcingCostPerUnit: this.outsourcingCostPerUnit,
+      baseCostPerUnit: this.baseCostPerUnit,
+      wastagePercent: this.wastagePercent,
+      postWastageCostPerUnit: this.postWastageCostPerUnit,
+      postLaborCostPerUnit: this.postLaborCostPerUnit,
+      setupCostPerUnit: this.setupCostPerUnit,
+      postSetupCostPerUnit: this.postSetupCostPerUnit,
+      postTaxCostPerUnit: this.postTaxCostPerUnit,
+      overheadPercent: this.overheadPercent,
+      postOverheadCostPerUnit: this.postOverheadCostPerUnit,
+      postProfitCostPerUnit: this.postProfitCostPerUnit,
+    };
+  }
 }
 
-function Quotes({items, materials, metals, inHouses, outsourcings}) {
+function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQuote}) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [quoteItems, setQuoteItems] = useState([blankQuoteItem()]);
+  const [fixedName, setFixedName] = useState("");
+  const [fixedTimestamp, setFixedTimestamp] = useState("");
+  const [fixedDescription, setFixedDescription] = useState("");
+  const [fixedQuoteItems, setFixedQuoteItems] = useState([]);
+  const [quoteItemsModelResults, setQuoteItemsModelResults] = useState([]);
+
+  const quoteItemsModels = quoteItems.map(qi => {
+    return new QuoteItemModel({
+       items: items,
+       materials: materials,
+       metals: metals,
+       inHouses: inHouses,
+       outsourcings: outsourcings,
+       quoteItem: qi,
+    });
+  });
+
+  function handleSaveQuote() {
+    if (!name) {
+      alert("Need a name");
+      return;
+    }
+    quoteItems.forEach((qi, i) => {
+      if (!qi.name) {
+        alert(`Quote row ${i+1} needs a name`);
+        return;
+      }
+      if (!qi.quantity || isNaN(qi.quantity)) {
+        alert(`Quote row ${i+1} needs a numeric quantity`);
+        return;
+      }
+    });
+    const quote = {
+      name: name,
+      timestamp: Date.now(),
+      description: description,
+      quoteItems: quoteItems,
+      quoteItemsModelResults: quoteItemsModels.map(qim => qim.results()),
+    };
+    saveQuote(quote);
+  }
+
+  function handleLoadQuote(i) {
+    const quote = quotes[i];
+    setName(quote.name);
+    setDescription(quote.description);
+    setQuoteItems(quote.quoteItems);
+    setFixedName(quote.name);
+    setFixedTimestamp(quote.timestamp);
+    setFixedDescription(quote.description);
+    setFixedQuoteItems(quote.quoteItems);
+    setQuoteItemsModelResults(quote.quoteItemsModelResults);
+  }
 
   function handleQuoteItemNameChange(value, index) {
     console.log(`handleQuoteItemNameChange(${value}, ${index})`);
@@ -69,7 +146,7 @@ function Quotes({items, materials, metals, inHouses, outsourcings}) {
         return {...qi};
       };
     });
-    console.log(JSON.stringify(nextQuoteItems));
+    console.log(`handleQuoteItemQuantityChange setting to ${JSON.stringify(nextQuoteItems)}`);
     setQuoteItems(nextQuoteItems);
   }
 
@@ -93,23 +170,88 @@ function Quotes({items, materials, metals, inHouses, outsourcings}) {
     setQuoteItems(nextQuoteItems);
   }
 
+  function formatQuoteItemModelResultsCells(qimr) {
+    return <>
+      <td>{qimr.materialCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.inHouseCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.outsourcingCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.baseCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.wastagePercent.toFixed(2)}%</td>
+      <td>{qimr.postWastageCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.postLaborCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.setupCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.postSetupCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.postTaxCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.overheadPercent.toFixed(2)}%</td>
+      <td>{qimr.postOverheadCostPerUnit.toFixed(2)}</td>
+      <td>{qimr.postProfitCostPerUnit.toFixed(2)}</td>
+    </>;
+  }
+
+  const loadedQuoteItemRowsFrag = quoteItemsModelResults.map((qimr, i) => {
+    const qi = fixedQuoteItems[i];
+    return <tr key={qi.key}>
+      <td>{qi.name}</td>
+      <td>{qi.quantity}</td>
+      {formatQuoteItemModelResultsCells(qimr)}
+    </tr>;
+  });
+
+  //const createdAtStr = fixedTimestamp ? (new Date(fixedTimestamp)).toLocaleString() : "";
+  //const createdAtStr2 = (new Date(fixedTimestamp)).toLocaleString(); 
+  const loadedQuoteSectionFrag = <>
+    <label>Name: {fixedName}</label>
+    <br/>
+    <label>Description: {fixedDescription}</label>
+    <br/>
+    <label>Quote created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Material Cost</th>
+          <th>In House Cost</th>
+          <th>Oustsourcing cost</th>
+          <th>Base unit cost</th>
+          <th>Wastage percent</th>
+          <th>Wastage included</th>
+          <th>Labor included 3%</th>
+          <th>Setup Cost</th>
+          <th>Setup included</th>
+          <th>Tax included</th>
+          <th>Overhead percent</th>
+          <th>Overhead included</th>
+          <th>Profit included 6%</th>
+        </tr>
+      </thead>
+      <tbody>
+        {loadedQuoteItemRowsFrag}
+      </tbody>
+    </table>
+  </>;
+
+  const quoteRowsFrag = quotes.map((q, i) => {
+    return (
+      <tr key={q.name + q.timestamp}>
+        <td>{q.name}</td>
+        <td>{(new Date(q.timestamp)).toLocaleString()}</td>
+        <td>{q.description}</td>
+        <td><button type="button" onClick={() => handleLoadQuote(i)}>Load</button></td>
+      </tr>
+    );
+  });
+
   const quoteItemsRowsFrag = quoteItems.map((qi, i) => {
 
-    const quoteItemModel = new QuoteItemModel({
-       items: items,
-       materials: materials,
-       metals: metals,
-       inHouses: inHouses,
-       outsourcings: outsourcings,
-       quoteItem: qi,
-    });
+    const qimr = quoteItemsModels[i].results();
 
     const itemSelectOptions = items.map(item => {
       return <option value={item.name} key={item.name}>{item.name}</option>;
     });
 
     const quoteItemSelectFrag = <select
-      value={qi[i]?.name}
+      value={qi.name}
       onChange={e => handleQuoteItemNameChange(e.target.value, i)}
     >
       <option value="" key="blank item"></option>
@@ -118,27 +260,15 @@ function Quotes({items, materials, metals, inHouses, outsourcings}) {
 
     const quoteItemQuantityFrag = <input
       name="quantity"
-      value={qi[i]?.quantity}
-      onChange={(e) => {handleQuoteItemQuantityChange(parseFloat(e.target.value), i)}}
+      value={qi.quantity}
+      onChange={(e) => {handleQuoteItemQuantityChange(e.target.value, i)}}
       style={{width: "60px"}}
     />;
 
     return <tr key={qi.key}>
       <td>{quoteItemSelectFrag}</td>
       <td>{quoteItemQuantityFrag}</td>
-      <td>{quoteItemModel.materialCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.inHouseCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.outsourcingCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.baseCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.wastagePercent.toFixed(2)}%</td>
-      <td>{quoteItemModel.postWastageCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.postLaborCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.setupCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.postSetupCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.postTaxCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.overheadPercent.toFixed(2)}%</td>
-      <td>{quoteItemModel.postOverheadCostPerUnit.toFixed(2)}</td>
-      <td>{quoteItemModel.postProfitCostPerUnit.toFixed(2)}</td>
+      {formatQuoteItemModelResultsCells(qimr)}
       <td><button type="button" onClick={() => deleteQuoteItem(i)}> - </button></td>
       <td><button type="button" onClick={() => addQuoteItem(i)}> + </button></td>
     </tr>
@@ -147,6 +277,41 @@ function Quotes({items, materials, metals, inHouses, outsourcings}) {
   return (
    <>
     <h1>Quotes page</h1>
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Timestamp</th>
+          <th>Description</th>
+          <th>Load</th>
+        </tr>
+      </thead>
+      <tbody>
+        {quoteRowsFrag}
+      </tbody>
+    </table>
+
+    <br/>
+    <br/>
+    <br/>
+
+    {quoteItemsModelResults && loadedQuoteSectionFrag }
+
+    <br/>
+    <br/>
+    <br/>
+    <label>Name:</label>
+    <input
+      value={name}
+      onChange={e => setName(e.target.value)}
+    />
+
+    <label>Description:</label>
+    <input
+      value={description}
+      onChange={e => setDescription(e.target.value)}
+      style={{width: "400px"}}
+    />
 
     <table border="1px solid black">
       <thead>
@@ -174,6 +339,10 @@ function Quotes({items, materials, metals, inHouses, outsourcings}) {
         {quoteItemsRowsFrag}
       </tbody>
     </table>
+
+    <button type="submit" onClick={handleSaveQuote}>
+      Save New Quote
+    </button>
    </>
   );
 }
