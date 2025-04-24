@@ -3,7 +3,7 @@ import { useState } from "react";
 export class LookupRangesModel {
   constructor(ranges, quantity) {
     const range = ranges.find(r => (r.starting <= quantity) && (quantity <= r.ending))
-    this.value = range?.value;
+    this.value = range?.value || Number.NaN;
   }
 }
 
@@ -11,8 +11,8 @@ export function LookupRangesStartingRange() {
   return {
     key: crypto.randomUUID(),
     starting: 0,
-    ending: 99999,
-    value: 0,
+    ending: 1000000,
+    value: "",
   };
 }
 
@@ -123,7 +123,7 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
   return (
    <>
     <h3>{title}:</h3>
-    <p>Quantity {quantity || 0} &rarr; {lookupRangesModel.value} {valueLabel}</p>
+    <p>Quantity {quantity || 0} &rarr; {valueLabel}: {lookupRangesModel.value}</p>
     <table border="1px solid black">
       <thead>
         <tr>

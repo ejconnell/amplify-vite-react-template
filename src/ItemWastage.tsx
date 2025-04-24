@@ -9,16 +9,13 @@ export function ItemWastageStartingRange() {
 }
 
 function ItemWastage({itemWastageRanges, exampleUnitQuantity, setItemWastageRanges}) {
-
-  //const iwModel = new ItemWastageModel(itemWastage);
-
   return (
     <LookupRanges
        ranges={itemWastageRanges}
        quantity={exampleUnitQuantity}
        setRanges={setItemWastageRanges}
        title="Wastage"
-       valueLabel="Wastage percentage"
+       valueLabel="Wastage %"
     />
   );
 }

@@ -65,10 +65,13 @@ async function loadItems(ddbDocClient, setItems) {
 };
 
 async function loadQuotes(ddbDocClient, setQuotes) {
-  await loadTable(ddbDocClient, setQuotes, "Quotes")
+  function sortCompare(a, b) {
+    return b.timestamp - a.timestamp;
+  };
+  await loadTable(ddbDocClient, setQuotes, "Quotes", sortCompare)
 };
 
-async function loadTable(ddbDocClient, setter, tableName) {
+async function loadTable(ddbDocClient, setter, tableName, sortCompare) {
   log(`loadTable("${tableName}")`)
   const paginatedScan = paginateScan(
     { client: ddbDocClient },
@@ -80,6 +83,9 @@ async function loadTable(ddbDocClient, setter, tableName) {
   const acc = [];
   for await (const page of paginatedScan) {
     acc.push(...page.Items);
+  }
+  if (sortCompare) {
+    acc.sort(sortCompare);
   }
   setter(acc);
 }
@@ -197,7 +203,7 @@ function MyTabs() {
       TableName: "Items",
       Item: item,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadItems(ddbDocClient, setItems);
   }
 

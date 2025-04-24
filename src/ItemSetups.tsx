@@ -3,7 +3,8 @@ import { useState } from "react";
 export class ItemSetupsModel {
   constructor(itemSetups, unitQuantity) {
     this.totalCostPerJob = itemSetups.map(s => Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
-    this.totalCostPerUnit = this.totalCostPerJob / unitQuantity;
+    this.totalCostPerUnit = unitQuantity ? this.totalCostPerJob / unitQuantity : Number.NaN;;
+    this.totalCostPerUnit = this.totalCostPerJob / unitQuantity;;
   }
 }
 
@@ -124,6 +125,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
       onChange={(e) => handleCustomNameChange(e.target.value, i)}
       style={{width: "150px"}}
     />
+    const rowCostPerUnit = is.costPerJob / exampleUnitQuantity;
     return <tr key={is.key}>
       <td>
         {is.isCustomName ? setupCustomNameInputFrag : standardSetupSelectFrag(i)}
@@ -139,6 +141,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
         value={is.costPerJob}
         onChange={(e) => handleCostChange(e.target.value, i)}
       /></td>
+      <td>{rowCostPerUnit.toFixed(2)}</td>
       <td><button type="button" onClick={() => deleteItemSetup(i)}> - </button></td>
       <td><button type="button" onClick={() => addItemSetup(i)}> + </button></td>
     </tr>
@@ -147,22 +150,25 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     <td>&rarr;</td>
     <td>&rarr;</td>
     <td>&rarr;</td>
+    <td>&rarr;</td>
     <td><button type="button" onClick={() => addItemSetup(-1)}> + </button></td>
   </tr>;
   const itemSetupsTotalRowFrag = <tr key="total row">
     <td><b>Total</b></td>
     <td><b>{isModel.totalCostPerJob.toFixed(2)}</b></td>
+    <td><b>{isModel.totalCostPerUnit.toFixed(2)}</b></td>
   </tr>
 
   return (
    <>
     <h3>Setup:</h3>
-    <p>Quantity: {exampleUnitQuantity} &rarr; Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
+    <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
     <table border="1px solid black">
       <thead>
         <tr>
           <th>Name (check box for custom)</th>
-          <th>Cost per Job</th>
+          <th>Cost per job</th>
+          <th>Cost per unit</th>
           <th>Delete</th>
           <th>Add</th>
         </tr>

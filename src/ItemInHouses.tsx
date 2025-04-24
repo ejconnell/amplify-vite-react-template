@@ -4,7 +4,7 @@ export class ItemInHousesModel {
   constructor(inHouses, itemInHouses) {
     this.rows = itemInHouses.map(iih => {
       const costPer1k = inHouses.find(ih => ih.name === iih.name)?.cost;
-      const costPerUnit = costPer1k * iih?.quantity / 1000;
+      const costPerUnit = iih.quantity === "" ? Number.NaN : costPer1k * iih.quantity / 1000;
       return {
         costPer1k: costPer1k,
         costPerUnit: costPerUnit,
@@ -53,7 +53,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
       ...itemInHouses.slice(0, index+1),
       {
         key: crypto.randomUUID(),
-        quantity: 0,
+        quantity: "",
       },
       ...itemInHouses.slice(index+1),
     ];
@@ -92,7 +92,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
       <td><input
         name="quantity"
         value={iih.quantity}
-        onChange={(e) => handleItemInHouseQuantityChange(parseFloat(e.target.value), i)}
+        onChange={(e) => handleItemInHouseQuantityChange(e.target.value, i)}
       /></td>
       <td>{iihModel.rows[i].costPer1k}</td>
       <td>{iihModel.rows[i].costPerUnit.toFixed(2)}</td>

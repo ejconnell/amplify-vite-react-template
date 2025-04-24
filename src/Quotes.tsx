@@ -197,8 +197,6 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </tr>;
   });
 
-  //const createdAtStr = fixedTimestamp ? (new Date(fixedTimestamp)).toLocaleString() : "";
-  //const createdAtStr2 = (new Date(fixedTimestamp)).toLocaleString(); 
   const loadedQuoteSectionFrag = <>
     <label>Name: {fixedName}</label>
     <br/>
@@ -231,12 +229,20 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </table>
   </>;
 
+  const MAX_SUMMARY_LENGTH = 80;
   const quoteRowsFrag = quotes.map((q, i) => {
+    let summary = q.quoteItems.map(qi => {
+      return `${qi.name}: ${qi.quantity}`;
+    }).join(", ");
+    if (summary.length > MAX_SUMMARY_LENGTH) {
+      summary = summary.slice(0, MAX_SUMMARY_LENGTH - 3) + "...";
+    }
     return (
       <tr key={q.name + q.timestamp}>
         <td>{q.name}</td>
         <td>{(new Date(q.timestamp)).toLocaleString()}</td>
         <td>{q.description}</td>
+        <td>{summary}</td>
         <td><button type="button" onClick={() => handleLoadQuote(i)}>Load</button></td>
       </tr>
     );
@@ -283,6 +289,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
           <th>Name</th>
           <th>Timestamp</th>
           <th>Description</th>
+          <th>Summary</th>
           <th>Load</th>
         </tr>
       </thead>

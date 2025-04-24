@@ -18,7 +18,7 @@ function ItemOverhead({itemOverheadRanges, exampleUnitQuantity, setItemOverheadR
        quantity={exampleUnitQuantity}
        setRanges={setItemOverheadRanges}
        title="Overhead"
-       valueLabel="Overhead percentage"
+       valueLabel="Overhead %"
     />
   );
 }

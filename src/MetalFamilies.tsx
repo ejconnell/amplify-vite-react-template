@@ -3,18 +3,22 @@ import { useState } from "react";
 function MetalFamilies({metalFamilies, saveMetalFamily}) {
   const [name, setName] = useState("");
 
-  const mfRowsFrag = metalFamilies.map(mf => {
-    return <tr key={mf.name}>
-      <td>{mf.name}</td>
-    </tr>
-  });
-
   function handleSaveMetalFamily() {
+    if (!name) {
+      alert("Need a name");
+      return;
+    }
     const metalFamily = {
       name: name,
     };
     saveMetalFamily(metalFamily)
   };
+
+  const mfRowsFrag = metalFamilies.map(mf => {
+    return <tr key={mf.name}>
+      <td>{mf.name}</td>
+    </tr>
+  });
 
   return (
    <>
@@ -34,6 +38,7 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
       value={name}
       onChange={e => setName(e.target.value)}
     />
+    <br/>
     <button type="submit" onClick={handleSaveMetalFamily}>
       Save Metal Family
     </button>

@@ -71,6 +71,39 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
 
   function handleSaveItem() {
     console.log("handleSaveItem()");
+    if (!name) {
+      alert("Need a name");
+      return;
+    }
+    if (!materialName) {
+      alert("Need a name");
+      return;
+    }
+    if (isNaN(itemModel.materialCostPerUnit)) {
+      alert("Need to fix Material section");
+      return;
+    }
+    if (isNaN(itemModel.inHouseCostPerUnit)) {
+      alert("Need to fix In House section");
+      return;
+    }
+    if (isNaN(itemModel.outsourcingCostPerUnit)) {
+      alert("Need to fix Outsourcing section");
+      return;
+    }
+    if (isNaN(itemModel.wastagePercent)) {
+      alert("Need to fix Wastage section");
+      return;
+    }
+    if (isNaN(itemModel.setupCostPerUnit)) {
+      alert("Need to fix Setup section");
+      return;
+    }
+    if (isNaN(itemModel.overheadPercent)) {
+      alert("Need to fix Overhead section");
+      return;
+    }
+
     const item = {
       name: name,
       materialName: materialName,
@@ -92,9 +125,9 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     setGramsPerUnit(item.gramsPerUnit);
     setItemSetups(item.itemSetups || []);
     setItemInHouses(item.itemInHouses || []);
-    setItemWastageRanges(item.itemWastageRanges || [ItemWastageStartingRange()]);
-    setItemOverheadRanges(item.itemOverheadRanges || [ItemOverheadStartingRange()]);
-    setItemOutsourcings(item.itemOutsourcings || []);
+    setItemWastageRanges(item.itemWastageRanges);
+    setItemOverheadRanges(item.itemOverheadRanges);
+    setItemOutsourcings(item.itemOutsourcings);
   }
 
   const itemRowsFrag = items.map((item, i) => {
@@ -104,9 +137,9 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       <td>{itemsModels[i].materialCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].inHouseCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].outsourcingCostPerUnit.toFixed(2)}</td>
-      <td>{itemsModels[i].wastagePercent.toFixed(2)}%</td>
+      <td>{itemsModels[i].wastagePercent.toFixed(2)}</td>
       <td>{itemsModels[i].setupCostPerUnit.toFixed(2)}</td>
-      <td>{itemsModels[i].overheadPercent.toFixed(2)}%</td>
+      <td>{itemsModels[i].overheadPercent.toFixed(2)}</td>
       <td>
         <button type="button" onClick={() => handleLoadItem(i)}>Load</button>
       </td>

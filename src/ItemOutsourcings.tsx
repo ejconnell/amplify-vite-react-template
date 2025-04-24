@@ -4,18 +4,17 @@ export class ItemOutsourcingsModel {
     this.totalCostPerJob = 0;
     this.rows = itemOutsourcings.map(io => {
       const outsourcing = outsourcings.find(o => o.name === io.name);
-      if (!outsourcing) { return {}; }
 
       let minCostPerUnit;
       let minCostPerKilogram;
       let costCutoverUnitQuantity;
-      if (outsourcing.isPricedByUnit) {
-        minCostPerUnit = outsourcing.variableCost;
-        costCutoverUnitQuantity = outsourcing.minCostPerJob / minCostPerUnit;
+      if (outsourcing?.isPricedByUnit) {
+        minCostPerUnit = outsourcing?.variableCost;
+        costCutoverUnitQuantity = outsourcing?.minCostPerJob / minCostPerUnit;
       } else {
-        minCostPerKilogram = outsourcing.variableCost;
+        minCostPerKilogram = outsourcing?.variableCost;
         minCostPerUnit = minCostPerKilogram / 1000 * io.gramsPerUnit;
-        costCutoverUnitQuantity = outsourcing.minCostPerJob / minCostPerUnit;
+        costCutoverUnitQuantity = outsourcing?.minCostPerJob / minCostPerUnit;
       }
 
       let costPerUnit;
@@ -24,19 +23,23 @@ export class ItemOutsourcingsModel {
         costPerUnit = minCostPerUnit;
         costPerJob = costPerUnit * unitQuantity;
       } else {
-        costPerJob = outsourcing.minCostPerJob;
-        costPerUnit = outsourcing.minCostPerJob / unitQuantity;
+        costPerJob = outsourcing?.minCostPerJob;
+        costPerUnit = outsourcing?.minCostPerJob / unitQuantity;
+      }
+      if (!minCostPerUnit) {
+        costPerJob = Number.NaN;
+        costPerUnit = Number.NaN;
       }
 
       this.totalCostPerUnit += costPerUnit;
       this.totalCostPerJob += costPerJob;
 
       return {
-        minCostPerUnit: minCostPerUnit,
-        minCostPerKilogram: minCostPerKilogram,
-        costCutoverUnitQuantity: costCutoverUnitQuantity,
-        costPerUnit: costPerUnit,
-        costPerJob: costPerJob,
+        minCostPerUnit: minCostPerUnit || Number.NaN,
+        minCostPerKilogram: minCostPerKilogram || Number.NaN,
+        costCutoverUnitQuantity: costCutoverUnitQuantity || Number.NaN,
+        costPerUnit: costPerUnit || Number.NaN,
+        costPerJob: costPerJob || Number.NaN,
       }
     });
   }
@@ -135,7 +138,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
     return <tr key={io.key}>
       <td>{nameSelectFrag}</td>
       <td>{gramsPerUnitInputFrag}</td>
-      <td>{modelRow.minCostPerKilogram}</td>
+      <td>{modelRow.minCostPerKilogram ? modelRow.minCostPerKilogram.toFixed(2) : "--"}</td>
       <td>{modelRow.minCostPerUnit.toFixed(4)}</td>
       <td>{outsourcing?.minCostPerJob}</td>
       <td>{modelRow.costCutoverUnitQuantity.toFixed(1)}</td>
@@ -160,7 +163,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
   return (
     <>
       <h3>Outsourcing:</h3>
-      <p>Quantity: {exampleUnitQuantity} &rarr; Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
+      <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
       <table border="1px solid black">
         <thead>
           <tr>

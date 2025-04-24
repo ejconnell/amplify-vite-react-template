@@ -25,7 +25,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
     })
   };
 
-  function handleViewEdit(index) {
+  function handleLoadMetal(index) {
      const metal = metals[index];
      setName(metal.name);
      setMetalFamilyName(metal.metalFamilyName);
@@ -37,7 +37,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
       <td>{m.name}</td>
       <td>{m.metalFamilyName}</td>
       <td>{m.density}</td>
-      <td><button type="button" onClick={() => handleViewEdit(i)}>View/Edit</button></td>
+      <td><button type="button" onClick={() => handleLoadMetal(i)}>Load</button></td>
     </tr>
   );
 
@@ -54,7 +54,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
           <th>Name</th>
           <th>Metal Family</th>
           <th>Density (g/mm^3)</th>
-          <th>View/Edit</th>
+          <th>Load</th>
         </tr>
       </thead>
       <tbody>

@@ -5,19 +5,34 @@ function InHouses({inHouses, saveInHouse}) {
   const [name, setName] = useState("");
   const [cost, setCost] = useState(0);
 
-  const tableRows = inHouses.map(m =>
+  function handleSaveInHouse() {
+    if (!name) {
+      alert("Need a name");
+      return;
+    }
+    if (isNaN(cost)) {
+      alert("Need a numeric cost");
+      return;
+    }
+    saveInHouse({
+      name: name,
+      cost: Number(cost),
+    });
+  }
+
+  function handleLoadInHouse(index) {
+    const inHouse = inHouses[index];
+    setName(inHouse.name);
+    setCost(inHouse.cost);
+  }
+
+  const tableRows = inHouses.map((m, i) =>
     <tr key={m.name}>
       <td>{m.name}</td>
       <td>{m.cost}</td>
+      <td><button type="button" onClick={() => handleLoadInHouse(i)}>Load</button></td>
     </tr>
   );
-
-  function handleSaveInHouse() {
-    saveInHouse({
-      name: name,
-      cost: cost,
-    });
-  }
 
   return (<>
     <h1>In Houses</h1>
@@ -25,8 +40,7 @@ function InHouses({inHouses, saveInHouse}) {
       <thead>
         <th>Name</th>
         <th>Cost</th>
-        <th>View/Edit TODO</th>
-        <th>Validation TODO</th>
+        <th>Load</th>
       </thead>
       <tbody>
         {tableRows}
@@ -37,7 +51,7 @@ function InHouses({inHouses, saveInHouse}) {
     <input value={name} onChange={(e) => setName(e.target.value)}/>
     <br/>
     <label>Cost:</label>
-    <input value={cost} onChange={(e) => setCost(parseFloat(e.target.value))}/>
+    <input value={cost} onChange={(e) => setCost(e.target.value)}/>
     <br/>
     <button type="submit" onClick={handleSaveInHouse}>
       Save In House

@@ -1,11 +1,15 @@
 import { useState } from "react";
 
 function StandardSetups({standardSetups, saveStandardSetup}) {
-  const [standardSetupName, setStandardSetupName] = useState("");
+  const [name, setName] = useState("");
 
   function handleSaveStandardSetup() {
+    if (!name) {
+      alert("Need a name");
+      return;
+    }
     saveStandardSetup({
-      name: standardSetupName,
+      name: name,
     });
   }
 
@@ -30,11 +34,12 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
       </tbody>
     </table>
 
-    <label>Standard Setup Name:</label>
+    <label>Name:</label>
     <input
-      value={standardSetupName}
-      onChange={(e) => setStandardSetupName(e.target.value)}
+      value={name}
+      onChange={(e) => setName(e.target.value)}
     />
+    <br/>
     <button type="submit" onClick={handleSaveStandardSetup}>
       Save Standard Setup
     </button>
