@@ -86,6 +86,8 @@ async function loadTable(ddbDocClient, setter, tableName, sortCompare) {
   }
   if (sortCompare) {
     acc.sort(sortCompare);
+  } else {
+    acc.sort((a, b) => a.name.localeCompare(b.name));
   }
   setter(acc);
 }

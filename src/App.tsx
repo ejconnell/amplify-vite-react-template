@@ -6,6 +6,7 @@ import MyTabs from './MyTabs.tsx';
 import { useAuth } from "react-oidc-context";
 
 import 'react-tabs/style/react-tabs.css';
+import './App.css';
 
 function App() {
 

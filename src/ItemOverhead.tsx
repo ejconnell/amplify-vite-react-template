@@ -10,8 +10,6 @@ export function ItemOverheadStartingRange() {
 
 function ItemOverhead({itemOverheadRanges, exampleUnitQuantity, setItemOverheadRanges}) {
 
-  //const iwModel = new ItemWastageModel(itemWastage);
-
   return (
     <LookupRanges
        ranges={itemOverheadRanges}

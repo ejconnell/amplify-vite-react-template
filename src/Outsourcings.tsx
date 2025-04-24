@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Accordion from 'react-bootstrap/Accordion';
+import Table from 'react-bootstrap/Table';
+import Importer from "./Importer";
 
 function Outsourcings({outsourcings, saveOutsourcing}) {
   const [name, setName] = useState("");
@@ -38,6 +41,25 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
      setMinCostPerJob(os.minCostPerJob);
   }
 
+  function importerProcessorFunc(grid) {
+    grid.forEach((row, i) => {
+      if ((row.length < 3) || (row.length > 4)) {
+        alert(`Import failed on row ${i+1}.  Expected exactly 3-4 columns`);
+        return;
+      }
+      const [name, variableCost, minCostPerJob, isPricedByUnit] = row;
+      if (!name) {
+        return;
+      }
+      saveOutsourcing({
+        name: name,
+        variableCost: Number(variableCost),
+        minCostPerJob: Number(minCostPerJob),
+        isPricedByUnit: isPricedByUnit?.toLowerCase() === "true",
+      });
+    });
+  }
+
   const outsourcingsRowsFrag = outsourcings.map((os, i) => {
     return <tr key={os.name}>
       <td>{os.name}</td>
@@ -50,57 +72,97 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     </tr>
   });
 
+  const importerInstructionsText = `Paste 3-4 columns with no header:
+  Column 1: name
+  Column 2: min cost per kg (or unit)
+  Column 3: min cost per job
+  Column 4: (optional) "true" if priced by unit or "false"
+            if priced by kg.  Defaults to "false"
+
+    --------------------------------|
+    | name1 | 25   | 50   | "true"  |
+    | name2 | 35   | 150  |         |
+    | name3 | 15   | 500  | "false" |
+    | ...   |
+  `;
+
   return (
    <>
-    <h1>Outsourcings page</h1>
+    <Accordion defaultActiveKey={["all", "current"]} alwaysOpen>
+      <Accordion.Item eventKey="all">
+        <Accordion.Header>All Outsourcings</Accordion.Header>
+        <Accordion.Body>
 
-    <table border="1px solid black">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Minimum cost per job</th>
-          <th>Priced by</th>
-          <th>Variable cost</th>
-          <th>Load</th>
-        </tr>
-      </thead>
-      <tbody>
-        {outsourcingsRowsFrag}
-      </tbody>
-    </table>
+          <Table bordered striped>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Minimum cost per job</th>
+                <th>Priced by</th>
+                <th>Cost per kg/unit</th>
+                <th>Load</th>
+              </tr>
+            </thead>
+            <tbody>
+              {outsourcingsRowsFrag}
+            </tbody>
+          </Table>
 
-    <label>Name:</label>
-    <input
-      value={name}
-      onChange={(e) => setName(e.target.value)}
-    />
-    <br/>
+        </Accordion.Body>
+      </Accordion.Item>
+      <Accordion.Item eventKey="current">
+        <Accordion.Header>Current Outsourcing</Accordion.Header>
+        <Accordion.Body>
 
-    <label>Minimum Cost per job:</label>
-    <input
-      value={minCostPerJob}
-      onChange={(e) => setMinCostPerJob(e.target.value)}
-    />
-    <br/>
+          <label>Name:</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <br/>
 
-    <label>Priced by unit:</label>
-    <input
-      type="checkbox"
-      name="isPricedByUnit"
-      checked={isPricedByUnit}
-      onChange={(e) => setIsPricedByUnit(!isPricedByUnit) }
-    />
+          <label>Minimum Cost per job:</label>
+          <input
+            value={minCostPerJob}
+            onChange={(e) => setMinCostPerJob(e.target.value)}
+          />
+          <br/>
 
-    <label>Minimum cost per {variableCostLabel}:</label>
-    <input
-      value={variableCost}
-      onChange={(e) => setVariableCost(e.target.value)}
-    />
-    <br/>
+          <label>Priced by unit:</label>
+          <input
+            type="checkbox"
+            name="isPricedByUnit"
+            checked={isPricedByUnit}
+            onChange={(e) => setIsPricedByUnit(!isPricedByUnit) }
+          />
+          <br/>
 
-    <button type="submit" onClick={handleSaveOutsourcing}>
-      Save Outsourcing
-    </button>
+          <label>Minimum cost per {variableCostLabel}:</label>
+          <input
+            value={variableCost}
+            onChange={(e) => setVariableCost(e.target.value)}
+          />
+          <br/>
+
+          <button type="submit" onClick={handleSaveOutsourcing}>
+            Save Outsourcing
+          </button>
+
+        </Accordion.Body>
+      </Accordion.Item>
+      <Accordion.Item eventKey="administration">
+        <Accordion.Header>Administration</Accordion.Header>
+        <Accordion.Body>
+
+          <Importer
+            instructionsText={importerInstructionsText}
+            buttonText="Save Outsourcings"
+            processorFunc={importerProcessorFunc}
+          />
+
+        </Accordion.Body>
+      </Accordion.Item>
+    </Accordion>
    </>
   );
 }
