@@ -38,9 +38,11 @@ function InHouses({inHouses, saveInHouse}) {
     <h1>In Houses</h1>
     <table border="1px solid black">
       <thead>
-        <th>Name</th>
-        <th>Cost</th>
-        <th>Load</th>
+        <tr>
+          <th>Name</th>
+          <th>Cost per 1k</th>
+          <th>Load</th>
+        </tr>
       </thead>
       <tbody>
         {tableRows}
@@ -50,7 +52,7 @@ function InHouses({inHouses, saveInHouse}) {
     <label>Name:</label>
     <input value={name} onChange={(e) => setName(e.target.value)}/>
     <br/>
-    <label>Cost:</label>
+    <label>Cost per 1k:</label>
     <input value={cost} onChange={(e) => setCost(e.target.value)}/>
     <br/>
     <button type="submit" onClick={handleSaveInHouse}>

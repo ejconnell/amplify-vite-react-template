@@ -12,7 +12,7 @@ import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
 import { ItemOutsourcingsModel } from "./ItemOutsourcings"
 
 export class ItemModel {
-  constructor({materials, metals, inHouses, outsourcings, materialName, gramsPerUnit, itemSetups=[], itemInHouses=[], itemWastageRanges=[], itemOverheadRanges=[], itemOutsourcings=[], unitQuantity}) {
+  constructor({materials, metals, inHouses, outsourcings, materialName, unitLength, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity}) {
     const material = materials.find(m => m.name === materialName) || {};
     const materialModel = new MaterialModel({metals: metals, ...material});
     const itemInHousesModel = new ItemInHousesModel(inHouses, itemInHouses);
@@ -20,11 +20,10 @@ export class ItemModel {
     const itemWastageModel = new ItemWastageModel(itemWastageRanges, unitQuantity);
     const itemSetupsModel = new ItemSetupsModel(itemSetups, unitQuantity);
     const itemOverheadModel = new ItemOverheadModel(itemOverheadRanges, unitQuantity);
-    this.materialCostPerUnit = gramsPerUnit * materialModel.effectiveCost / 1000;
-    this.unitLength = gramsPerUnit / materialModel.weightPerMm;
+    this.gramsPerUnit = unitLength === "" ? Number.NaN : unitLength * materialModel.weightPerMm;
+    this.materialCostPerUnit = this.gramsPerUnit * materialModel.effectiveCost / 1000;
     this.inHouseCostPerUnit = itemInHousesModel.totalCostPerUnit;
     this.outsourcingCostPerUnit = itemOutsourcingsModel.totalCostPerUnit;
-    //this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.outsourcingCostPerUnit;
     this.wastagePercent = Number(itemWastageModel.value);
     this.setupCostPerUnit = itemSetupsModel.totalCostPerUnit;
     this.overheadPercent = Number(itemOverheadModel.value);
@@ -35,7 +34,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   const [exampleUnitQuantity, setExampleUnitQuantity] = useState(300);
   const [name, setName] = useState("");
   const [materialName, setMaterialName] = useState("");
-  const [gramsPerUnit, setGramsPerUnit] = useState(0);
+  const [unitLength, setUnitLength] = useState("");
   const [itemSetups, setItemSetups] = useState([]);
   const [itemInHouses, setItemInHouses] = useState([]);
   const [itemWastageRanges, setItemWastageRanges] = useState([ItemWastageStartingRange()]);
@@ -52,7 +51,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   const itemModel = new ItemModel({
     ...lookupTables,
     materialName: materialName,
-    gramsPerUnit: Number(gramsPerUnit),
+    unitLength: unitLength,
     itemSetups: itemSetups,
     itemInHouses: itemInHouses,
     itemWastageRanges: itemWastageRanges,
@@ -107,7 +106,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     const item = {
       name: name,
       materialName: materialName,
-      gramsPerUnit: gramsPerUnit,
+      unitLength: unitLength,
       itemSetups: itemSetups,
       itemInHouses: itemInHouses,
       itemWastageRanges: itemWastageRanges,
@@ -122,9 +121,9 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     const item = items[index];
     setName(item.name);
     setMaterialName(item.materialName);
-    setGramsPerUnit(item.gramsPerUnit);
-    setItemSetups(item.itemSetups || []);
-    setItemInHouses(item.itemInHouses || []);
+    setUnitLength(item.unitLength);
+    setItemSetups(item.itemSetups);
+    setItemInHouses(item.itemInHouses);
     setItemWastageRanges(item.itemWastageRanges);
     setItemOverheadRanges(item.itemOverheadRanges);
     setItemOutsourcings(item.itemOutsourcings);
@@ -196,15 +195,15 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       {materialSelectOptions}
     </select>
     &nbsp;
-    <label>Grams per Unit:</label>
+    <label>Unit length (mm):</label>
     <input
-      value={gramsPerUnit}
-      onChange={(e) => setGramsPerUnit(e.target.value)}
+      value={unitLength}
+      onChange={(e) => setUnitLength(e.target.value)}
     />
     &nbsp;
-    <label>Cost per Unit: {itemModel.materialCostPerUnit?.toFixed(4)}</label>
+    <label>Cost per Unit: {itemModel.materialCostPerUnit.toFixed(4)}</label>
     &nbsp;
-    <label>Unit Length (mm): {itemModel.unitLength?.toFixed(4)}</label>
+    <label>Grams per unit: {itemModel.gramsPerUnit.toFixed(4)}</label>
     <br/>
 
     <ItemInHouses
@@ -217,6 +216,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       outsourcings={outsourcings}
       itemOutsourcings={itemOutsourcings}
       exampleUnitQuantity={exampleUnitQuantity}
+      startingGramsPerUnit={itemModel.gramsPerUnit}
       setItemOutsourcings={setItemOutsourcings}
     />
 

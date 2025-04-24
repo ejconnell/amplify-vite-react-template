@@ -2,8 +2,7 @@ import { useState } from "react";
 
 export class ItemSetupsModel {
   constructor(itemSetups, unitQuantity) {
-    this.totalCostPerJob = itemSetups.map(s => Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
-    this.totalCostPerUnit = unitQuantity ? this.totalCostPerJob / unitQuantity : Number.NaN;;
+    this.totalCostPerJob = itemSetups.map(s => s.costPerJob === "" ? Number.NaN : Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
     this.totalCostPerUnit = this.totalCostPerJob / unitQuantity;;
   }
 }
@@ -87,7 +86,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
         standardName: "",
         customName: "",
         isCustomName: false,
-        costPerJob: 0,
+        costPerJob: "",
       },
       ...itemSetups.slice(index+1),
     ];

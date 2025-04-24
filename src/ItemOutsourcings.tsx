@@ -45,7 +45,7 @@ export class ItemOutsourcingsModel {
   }
 }
 
-function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, setItemOutsourcings}) {
+function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, startingGramsPerUnit, setItemOutsourcings}) {
 
   const ioModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, exampleUnitQuantity);
 
@@ -55,7 +55,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
       {
         key: crypto.randomUUID(),
         name: "",
-        gramsPerUnit: 0,
+        gramsPerUnit: "",
       },
       ...itemOutsourcings.slice(index+1),
     ];
@@ -164,6 +164,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
     <>
       <h3>Outsourcing:</h3>
       <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
+      <p>Starting grams per unit: {startingGramsPerUnit.toFixed(4)}</p>
       <table border="1px solid black">
         <thead>
           <tr>
