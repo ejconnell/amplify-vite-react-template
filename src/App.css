@@ -2,9 +2,14 @@ body {
   line-height: normal;
 }
 
+h4 {
+  margin-top: 1rem;
+}
+
 .table {
   width: unset;
   border-color: black;
+  margin-bottom: unset;
 }
 .table tbody tr td, .table thead tr th {
   padding: 0px;

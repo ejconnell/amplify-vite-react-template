@@ -1,3 +1,5 @@
+import Table from 'react-bootstrap/Table';
+
 export class ItemOutsourcingsModel {
   constructor(outsourcings, itemOutsourcings, unitQuantity) {
     this.totalCostPerUnit = 0;
@@ -158,14 +160,16 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
     <td></td>
     <td><b>{ioModel.totalCostPerUnit.toFixed(4)}</b></td>
     <td>{ioModel.totalCostPerJob.toFixed(1)}</td>
+    <td></td>
+    <td></td>
   </tr>;
 
   return (
     <>
-      <h3>Outsourcing:</h3>
+      <h4>Outsourcing:</h4>
       <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
       <p>Starting grams per unit: {startingGramsPerUnit.toFixed(4)}</p>
-      <table border="1px solid black">
+      <Table bordered striped>
         <thead>
           <tr>
             <th>Name</th>
@@ -184,7 +188,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
           {itemOutsourcings.length === 0 ? itemOutsourcingsEmptyRowFrag : itemOutsourcingsRowsFrag}
           {itemOutsourcingsTotalRowFrag}
         </tbody>
-      </table>
+      </Table>
     </>
   );
 }

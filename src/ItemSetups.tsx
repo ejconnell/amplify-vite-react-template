@@ -1,4 +1,4 @@
-import { useState } from "react";
+import Table from 'react-bootstrap/Table';
 
 export class ItemSetupsModel {
   constructor(itemSetups, unitQuantity) {
@@ -156,13 +156,15 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     <td><b>Total</b></td>
     <td><b>{isModel.totalCostPerJob.toFixed(2)}</b></td>
     <td><b>{isModel.totalCostPerUnit.toFixed(2)}</b></td>
+    <td></td>
+    <td></td>
   </tr>
 
   return (
    <>
-    <h3>Setup:</h3>
+    <h4>Setup:</h4>
     <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
-    <table border="1px solid black">
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Name (check box for custom)</th>
@@ -176,7 +178,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
         {itemSetups.length === 0 ? itemSetupsEmptyRowFrag : itemSetupsRowsFrag}
         {itemSetupsTotalRowFrag}
       </tbody>
-    </table>
+    </Table>
    </>
   );
 }

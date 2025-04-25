@@ -1,4 +1,4 @@
-import { useState } from "react";
+import Table from 'react-bootstrap/Table';
 
 export class ItemInHousesModel {
   constructor(inHouses, itemInHouses) {
@@ -113,12 +113,14 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     <td></td>
     <td></td>
     <td><b>{iihModel.totalCostPerUnit.toFixed(2)}</b></td>
+    <td></td>
+    <td></td>
   </tr>;
 
   return (
    <>
-    <h3>In House:</h3>
-    <table border="1px solid black">
+    <h4>In House:</h4>
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Name</th>
@@ -133,7 +135,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
         {itemInHouses.length === 0 ? itemInHousesEmptyRowFrag : itemInHousesRowsFrag}
         {itemInHousesTotalRowFrag}
       </tbody>
-    </table>
+    </Table>
    </>
   );
 }

@@ -57,10 +57,10 @@ export class MaterialModel {
 
   buildAutoName(metalName, shape, width, innerWidth) {
     if (!metalName) return "-";
-    let str = `${metalName} ${width}`;
+    let str = `${metalName} ${Number(width).toFixed(1)}`;
     if (!shape) return str;
     if (shape.hasInnerWidth) {
-      str += `-${innerWidth}`
+      str += `-${Number(innerWidth).toFixed(1)}`
     }
     str += "mm"
     if (shape.abbreviation) {
@@ -206,12 +206,12 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
       <td>{m.name}</td>
       <td>{m.metalName}</td>
       <td>{m.shapeName}</td>
-      <td>{m.width}</td>
-      <td>{m.innerWidth || "-"}</td>
-      <td>{materialsModels[i].weightPerMm.toFixed(4)}</td>
-      <td>{m.rawCost.toFixed(4)}</td>
-      <td>{m.markup}</td>
-      <td>{materialsModels[i].effectiveCost.toFixed(4)}</td>
+      <td style={{textAlign: "right"}}>{m.width.toFixed(1)}</td>
+      <td style={{textAlign: "right"}}>{m.innerWidth ? m.innerWidth.toFixed(1) : "---"}</td>
+      <td style={{textAlign: "right"}}>{materialsModels[i].weightPerMm.toFixed(4)}</td>
+      <td style={{textAlign: "right"}}>{m.rawCost.toFixed(4)}</td>
+      <td style={{textAlign: "right"}}>{m.markup}</td>
+      <td style={{textAlign: "right"}}>{materialsModels[i].effectiveCost.toFixed(4)}</td>
       <td><button type="button" onClick={() => handleLoadMaterial(i)}>Load</button></td>
     </tr>
   );

@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Table from 'react-bootstrap/Table';
+import Importer from "./Importer";
+import Trifold from "./Trifold";
 import ItemSetups from "./ItemSetups"
 import ItemInHouses from "./ItemInHouses"
 import ItemWastage from "./ItemWastage"
@@ -148,10 +151,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
      return <option value={m.name} key={m.name}>{m.name}</option>;
   });
 
-  return (
-   <>
-    <h1>Items page</h1>
-
+  const allItemsFrag = (<>
     <label>Example unit quantity:</label>
     <input
       value={exampleUnitQuantity}
@@ -160,11 +160,11 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     <br/>
     <br/>
 
-    <table border="1px solid black">
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Name</th>
-          <th>Metal</th>
+          <th>Material name</th>
           <th>Material cost</th>
           <th>In House cost</th>
           <th>Outsourcing cost</th>
@@ -177,8 +177,10 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       <tbody>
         {itemRowsFrag}
       </tbody>
-    </table>
+    </Table>
+  </>);
 
+  const currentItemFrag = (<>
     <label>Name:</label>
     <input
       value={name}
@@ -186,7 +188,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     />
     <br/>
 
-    <label>Material:</label>
+    <h4>Material:</h4>
     <select
       value={materialName}
       onChange={e => setMaterialName(e.target.value)}
@@ -200,9 +202,9 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       value={unitLength}
       onChange={(e) => setUnitLength(e.target.value)}
     />
-    &nbsp;
-    <label>Cost per Unit: {itemModel.materialCostPerUnit.toFixed(4)}</label>
-    &nbsp;
+    <br/>
+    <label>Cost per unit: {itemModel.materialCostPerUnit.toFixed(4)}</label>
+    <br/>
     <label>Grams per unit: {itemModel.gramsPerUnit.toFixed(4)}</label>
     <br/>
 
@@ -244,8 +246,60 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     <button type="submit" onClick={handleSaveItem}>
       Save Item
     </button>
-   </>
+  </>);
+
+  const importerInstructionsText = `This importer works for a single item at a time.
+It doesn't 'save' the item directly; it only 'loads' it
+to the "Current Item" section for you to review and then
+click "Save Item".
+
+In Google Sheets go to an Item tab, click on cell P46
+and drag back to cell A1.  Copy and then paste the
+whole thing here.
+  `;
+
+  function importerProcessorFunc(grid) {
+    const metalNames = metals.map(m => m.name);
+
+    console.log("DDDDDDDDDDD")
+    console.log(grid.length);
+    console.log(grid[0].length);
+    grid.forEach((row, i) => {
+      if (row.length !== 4) {
+        alert(`Import failed on row ${i+1}.  Expected exactly 4 columns`);
+        return;
+      }
+    });
+/*
+    setName(item.name);
+    setMaterialName(item.materialName);
+    setUnitLength(item.unitLength);
+    setItemSetups(item.itemSetups);
+    setItemInHouses(item.itemInHouses);
+    setItemWastageRanges(item.itemWastageRanges);
+    setItemOverheadRanges(item.itemOverheadRanges);
+    setItemOutsourcings(item.itemOutsourcings);
+*/
+  }
+
+  const administrationFrag = (<>
+    <Importer
+      instructionsText={importerInstructionsText}
+      buttonText="Load to Current Item"
+      processorFunc={importerProcessorFunc}
+    />
+  </>);
+
+  return (
+    <Trifold
+      top={allItemsFrag}
+      middle={currentItemFrag}
+      bottom={administrationFrag}
+      singular="Item"
+      plural="Items"
+    />
   );
+
 }
 
 export default Items;

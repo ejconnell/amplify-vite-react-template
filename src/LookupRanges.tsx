@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Table from 'react-bootstrap/Table';
 
 export class LookupRangesModel {
   constructor(ranges, quantity) {
@@ -122,9 +123,9 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
 
   return (
    <>
-    <h3>{title}:</h3>
+    <h4>{title}:</h4>
     <p>Quantity {quantity || 0} &rarr; {valueLabel}: {lookupRangesModel.value}</p>
-    <table border="1px solid black">
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Range Start</th>
@@ -135,7 +136,7 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
       <tbody>
         {rangesRowsFrag}
       </tbody>
-    </table>
+    </Table>
 
     <input
       value={splitRangeAt}
