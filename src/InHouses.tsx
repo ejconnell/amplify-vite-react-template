@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { useState } from "react";
+import Table from 'react-bootstrap/Table';
+import Importer from "./Importer";
+import Trifold from "./Trifold";
 
 function InHouses({inHouses, saveInHouse}) {
   const [name, setName] = useState("");
@@ -26,6 +28,28 @@ function InHouses({inHouses, saveInHouse}) {
     setCost(inHouse.cost);
   }
 
+  function importerProcessorFunc(grid) {
+    grid.forEach((row, i) => {
+      if (row.length !== 2) {
+        alert(`Import failed on row ${i+1}.  Expected exactly 2 columns`);
+        return;
+      }
+      const [name, cost] = row;
+      if (!name) {
+        alert(`Import failed on row ${i+1}.  Need a name.`);
+        return;
+      }
+      if (isNaN(cost)) {
+        alert(`Import failed on row ${i+1}.  Need a numeric cost.`);
+        return;
+      }
+      saveInHouse({
+        name: name,
+        cost: Number(cost),
+      });
+    });
+  }
+
   const tableRows = inHouses.map((m, i) =>
     <tr key={m.name}>
       <td>{m.name}</td>
@@ -34,9 +58,19 @@ function InHouses({inHouses, saveInHouse}) {
     </tr>
   );
 
-  return (<>
-    <h1>In Houses</h1>
-    <table border="1px solid black">
+  const importerInstructionsText = `Paste 2 columns with no header:
+  Column 1: name
+  Column 2: cost per 1k
+
+    ----------------
+    | name1 | 25   |
+    | name2 | 35   |
+    | name3 | 15   |
+    | ...   |      |
+  `;
+
+  const allInHousesFrag = (<>
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Name</th>
@@ -47,8 +81,10 @@ function InHouses({inHouses, saveInHouse}) {
       <tbody>
         {tableRows}
       </tbody>
-    </table>
+    </Table>
+  </>);
 
+  const currentInHouseFrag = (<>
     <label>Name:</label>
     <input value={name} onChange={(e) => setName(e.target.value)}/>
     <br/>
@@ -58,6 +94,24 @@ function InHouses({inHouses, saveInHouse}) {
     <button type="submit" onClick={handleSaveInHouse}>
       Save In House
     </button>
+  </>);
+
+  const administrationFrag = (<>
+    <Importer
+      instructionsText={importerInstructionsText}
+      buttonText="Save In Houses"
+      processorFunc={importerProcessorFunc}
+    />
+  </>);
+
+  return (<>
+    <Trifold
+      top={allInHousesFrag}
+      middle={currentInHouseFrag}
+      bottom={administrationFrag}
+      singular="In House"
+      plural="In Houses"
+    />
   </>);
 }
 

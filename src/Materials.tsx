@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Table from 'react-bootstrap/Table';
+import Importer from "./Importer";
+import Trifold from "./Trifold";
 
 const Shapes = [
   {
@@ -44,12 +47,12 @@ export class MaterialModel {
     const shape = Shapes.find(s => s.name === shapeName)
 
     this.autoName = this.buildAutoName(metalName, shape, width, innerWidth);
-    this.density = metal?.density || 0;
+    this.density = Number(metal?.density);
     this.hasInnerWidth = shape?.hasInnerWidth || false;
     this.widthLabel = shape?.widthLabel || "-";
-    this.crossSectionArea = shape?.area(width, innerWidth) || 0;
-    this.weightPerMm = (this.density * this.crossSectionArea) || 0;
-    this.effectiveCost = (rawCost + (rawCost * markup / 100)) || 0;
+    this.crossSectionArea = width === "" ? Number.NaN : Number(shape?.area(width, innerWidth));
+    this.weightPerMm = Number(this.density * this.crossSectionArea);
+    this.effectiveCost = rawCost === "" ? Number.NaN : Number(rawCost + (rawCost * markup / 100));
   }
 
   buildAutoName(metalName, shape, width, innerWidth) {
@@ -72,11 +75,10 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
   const [name, setName] = useState("");
   const [metalName, setMetalName] = useState("");
   const [shapeName, setShapeName] = useState(Shapes[0].name);
-  const [width, setWidth] = useState(0);
-  const [innerWidth, setInnerWidth] = useState(0);
-  const [rawCost, setRawCost] = useState(0);
+  const [width, setWidth] = useState("");
+  const [innerWidth, setInnerWidth] = useState("");
+  const [rawCost, setRawCost] = useState("");
   const [markup, setMarkup] = useState(6.5);
-
 
   const materialModel = new MaterialModel({
     metals: metals,
@@ -84,7 +86,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
     shapeName: shapeName,
     width: width,
     innerWidth: innerWidth,
-    rawCost: Number(rawCost),
+    rawCost: rawCost,
     markup: markup,
   });
   const mergedName = isNameManual ? name : materialModel.autoName;
@@ -141,6 +143,52 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
     saveMaterial(material);
   };
 
+  function importerProcessorFunc(grid) {
+    const metalNames = metals.map(m => m.name);
+
+    grid.forEach((row, i) => {
+      if (row.length !== 4) {
+        alert(`Import failed on row ${i+1}.  Expected exactly 4 columns`);
+        return;
+      }
+      const [metalName, width, rawCost, markup] = row;
+      if (!metalName || !metalNames.includes(metalName)) {
+        alert(`Import failed on row ${i+1}.  Metal ${metalName} not found.`);
+        return;
+      }
+      if (!width || isNaN(width)) {
+        alert(`Import failed on row ${i+1}.  Need a numeric width.`);
+        return;
+      }
+      if (isNaN(rawCost)) {
+        alert(`Import failed on row ${i+1}.  Need a numeric raw cost.`);
+        return;
+      }
+      if (isNaN(markup)) {
+        alert(`Import failed on row ${i+1}.  Need a numeric markup.`);
+        return;
+      }
+      const materialModel = new MaterialModel({
+        metals: metals,
+        metalName: metalName,
+        shapeName: Shapes[0].name,
+        width: width,
+        innerWidth: "0",
+        rawCost: rawCost,
+        markup: markup,
+      });
+      saveMaterial({
+        name: materialModel.autoName,
+        isNameManual: false,
+        metalName: metalName,
+        shapeName: Shapes[0].name,
+        width: Number(width),
+        rawCost: Number(rawCost),
+        markup: Number(markup),
+      });
+    });
+  }
+
   function handleLoadMaterial(index) {
      const material = materials[index];
      setName(material.name);
@@ -185,10 +233,8 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
      return <option value={s.name} key={s.name}>{s.name}</option>;
   });
 
-  return (
-   <>
-    <h1>Materials</h1>
-    <table border="1px solid black">
+  const allMaterialsFrag = (
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Name</th>
@@ -206,8 +252,10 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
       <tbody>
         {tableRows}
       </tbody>
-    </table>
+    </Table>
+  );
 
+  const currentMaterialFrag = (<>
     <label>Name:</label>
     <input
       value={mergedName}
@@ -273,8 +321,39 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
     <button type="submit" onClick={handleSaveMaterial}>
       Save Material
     </button>
-    <br/>
-   </>
+  </>);
+
+  const importerInstructionsText = `This importer only supports cylindrical shaped
+materials.  Manual material names are not supported.
+Paste 4 columns with no header:
+  Column 1: metal name
+  Column 2: diameter
+  Column 3: raw cost
+  Column 4: markup %
+
+    -----------------------------|
+    | C3604B | 1.8 | 291  | 6.5  |
+    | GS5A-B | 5.0 | 317  | 6.5  |
+    | 1215MS | 2.0 | 77.5 | 35   |
+    | ...    |
+  `;
+
+  const administrationFrag = (<>
+    <Importer 
+      instructionsText={importerInstructionsText}
+      buttonText="Save Materials"
+      processorFunc={importerProcessorFunc}
+    />
+  </>);
+
+  return (
+    <Trifold
+      top={allMaterialsFrag}
+      middle={currentMaterialFrag}
+      bottom={administrationFrag}
+      singular="Material"
+      plural="Materials"
+    />
   );
 }
 

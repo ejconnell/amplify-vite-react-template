@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Accordion from 'react-bootstrap/Accordion';
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
+import Trifold from "./Trifold";
 
 function Outsourcings({outsourcings, saveOutsourcing}) {
   const [name, setName] = useState("");
@@ -86,85 +86,76 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     | ...   |
   `;
 
-  return (
-   <>
-    <Accordion defaultActiveKey={["all", "current"]} alwaysOpen>
-      <Accordion.Item eventKey="all">
-        <Accordion.Header>All Outsourcings</Accordion.Header>
-        <Accordion.Body>
+  const allOutsourcingsFrag = (<>
+    <Table bordered striped>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Minimum cost per job</th>
+          <th>Priced by</th>
+          <th>Cost per kg/unit</th>
+          <th>Load</th>
+        </tr>
+      </thead>
+      <tbody>
+        {outsourcingsRowsFrag}
+      </tbody>
+    </Table>
+  </>);
 
-          <Table bordered striped>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Minimum cost per job</th>
-                <th>Priced by</th>
-                <th>Cost per kg/unit</th>
-                <th>Load</th>
-              </tr>
-            </thead>
-            <tbody>
-              {outsourcingsRowsFrag}
-            </tbody>
-          </Table>
+  const currentOutsourcingFrag = (<>
+    <label>Name:</label>
+    <input
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+    />
+    <br/>
 
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="current">
-        <Accordion.Header>Current Outsourcing</Accordion.Header>
-        <Accordion.Body>
+    <label>Minimum Cost per job:</label>
+    <input
+      value={minCostPerJob}
+      onChange={(e) => setMinCostPerJob(e.target.value)}
+    />
+    <br/>
 
-          <label>Name:</label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <br/>
+    <label>Priced by unit:</label>
+    <input
+      type="checkbox"
+      name="isPricedByUnit"
+      checked={isPricedByUnit}
+      onChange={(e) => setIsPricedByUnit(!isPricedByUnit) }
+    />
+    <br/>
 
-          <label>Minimum Cost per job:</label>
-          <input
-            value={minCostPerJob}
-            onChange={(e) => setMinCostPerJob(e.target.value)}
-          />
-          <br/>
+    <label>Minimum cost per {variableCostLabel}:</label>
+    <input
+      value={variableCost}
+      onChange={(e) => setVariableCost(e.target.value)}
+    />
+    <br/>
 
-          <label>Priced by unit:</label>
-          <input
-            type="checkbox"
-            name="isPricedByUnit"
-            checked={isPricedByUnit}
-            onChange={(e) => setIsPricedByUnit(!isPricedByUnit) }
-          />
-          <br/>
+    <button type="submit" onClick={handleSaveOutsourcing}>
+      Save Outsourcing
+    </button>
+  </>);
 
-          <label>Minimum cost per {variableCostLabel}:</label>
-          <input
-            value={variableCost}
-            onChange={(e) => setVariableCost(e.target.value)}
-          />
-          <br/>
+  const administrationFrag = (<>
+    <Importer
+      instructionsText={importerInstructionsText}
+      buttonText="Save Outsourcings"
+      processorFunc={importerProcessorFunc}
+    />
+  </>);
 
-          <button type="submit" onClick={handleSaveOutsourcing}>
-            Save Outsourcing
-          </button>
-
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="administration">
-        <Accordion.Header>Administration</Accordion.Header>
-        <Accordion.Body>
-
-          <Importer
-            instructionsText={importerInstructionsText}
-            buttonText="Save Outsourcings"
-            processorFunc={importerProcessorFunc}
-          />
-
-        </Accordion.Body>
-      </Accordion.Item>
-    </Accordion>
-   </>
-  );
+  return (<>
+    <Trifold
+      top={allOutsourcingsFrag}
+      middle={currentOutsourcingFrag}
+      bottom={administrationFrag}
+      singular="Outsourcing"
+      plural="Outsourcings"
+    />
+  </>);
 }
 
 export default Outsourcings;

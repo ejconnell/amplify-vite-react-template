@@ -5,17 +5,9 @@ body {
 .table {
   width: unset;
   border-color: black;
-  padding: 0px;
 }
-.table tbody tr td {
-  width: unset;
-  border-color: black;
+.table tbody tr td, .table thead tr th {
   padding: 0px;
-}
-table button {
-  line-height: normal;
-  display: block;
-  margin: auto;
 }
 
 button.accordion-button {

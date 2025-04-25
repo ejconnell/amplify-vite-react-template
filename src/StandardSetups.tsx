@@ -1,7 +1,8 @@
 import { useState } from "react";
-import Accordion from 'react-bootstrap/Accordion';
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
+import Trifold from "./Trifold";
+
 
 function StandardSetups({standardSetups, saveStandardSetup}) {
   const [name, setName] = useState("");
@@ -46,57 +47,48 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
     | ...   |
   `;
 
-  return (
-   <>
-    <Accordion defaultActiveKey={["all", "current"]} alwaysOpen>
-      <Accordion.Item eventKey="all">
-        <Accordion.Header>All Standard Setups</Accordion.Header>
-        <Accordion.Body>
+  const allStandardSetupsFrag = (<>
+    <Table bordered striped>
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows}
+      </tbody>
+    </Table>
+  </>);
 
-          <Table bordered striped>
-            <thead>
-              <tr>
-                <th>Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableRows}
-            </tbody>
-          </Table>
+  const currentStandardSetupFrag = (<>
+    <label>Name:</label>
+    <input
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+    />
+    <br/>
+    <button type="submit" onClick={handleSaveStandardSetup}>
+      Save Standard Setup
+    </button>
+  </>);
 
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="current">
-        <Accordion.Header>Current Standard Setup</Accordion.Header>
-        <Accordion.Body>
+  const administrationFrag = (<>
+    <Importer
+      instructionsText={importerInstructionsText}
+      buttonText="Save Standard Setups"
+      processorFunc={importerProcessorFunc}
+    />
+  </>);
 
-          <label>Name:</label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <br/>
-          <button type="submit" onClick={handleSaveStandardSetup}>
-            Save Standard Setup
-          </button>
-
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="administration">
-        <Accordion.Header>Administration</Accordion.Header>
-        <Accordion.Body>
-
-          <Importer
-            instructionsText={importerInstructionsText}
-            buttonText="Save Standard Setups"
-            processorFunc={importerProcessorFunc}
-          />
-
-        </Accordion.Body>
-      </Accordion.Item>
-    </Accordion>
-   </>
-  );
+  return (<>
+    <Trifold
+      top={allStandardSetupsFrag}
+      middle={currentStandardSetupFrag}
+      bottom={administrationFrag}
+      singular="Standard Setup"
+      plural="Standard Setups"
+    />
+  </>);
 }
 
 export default StandardSetups;

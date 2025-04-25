@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Table from 'react-bootstrap/Table';
+import Trifold from "./Trifold";
 
 function MetalFamilies({metalFamilies, saveMetalFamily}) {
   const [name, setName] = useState("");
@@ -20,10 +22,8 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
     </tr>
   });
 
-  return (
-   <>
-    <h1>Metal Families</h1>
-    <table border="1px solid black">
+  const allMetalFamiliesFrag = (<>
+    <Table bordered striped>
       <thead>
          <tr>
            <th>Name</th>
@@ -32,8 +32,10 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
       <tbody>
         {mfRowsFrag}
       </tbody>
-    </table>
+    </Table>
+  </>);
 
+  const currentMetalFamilyFrag = (<>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
@@ -42,7 +44,16 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
     <button type="submit" onClick={handleSaveMetalFamily}>
       Save Metal Family
     </button>
-   </>
+  </>);
+
+  return (
+    <Trifold
+      top={allMetalFamiliesFrag}
+      middle={currentMetalFamilyFrag}
+      bottom=""
+      singular="Metal Family"
+      plural="Metal Families"
+    />
   );
 }
 
