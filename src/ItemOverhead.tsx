@@ -1,11 +1,11 @@
 import LookupRanges from "./LookupRanges"
-import { LookupRangesModel, LookupRangesStartingRange } from "./LookupRanges"
+import { LookupRangesModel, LookupRangesInitialRange } from "./LookupRanges"
 
 export class ItemOverheadModel extends LookupRangesModel {
 }
 
-export function ItemOverheadStartingRange() {
-  return LookupRangesStartingRange();
+export function ItemOverheadInitialRange() {
+  return LookupRangesInitialRange();
 }
 
 function ItemOverhead({itemOverheadRanges, exampleUnitQuantity, setItemOverheadRanges}) {

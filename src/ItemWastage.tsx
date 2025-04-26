@@ -1,11 +1,11 @@
 import LookupRanges from "./LookupRanges"
-import { LookupRangesModel, LookupRangesStartingRange } from "./LookupRanges"
+import { LookupRangesModel, LookupRangesInitialRange } from "./LookupRanges"
 
 export class ItemWastageModel extends LookupRangesModel {
 }
 
-export function ItemWastageStartingRange() {
-  return LookupRangesStartingRange();
+export function ItemWastageInitialRange() {
+  return LookupRangesInitialRange();
 }
 
 function ItemWastage({itemWastageRanges, exampleUnitQuantity, setItemWastageRanges}) {

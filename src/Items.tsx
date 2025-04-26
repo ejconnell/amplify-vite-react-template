@@ -10,8 +10,8 @@ import ItemOutsourcings from "./ItemOutsourcings"
 import { MaterialModel } from "./Materials"
 import { ItemSetupsModel } from "./ItemSetups"
 import { ItemInHousesModel } from "./ItemInHouses"
-import { ItemWastageModel, ItemWastageStartingRange } from "./ItemWastage"
-import { ItemOverheadModel, ItemOverheadStartingRange } from "./ItemOverhead"
+import { ItemWastageModel, ItemWastageInitialRange } from "./ItemWastage"
+import { ItemOverheadModel, ItemOverheadInitialRange } from "./ItemOverhead"
 import { ItemOutsourcingsModel } from "./ItemOutsourcings"
 
 export class ItemModel {
@@ -40,8 +40,8 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   const [unitLength, setUnitLength] = useState("");
   const [itemSetups, setItemSetups] = useState([]);
   const [itemInHouses, setItemInHouses] = useState([]);
-  const [itemWastageRanges, setItemWastageRanges] = useState([ItemWastageStartingRange()]);
-  const [itemOverheadRanges, setItemOverheadRanges] = useState([ItemOverheadStartingRange()]);
+  const [itemWastageRanges, setItemWastageRanges] = useState([ItemWastageInitialRange()]);
+  const [itemOverheadRanges, setItemOverheadRanges] = useState([ItemOverheadInitialRange()]);
   const [itemOutsourcings, setItemOutsourcings] = useState([]);
 
   const lookupTables = {
@@ -250,7 +250,8 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
 
   const importerInstructionsText = `This importer works for a single item at a time.
 It doesn't 'save' the item directly; it only 'loads' it
-to the "Current Item" section for you to review and then
+to the "Current Item" section for you to review, then add
+the 'name' field based on Google Sheet tab name, and then
 click "Save Item".
 
 In Google Sheets go to an Item tab, click on cell P46
@@ -259,27 +260,142 @@ whole thing here.
   `;
 
   function importerProcessorFunc(grid) {
-    const metalNames = metals.map(m => m.name);
+    const materialNames = materials.map(m => m.name);
+    const standardSetupNames = standardSetups.map(m => m.name);
+    const inHouseNames = inHouses.map(m => m.name);
+    const outsourcingNames = outsourcings.map(m => m.name);
 
-    console.log("DDDDDDDDDDD")
-    console.log(grid.length);
-    console.log(grid[0].length);
+    let numErrors = 0;
+    const MaxErrors = 2;
+    if (grid.length !== 46) {
+      doAlert(`Import aborted. Expected exactly 46 rows but got ${grid.length}`);
+      return;
+    }
+    console.log(grid);
+    function doAlert(str) {
+      if (numErrors < MaxErrors) {
+        if (numErrors < MaxErrors - 1) {
+          alert(str);
+        } else {
+          alert(str + " - Additional errors will be ignored");
+        }
+      }
+      numErrors += 1;
+    }
     grid.forEach((row, i) => {
-      if (row.length !== 4) {
-        alert(`Import failed on row ${i+1}.  Expected exactly 4 columns`);
+      if (row.length !== 16) {
+        doAlert(`Import failed on row ${i+1}.  Expected exactly 16 columns but got ${row.length}`);
         return;
       }
     });
-/*
-    setName(item.name);
-    setMaterialName(item.materialName);
-    setUnitLength(item.unitLength);
-    setItemSetups(item.itemSetups);
-    setItemInHouses(item.itemInHouses);
-    setItemWastageRanges(item.itemWastageRanges);
-    setItemOverheadRanges(item.itemOverheadRanges);
-    setItemOutsourcings(item.itemOutsourcings);
-*/
+    const materialName = grid[1][0];
+    if (materialNames.includes(materialName)) {
+      setMaterialName(materialName);
+    } else {
+      setMaterialName(materialName.replace("-", " "));
+    }
+
+    const unitLength = grid[3][13];
+    setUnitLength(unitLength);
+
+    const itemSetups = [];
+    for (let row = 2; row <= 7; row++) {
+      const standardSetupName = grid[row][5];
+      const costPerJob = grid[row][6];
+      if (!standardSetupName) continue;
+      if (!standardSetupNames.includes(standardSetupName)) {
+        doAlert(`Standard setup name '${standardSetupName}' not found on row ${row+1}`);
+        continue;
+      }
+      itemSetups.push({
+        key: crypto.randomUUID(),
+        standardName: standardSetupName,
+        customName: "",
+        isCustomName: false,
+        costPerJob: costPerJob,
+      });
+    }
+    for (let row = 10; row <= 15; row++) {
+      const customSetupName = grid[row][5];
+      const costPerJob = grid[row][6];
+      if (!customSetupName) continue;
+      itemSetups.push({
+        key: crypto.randomUUID(),
+        standardName: "",
+        customName: customSetupName,
+        isCustomName: true,
+        costPerJob: costPerJob,
+      });
+    }
+    setItemSetups(itemSetups);
+
+    const itemInHouses = [];
+    for (let row = 4; row <= 15; row++) {
+      //const inHouseName = grid[row][0];
+      const inHouseName = grid[row][0].replace("\n", "").trim();
+      if (!inHouseName) continue;
+      if (inHouseName === "空白") continue;  // "unused"
+      if (!inHouseNames.includes(inHouseName)) {
+        doAlert(`In house name '${inHouseName}' not found on row ${row+1}`);
+        continue;
+      }
+      itemInHouses.push({
+        key: crypto.randomUUID(),
+        name: inHouseName,
+        quantity: grid[row][2],
+      });
+    }
+    setItemInHouses(itemInHouses);
+
+    const itemWastageRanges = [];
+    let nextEnding = ItemWastageInitialRange().ending;
+    for (let row = 21; row <= 30; row++) {
+      const starting = grid[row][0];
+      const value = grid[row][1];
+      if (!starting) continue;
+      itemWastageRanges.push({
+        key: crypto.randomUUID(),
+        starting: starting,
+        ending: nextEnding,
+        value: value,
+      });
+      nextEnding = starting - 1;
+    }
+    setItemWastageRanges(itemWastageRanges);
+
+    const itemOverheadRanges = [];
+    nextEnding = ItemOverheadInitialRange().ending;
+    for (let row = 21; row <= 30; row++) {
+      const starting = grid[row][3];
+      const value = grid[row][4];
+      if (!starting) continue;
+      itemOverheadRanges.push({
+        key: crypto.randomUUID(),
+        starting: starting,
+        ending: nextEnding,
+        value: value,
+      });
+      nextEnding = starting - 1;
+    }
+    setItemOverheadRanges(itemOverheadRanges);
+
+    const itemOutsourcings = []
+    for (let row = 36; row <= 45; row++) {
+      const outsourcingName = grid[row][0];
+      const gramsPerUnit = grid[row][1];
+      if (!outsourcingName) continue;
+      if (outsourcingName.trim() === "空白 unused") continue;
+      if (!outsourcingNames.includes(outsourcingName)) {
+        doAlert(`Outsourcing name '${outsourcingName}' not found on row ${row+1}`);
+        continue;
+      }
+      itemOutsourcings.push({
+        key: crypto.randomUUID(),
+        name: outsourcingName,
+        gramsPerUnit: gramsPerUnit,
+      });
+    }
+    setItemOutsourcings(itemOutsourcings);
   }
 
   const administrationFrag = (<>

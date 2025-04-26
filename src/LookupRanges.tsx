@@ -8,7 +8,7 @@ export class LookupRangesModel {
   }
 }
 
-export function LookupRangesStartingRange() {
+export function LookupRangesInitialRange() {
   return {
     key: crypto.randomUUID(),
     starting: 0,
