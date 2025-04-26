@@ -15,8 +15,28 @@ h4 {
   padding: 0px;
 }
 
+.nav-tabs {
+  border-color: black;
+}
+.nav-tabs .nav-link {
+  border: var(--bs-nav-tabs-border-width) solid black;
+  background-color: #f0f0f0;
+  --bs-nav-tabs-border-radius: 1rem;
+}
+.nav-tabs .nav-link.active {
+  background-color: white;
+  border-color: black;
+  border-bottom: 1px solid white;
+  &:hover {
+    border-bottom: 1px solid white;
+  }
+}
+.nav-tabs .nav-link:hover {
+  background-color: #dee2e6;
+  border: 1px solid black;
+}
+
 button.accordion-button {
   width: 800px;
   padding: 0.5rem;
-
 }

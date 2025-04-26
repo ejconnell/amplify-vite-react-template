@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 import Items from './Items.tsx';
 import Materials from './Materials.tsx';
@@ -224,86 +225,73 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
     return <h1>Loading...</h1>
   }
 
-  return (
-  <Tabs>
-    <TabList>
-      <Tab>Items</Tab>
-      <Tab>Materials</Tab>
-      <Tab>Metals</Tab>
-      <Tab>Metal Families</Tab>
-      <Tab>Quotes</Tab>
-      <Tab>In Houses</Tab>
-      <Tab>Outsourcings</Tab>
-      <Tab>Standard Setups</Tab>
-      <Tab>Todos</Tab>
-    </TabList>
-
-    <TabPanel>
-      <Items
-        items={items}
-        materials={materials}
-        metals={metals}
-        standardSetups={standardSetups}
-        inHouses={inHouses}
-        outsourcings={outsourcings}
-        saveItem={saveItem}
-      />
-    </TabPanel>
-    <TabPanel>
-      <Materials
-        materials={materials}
-        metals={metals}
-        metalFamilies={metalFamilies}
-        saveMaterial={saveMaterial}
-      />
-    </TabPanel>
-    <TabPanel>
-      <Metals
-        metals={metals}
-        metalFamilies={metalFamilies}
-        saveMetal={saveMetal}
-      />
-    </TabPanel>
-    <TabPanel>
-      <MetalFamilies
-        metalFamilies={metalFamilies}
-        saveMetalFamily={saveMetalFamily}
-      />
-    </TabPanel>
-    <TabPanel>
-      <Quotes
-        quotes={quotes}
-        items={items}
-        materials={materials}
-        metals={metals}
-        inHouses={inHouses}
-        outsourcings={outsourcings}
-        saveQuote={saveQuote}
-      />
-    </TabPanel>
-    <TabPanel>
-      <InHouses
-        inHouses={inHouses}
-        saveInHouse={saveInHouse}
-      />
-    </TabPanel>
-    <TabPanel>
-      <Outsourcings
-        outsourcings={outsourcings}
-        saveOutsourcing={saveOutsourcing}
-      />
-    </TabPanel>
-    <TabPanel>
-      <StandardSetups
-        standardSetups={standardSetups}
-        saveStandardSetup={saveStandardSetup}
-      />
-    </TabPanel>
-    <TabPanel>
-      <Todos />
-    </TabPanel>
-  </Tabs>
-  );
+  return (<>
+    <Tabs
+      defaultActiveKey="quotes"
+    >
+      <Tab eventKey="quotes" title="Quotes">
+        <Quotes
+          quotes={quotes}
+          items={items}
+          materials={materials}
+          metals={metals}
+          inHouses={inHouses}
+          outsourcings={outsourcings}
+          saveQuote={saveQuote}
+        />
+      </Tab>
+      <Tab eventKey="items" title="Items">
+        <Items
+          items={items}
+          materials={materials}
+          metals={metals}
+          standardSetups={standardSetups}
+          inHouses={inHouses}
+          outsourcings={outsourcings}
+          saveItem={saveItem}
+        />
+      </Tab>
+      <Tab eventKey="materials" title="Materials">
+        <Materials
+          materials={materials}
+          metals={metals}
+          metalFamilies={metalFamilies}
+          saveMaterial={saveMaterial}
+        />
+      </Tab>
+      <Tab eventKey="metals" title="Metals">
+        <Metals
+          metals={metals}
+          metalFamilies={metalFamilies}
+          saveMetal={saveMetal}
+        />
+      </Tab>
+      <Tab eventKey="metalFamilies" title="Metal Families">
+        <MetalFamilies
+          metalFamilies={metalFamilies}
+          saveMetalFamily={saveMetalFamily}
+        />
+      </Tab>
+      <Tab eventKey="inHouses" title="In Houses">
+        <InHouses
+          inHouses={inHouses}
+          saveInHouse={saveInHouse}
+        />
+      </Tab>
+      <Tab eventKey="outsourcings" title="Outsourcings">
+        <Outsourcings
+          outsourcings={outsourcings}
+          saveOutsourcing={saveOutsourcing}
+        />
+      </Tab>
+      <Tab eventKey="standardSetups" title="Standard Setups">
+        <StandardSetups
+          standardSetups={standardSetups}
+          saveStandardSetup={saveStandardSetup}
+        />
+      </Tab>
+    </Tabs>
+  </>);
 }
 
 export default MyTabs;
