@@ -303,6 +303,7 @@ whole thing here.
       const standardSetupName = grid[row][5];
       const costPerJob = grid[row][6];
       if (!standardSetupName) continue;
+      if (standardSetupName === "空白") continue;  // "unused"
       if (!standardSetupNames.includes(standardSetupName)) {
         doAlert(`Standard setup name '${standardSetupName}' not found on row ${row+1}`);
         continue;
@@ -361,6 +362,14 @@ whole thing here.
       });
       nextEnding = starting - 1;
     }
+    if (nextEnding >= 0) {
+      itemWastageRanges.push({
+        key: crypto.randomUUID(),
+        starting: 0,
+        ending: nextEnding,
+        value: 1000000,
+      });
+    }
     setItemWastageRanges(itemWastageRanges);
 
     const itemOverheadRanges = [];
@@ -376,6 +385,14 @@ whole thing here.
         value: value,
       });
       nextEnding = starting - 1;
+    }
+    if (nextEnding >= 0) {
+      itemOverheadRanges.push({
+        key: crypto.randomUUID(),
+        starting: 0,
+        ending: nextEnding,
+        value: 1000000,
+      });
     }
     setItemOverheadRanges(itemOverheadRanges);
 

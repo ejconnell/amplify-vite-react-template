@@ -1,7 +1,10 @@
 import { useState } from "react";
+import Table from 'react-bootstrap/Table';
 import { ItemSetupsModel } from "./ItemSetups"
 import { ItemInHousesModel } from "./ItemInHouses"
 import { ItemModel } from "./Items"
+import Trifold from "./Trifold";
+
 
 function blankQuoteItem() {
   return {
@@ -203,7 +206,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     <label>Description: {fixedDescription}</label>
     <br/>
     <label>Quote created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
-    <table border="1px solid black">
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Item</th>
@@ -226,7 +229,9 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       <tbody>
         {loadedQuoteItemRowsFrag}
       </tbody>
-    </table>
+    </Table>
+    <br/>
+    <br/>
   </>;
 
   const MAX_SUMMARY_LENGTH = 80;
@@ -280,10 +285,8 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </tr>
   });
 
-  return (
-   <>
-    <h1>Quotes page</h1>
-    <table border="1px solid black">
+  const allQuotesFrag = (<>
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Name</th>
@@ -296,17 +299,12 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       <tbody>
         {quoteRowsFrag}
       </tbody>
-    </table>
+    </Table>
+  </>);
 
-    <br/>
-    <br/>
-    <br/>
+  const currentQuoteFrag = (<>
+    {fixedName && loadedQuoteSectionFrag }
 
-    {quoteItemsModelResults && loadedQuoteSectionFrag }
-
-    <br/>
-    <br/>
-    <br/>
     <label>Name:</label>
     <input
       value={name}
@@ -320,7 +318,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       style={{width: "400px"}}
     />
 
-    <table border="1px solid black">
+    <Table bordered striped>
       <thead>
         <tr>
           <th>Item</th>
@@ -345,12 +343,23 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       <tbody>
         {quoteItemsRowsFrag}
       </tbody>
-    </table>
+    </Table>
 
     <button type="submit" onClick={handleSaveQuote}>
       Save New Quote
     </button>
-   </>
+  </>);
+
+  const administrationFrag = "";
+
+  return (
+    <Trifold
+      top={allQuotesFrag}
+      middle={currentQuoteFrag}
+      bottom={administrationFrag}
+      singular="Quote"
+      plural="Quotes"
+    />
   );
 }
 
