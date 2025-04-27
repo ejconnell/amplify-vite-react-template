@@ -5,8 +5,6 @@ import App from "./App.tsx";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
 import { AuthProvider } from "react-oidc-context";
-import 'react-tabs/style/react-tabs.css';
-
 
 Amplify.configure(outputs);
 

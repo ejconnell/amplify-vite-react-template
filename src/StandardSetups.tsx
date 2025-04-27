@@ -3,10 +3,8 @@ import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
 
-
 function StandardSetups({standardSetups, saveStandardSetup}) {
   const [name, setName] = useState("");
-  const [bulkImportText, setBulkImportText] = useState("");
 
   function handleSaveStandardSetup() {
     if (!name) {

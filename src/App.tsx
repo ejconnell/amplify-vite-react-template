@@ -1,11 +1,5 @@
-import { useEffect, useState } from "react";
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-
 import MyTabs from './MyTabs.tsx';
-
 import { useAuth } from "react-oidc-context";
-
-import 'react-tabs/style/react-tabs.css';
 import './App.css';
 
 function App() {

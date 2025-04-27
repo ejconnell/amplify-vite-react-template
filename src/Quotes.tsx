@@ -1,7 +1,5 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
-import { ItemSetupsModel } from "./ItemSetups"
-import { ItemInHousesModel } from "./ItemInHouses"
 import { ItemModel } from "./Items"
 import Trifold from "./Trifold";
 
