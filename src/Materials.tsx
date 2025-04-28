@@ -52,7 +52,7 @@ export class MaterialModel {
     this.widthLabel = shape?.widthLabel || "-";
     this.crossSectionArea = width === "" ? Number.NaN : Number(shape?.area(width, innerWidth));
     this.weightPerMm = Number(this.density * this.crossSectionArea);
-    this.effectiveCost = rawCost === "" ? Number.NaN : Number(rawCost + (rawCost * markup / 100));
+    this.effectiveCost = rawCost === "" ? Number.NaN : Number(Number(rawCost) + (rawCost * markup / 100));
   }
 
   buildAutoName(metalName, shape, width, innerWidth) {
