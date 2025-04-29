@@ -2,6 +2,7 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
+import Labels from './Labels';
 
 const Shapes = [
   {
@@ -21,21 +22,21 @@ const Shapes = [
   {
     name: "Square",
     hasInnerWidth: false,
-    abbreviation: "Sq",
+    abbreviation: "四角",
     widthLabel: "Side",
     area: (width) => width * width,
   },
   {
     name: "Hollow Square",
     hasInnerWidth: true,
-    abbreviation: "Sq",
+    abbreviation: "四角",
     widthLabel: "Side",
     area: (width, innerWidth) => (width * width) - (innerWidth * innerWidth),
   },
   {
     name: "Hexagonal",
     hasInnerWidth: false,
-    abbreviation: "Hex",
+    abbreviation: "六角",
     widthLabel: "Side",
     area: (width) => Math.sqrt(3) / 2 * width * width,
   },
@@ -351,8 +352,7 @@ Paste 4 columns with no header:
       top={allMaterialsFrag}
       middle={currentMaterialFrag}
       bottom={administrationFrag}
-      singular="Material"
-      plural="Materials"
+      label={Labels.material}
     />
   );
 }

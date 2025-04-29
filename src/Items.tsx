@@ -7,6 +7,7 @@ import ItemInHouses from "./ItemInHouses"
 import ItemWastage from "./ItemWastage"
 import ItemOverhead from "./ItemOverhead"
 import ItemOutsourcings from "./ItemOutsourcings"
+import Labels from "./Labels"
 import { MaterialModel } from "./Materials"
 import { ItemSetupsModel } from "./ItemSetups"
 import { ItemInHousesModel } from "./ItemInHouses"
@@ -152,7 +153,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   });
 
   const allItemsFrag = (<>
-    <label>Example unit quantity:</label>
+    <label>{Labels.exampleUnitQuantity.chinese} Example unit quantity:</label>
     <input
       value={exampleUnitQuantity}
       onChange={(e) => setExampleUnitQuantity(e.target.value)}
@@ -163,15 +164,15 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Material name</th>
-          <th>Material cost</th>
-          <th>In House cost</th>
-          <th>Outsourcing cost</th>
-          <th>Wastage percent</th>
-          <th>Setup cost</th>
-          <th>Overhead percent</th>
-          <th>Load</th>
+          <th>{Labels.name.chinese} Name</th>
+          <th>{Labels.material.chinese}{Labels.name.chinese} Material name</th>
+          <th>{Labels.material.chinese}{Labels.cost.chinese} Material cost</th>
+          <th>{Labels.inHouse.chinese}{Labels.cost.chinese} In House cost</th>
+          <th>{Labels.outsourcing.chinese}{Labels.cost.chinese} Outsourcing cost</th>
+          <th>{Labels.wastage.chinese} Wastage percent</th>
+          <th>{Labels.setupCost.chinese} Setup cost</th>
+          <th>{Labels.overhead.chinese} Overhead percent</th>
+          <th>{Labels.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -181,14 +182,14 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   </>);
 
   const currentItemFrag = (<>
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
     <br/>
 
-    <h4>Material:</h4>
+    <h4>{Labels.material.chinese} Material:</h4>
     <select
       value={materialName}
       onChange={e => setMaterialName(e.target.value)}
@@ -197,15 +198,15 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       {materialSelectOptions}
     </select>
     &nbsp;
-    <label>Unit length (mm):</label>
+    <label>{Labels.unit.chinese}{Labels.length.chinese} Unit length (mm):</label>
     <input
       value={unitLength}
       onChange={(e) => setUnitLength(e.target.value)}
     />
     <br/>
-    <label>Cost per unit: {itemModel.materialCostPerUnit.toFixed(4)}</label>
+    <label>{Labels.cost.chinese}/{Labels.unit.chinese}Cost per unit: {itemModel.materialCostPerUnit.toFixed(4)}</label>
     <br/>
-    <label>Grams per unit: {itemModel.gramsPerUnit.toFixed(4)}</label>
+    <label>{Labels.gram.chinese}/{Labels.unit.chinese}Grams per unit: {itemModel.gramsPerUnit.toFixed(4)}</label>
     <br/>
 
     <ItemInHouses
@@ -428,8 +429,7 @@ whole thing here.
       top={allItemsFrag}
       middle={currentItemFrag}
       bottom={administrationFrag}
-      singular="Item"
-      plural="Items"
+      label={Labels.item}
     />
   );
 

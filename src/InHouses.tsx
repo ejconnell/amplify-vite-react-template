@@ -2,6 +2,7 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
+import Labels from "./Labels";
 
 function InHouses({inHouses, saveInHouse}) {
   const [name, setName] = useState("");
@@ -109,8 +110,7 @@ function InHouses({inHouses, saveInHouse}) {
       top={allInHousesFrag}
       middle={currentInHouseFrag}
       bottom={administrationFrag}
-      singular="In House"
-      plural="In Houses"
+      label={Labels.inHouse}
     />
   </>);
 }

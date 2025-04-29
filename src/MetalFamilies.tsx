@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Trifold from "./Trifold";
+import Labels from "./Labels";
 
 function MetalFamilies({metalFamilies, saveMetalFamily}) {
   const [name, setName] = useState("");
@@ -51,8 +52,7 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
       top={allMetalFamiliesFrag}
       middle={currentMetalFamilyFrag}
       bottom=""
-      singular="Metal Family"
-      plural="Metal Families"
+      label={Labels.metalFamily}
     />
   );
 }

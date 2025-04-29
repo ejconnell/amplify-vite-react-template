@@ -2,6 +2,7 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
+import Labels from "./Labels";
 
 function StandardSetups({standardSetups, saveStandardSetup}) {
   const [name, setName] = useState("");
@@ -83,8 +84,7 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
       top={allStandardSetupsFrag}
       middle={currentStandardSetupFrag}
       bottom={administrationFrag}
-      singular="Standard Setup"
-      plural="Standard Setups"
+      label={Labels.standardSetup}
     />
   </>);
 }

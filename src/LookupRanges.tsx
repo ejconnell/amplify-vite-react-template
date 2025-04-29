@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
+import Labels from './Labels';
 
 export class LookupRangesModel {
   constructor(ranges, quantity) {
@@ -124,12 +125,12 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
   return (
    <>
     <h4>{title}:</h4>
-    <p>Quantity {quantity || 0} &rarr; {valueLabel}: {lookupRangesModel.value}</p>
+    <p>{Labels.exampleUnitQuantity.chinese} Example unit quantity {quantity || 0} &rarr; {valueLabel}: {lookupRangesModel.value}</p>
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Range Start</th>
-          <th>Range End</th>
+          <th>{Labels.rangeStart.chinese} Range Start</th>
+          <th>{Labels.rangeEnd.chinese} Range End</th>
           <th>{valueLabel}</th>
         </tr>
       </thead>
@@ -142,11 +143,11 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
       value={splitRangeAt}
       onChange={e => setSplitRangeAt(e.target.value)}
     />
-    <button type="button" onClick={handleSplitRange}>Split Range At</button>
+    <button type="button" onClick={handleSplitRange}>{Labels.splitRangeAt.chinese}Split Range At</button>
     <br/>
     {rangePairSelectFrag}
-    <button type="button" onClick={e => handleMergeRanges(true)}>Merge Ranges (keep upper)</button>
-    <button type="button" onClick={e => handleMergeRanges(false)}>Merge Ranges (keep lower)</button>
+    <button type="button" onClick={e => handleMergeRanges(true)}>{Labels.mergeRangesKeepUpper.chinese}Merge Ranges (keep upper)</button>
+    <button type="button" onClick={e => handleMergeRanges(false)}>{Labels.mergeRangesKeepLower.chinese}Merge Ranges (keep lower)</button>
    </>
   );
 }

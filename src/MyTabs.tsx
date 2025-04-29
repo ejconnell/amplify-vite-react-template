@@ -10,7 +10,7 @@ import Quotes from './Quotes.tsx';
 import InHouses from './InHouses.tsx';
 import Outsourcings from './Outsourcings.tsx';
 import StandardSetups from './StandardSetups.tsx';
-import Todos from './Todos.js';
+import Labels from './Labels';
 
 import {fromCognitoIdentityPool} from "@aws-sdk/credential-providers";
 
@@ -225,11 +225,15 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
     return <h1>Loading...</h1>
   }
 
+  function tabTitle(label) {
+    return `${label.chinese} ${label.plural}`;
+  }
+
   return (<>
     <Tabs
       defaultActiveKey="quotes"
     >
-      <Tab eventKey="quotes" title="Quotes">
+      <Tab eventKey="quotes" title={tabTitle(Labels.quote)}>
         <Quotes
           quotes={quotes}
           items={items}
@@ -240,7 +244,7 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
           saveQuote={saveQuote}
         />
       </Tab>
-      <Tab eventKey="items" title="Items">
+      <Tab eventKey="items" title={tabTitle(Labels.item)}>
         <Items
           items={items}
           materials={materials}
@@ -251,7 +255,7 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
           saveItem={saveItem}
         />
       </Tab>
-      <Tab eventKey="materials" title="Materials">
+      <Tab eventKey="materials" title={tabTitle(Labels.material)}>
         <Materials
           materials={materials}
           metals={metals}
@@ -259,32 +263,32 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
           saveMaterial={saveMaterial}
         />
       </Tab>
-      <Tab eventKey="metals" title="Metals">
+      <Tab eventKey="metals" title={tabTitle(Labels.metal)}>
         <Metals
           metals={metals}
           metalFamilies={metalFamilies}
           saveMetal={saveMetal}
         />
       </Tab>
-      <Tab eventKey="metalFamilies" title="Metal Families">
+      <Tab eventKey="metalFamilies" title={tabTitle(Labels.metalFamily)}>
         <MetalFamilies
           metalFamilies={metalFamilies}
           saveMetalFamily={saveMetalFamily}
         />
       </Tab>
-      <Tab eventKey="inHouses" title="In Houses">
+      <Tab eventKey="inHouses" title={tabTitle(Labels.inHouse)}>
         <InHouses
           inHouses={inHouses}
           saveInHouse={saveInHouse}
         />
       </Tab>
-      <Tab eventKey="outsourcings" title="Outsourcings">
+      <Tab eventKey="outsourcings" title={tabTitle(Labels.outsourcing)}>
         <Outsourcings
           outsourcings={outsourcings}
           saveOutsourcing={saveOutsourcing}
         />
       </Tab>
-      <Tab eventKey="standardSetups" title="Standard Setups">
+      <Tab eventKey="standardSetups" title={tabTitle(Labels.standardSetup)}>
         <StandardSetups
           standardSetups={standardSetups}
           saveStandardSetup={saveStandardSetup}

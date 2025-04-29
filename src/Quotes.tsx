@@ -2,7 +2,7 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import { ItemModel } from "./Items"
 import Trifold from "./Trifold";
-
+import Labels from "./Labels";
 
 function blankQuoteItem() {
   return {
@@ -198,30 +198,34 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </tr>;
   });
 
+  const columnHeadersFrag = (<>
+    <th>{Labels.item.chinese} Item</th>
+    <th>{Labels.quantity.chinese} Quantity</th>
+    <th>{Labels.material.chinese} {Labels.cost.chinese} Material Cost</th>
+    <th>{Labels.inHouse.chinese} {Labels.cost.chinese} In House Cost</th>
+    <th>{Labels.outsourcing.chinese} {Labels.cost.chinese} Oustsourcing cost</th>
+    <th>{Labels.baseUnit.chinese} Base unit cost</th>
+    <th>{Labels.wastage.chinese} Wastage percent</th>
+    <th>{Labels.wastageIncluded.chinese} Wastage included</th>
+    <th>{Labels.laborIncluded.chinese} Labor included 3%</th>
+    <th>{Labels.setupCost.chinese} Setup Cost</th>
+    <th>{Labels.setupIncluded.chinese} Setup included</th>
+    <th>{Labels.taxIncluded.chinese} Tax included</th>
+    <th>{Labels.overhead.chinese} Overhead percent</th>
+    <th>{Labels.overheadIncluded.chinese} Overhead included</th>
+    <th>{Labels.profitIncluded.chinese} Profit included 6%</th>
+  </>);
+
   const loadedQuoteSectionFrag = <>
-    <label>Name: {fixedName}</label>
+    <label>{Labels.name.chinese} Name: {fixedName}</label>
     <br/>
-    <label>Description: {fixedDescription}</label>
+    <label>{Labels.description.chinese} Description: {fixedDescription}</label>
     <br/>
-    <label>Quote created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
+    <label>{Labels.createdAt.chinese} Created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>Material Cost</th>
-          <th>In House Cost</th>
-          <th>Oustsourcing cost</th>
-          <th>Base unit cost</th>
-          <th>Wastage percent</th>
-          <th>Wastage included</th>
-          <th>Labor included 3%</th>
-          <th>Setup Cost</th>
-          <th>Setup included</th>
-          <th>Tax included</th>
-          <th>Overhead percent</th>
-          <th>Overhead included</th>
-          <th>Profit included 6%</th>
+          {columnHeadersFrag}
         </tr>
       </thead>
       <tbody>
@@ -287,11 +291,11 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Timestamp</th>
-          <th>Description</th>
-          <th>Summary</th>
-          <th>Load</th>
+          <th>{Labels.material.chinese} Name</th>
+          <th>{Labels.timestamp.chinese} Timestamp</th>
+          <th>{Labels.description.chinese} Description</th>
+          <th>{Labels.summary.chinese} Summary</th>
+          <th>{Labels.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -303,13 +307,13 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
   const currentQuoteFrag = (<>
     {fixedName && loadedQuoteSectionFrag }
 
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
     />
 
-    <label>Description:</label>
+    <label>{Labels.description.chinese} Description:</label>
     <input
       value={description}
       onChange={e => setDescription(e.target.value)}
@@ -319,23 +323,9 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>Material Cost</th>
-          <th>In House Cost</th>
-          <th>Oustsourcing cost</th>
-          <th>Base unit cost</th>
-          <th>Wastage percent</th>
-          <th>Wastage included</th>
-          <th>Labor included 3%</th>
-          <th>Setup Cost</th>
-          <th>Setup included</th>
-          <th>Tax included</th>
-          <th>Overhead percent</th>
-          <th>Overhead included</th>
-          <th>Profit included 6%</th>
-          <th>Delete</th>
-          <th>Add</th>
+          {columnHeadersFrag}
+          <th>{Labels.remove.chinese} Delete</th>
+          <th>{Labels.add.chinese} Add</th>
         </tr>
       </thead>
       <tbody>
@@ -344,7 +334,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </Table>
 
     <button type="submit" onClick={handleSaveQuote}>
-      Save New Quote
+      {Labels.save.chinese} {Labels.quote.chinese} Save New Quote
     </button>
   </>);
 
@@ -355,8 +345,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       top={allQuotesFrag}
       middle={currentQuoteFrag}
       bottom={administrationFrag}
-      singular="Quote"
-      plural="Quotes"
+      label={Labels.quote}
     />
   );
 }

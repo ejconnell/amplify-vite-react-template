@@ -1,4 +1,5 @@
 import Table from 'react-bootstrap/Table';
+import Labels from './Labels';
 
 export class ItemOutsourcingsModel {
   constructor(outsourcings, itemOutsourcings, unitQuantity) {
@@ -166,22 +167,22 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
 
   return (
     <>
-      <h4>Outsourcing:</h4>
-      <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
-      <p>Starting grams per unit: {startingGramsPerUnit.toFixed(4)}</p>
+      <h4>{Labels.outsourcing.chinese} Outsourcing:</h4>
+      <p>{Labels.exampleUnitQuantity.chinese} Example unit quantity: {exampleUnitQuantity || 0} &rarr; {Labels.costPerUnit.chinese} Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
+      <p>{Labels.starting.chinese}{Labels.gramsPerUnit.chinese} Starting grams per unit: {startingGramsPerUnit.toFixed(4)}</p>
       <Table bordered striped>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Grams per Unit</th>
-            <th>Minimum Cost<br/>per kg</th>
-            <th>Minimum Cost<br/>per unit</th>
-            <th>Minimum Cost<br/>per job</th>
-            <th>Cost cutover<br/>unit quantity</th>
-            <th>Cost per unit</th>
-            <th>Cost per {exampleUnitQuantity || 0}<br/>unit job</th>
-            <th>Delete</th>
-            <th>Add</th>
+            <th>{Labels.name.chinese} Name</th>
+            <th>{Labels.gramsPerUnit.chinese} Grams per Unit</th>
+            <th>{Labels.minCostPerKg.chinese} Minimum Cost per kg</th>
+            <th>{Labels.minCostPerUnit.chinese} Minimum Cost per unit</th>
+            <th>{Labels.minCostPerJob.chinese} Minimum Cost per job</th>
+            <th>{Labels.costcutoverUnitQuantity.chinese} Cost cutover unit quantity</th>
+            <th>{Labels.costPerUnit.chinese} Cost per unit</th>
+            <th>{Labels.cost.chinese} / {exampleUnitQuantity || 0} {Labels.unit.chinese} Cost per {exampleUnitQuantity || 0}<br/>unit job</th>
+            <th>{Labels.remove.chinese} Delete</th>
+            <th>{Labels.add.chinese} Add</th>
           </tr>
         </thead>
         <tbody>

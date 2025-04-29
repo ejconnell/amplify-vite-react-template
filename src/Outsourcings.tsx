@@ -2,6 +2,7 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
+import Labels from "./Labels";
 
 function Outsourcings({outsourcings, saveOutsourcing}) {
   const [name, setName] = useState("");
@@ -152,8 +153,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       top={allOutsourcingsFrag}
       middle={currentOutsourcingFrag}
       bottom={administrationFrag}
-      singular="Outsourcing"
-      plural="Outsourcings"
+      label={Labels.outsourcing}
     />
   </>);
 }
