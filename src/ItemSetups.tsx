@@ -1,4 +1,5 @@
 import Table from 'react-bootstrap/Table';
+import Labels from './Labels'
 
 export class ItemSetupsModel {
   constructor(itemSetups, unitQuantity) {
@@ -163,15 +164,15 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
   return (
    <>
     <h4>Setup:</h4>
-    <p>Quantity: {exampleUnitQuantity || 0} &rarr; Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
+    <p>{Labels.exampleUnitQuantity.chinese} Example unit quantity: {exampleUnitQuantity || 0} &rarr; {Labels.costPerUnit.chinese} Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name (check box for custom)</th>
-          <th>Cost per job</th>
-          <th>Cost per unit</th>
-          <th>Delete</th>
-          <th>Add</th>
+          <th>{Labels.name.chinese} {Labels.checkBoxForCustom.chinese} Name (check box for custom)</th>
+          <th>{Labels.costPerJob.chinese} Cost per job</th>
+          <th>{Labels.costPerUnit.chinese} Cost per unit</th>
+          <th>{Labels.remove.chinese} Delete</th>
+          <th>{Labels.add.chinese} Add</th>
         </tr>
       </thead>
       <tbody>

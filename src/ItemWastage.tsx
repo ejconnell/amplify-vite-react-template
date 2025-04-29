@@ -1,5 +1,6 @@
 import LookupRanges from "./LookupRanges"
 import { LookupRangesModel, LookupRangesInitialRange } from "./LookupRanges"
+import Labels from './Labels'
 
 export class ItemWastageModel extends LookupRangesModel {
 }
@@ -14,8 +15,8 @@ function ItemWastage({itemWastageRanges, exampleUnitQuantity, setItemWastageRang
        ranges={itemWastageRanges}
        quantity={exampleUnitQuantity}
        setRanges={setItemWastageRanges}
-       title="Wastage"
-       valueLabel="Wastage %"
+       title={Labels.wastage.chinese + " Wastage"}
+       valueLabel={Labels.wastage.chinese + " Wastage %"}
     />
   );
 }

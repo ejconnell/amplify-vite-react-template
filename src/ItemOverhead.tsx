@@ -1,5 +1,6 @@
 import LookupRanges from "./LookupRanges"
 import { LookupRangesModel, LookupRangesInitialRange } from "./LookupRanges"
+import Labels from './Labels'
 
 export class ItemOverheadModel extends LookupRangesModel {
 }
@@ -15,8 +16,8 @@ function ItemOverhead({itemOverheadRanges, exampleUnitQuantity, setItemOverheadR
        ranges={itemOverheadRanges}
        quantity={exampleUnitQuantity}
        setRanges={setItemOverheadRanges}
-       title="Overhead"
-       valueLabel="Overhead %"
+       title={Labels.overhead.chinese + " Overhead"}
+       valueLabel={Labels.overhead.chinese + "Overhead %"}
     />
   );
 }

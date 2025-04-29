@@ -245,7 +245,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     <br/>
     <br/>
     <button type="submit" onClick={handleSaveItem}>
-      Save Item
+      {Labels.save.chinese}{Labels.item.chinese} Save Item
     </button>
   </>);
 

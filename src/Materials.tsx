@@ -8,36 +8,46 @@ const Shapes = [
   {
     name: "Cylindrical",
     hasInnerWidth: false,
+    chinese: "圓柱",
     abbreviation: "",
     widthLabel: "Diameter",
+    chineseWidth: "直徑",
     area: (width) => Math.PI * width * width / 4,
   },
   {
     name: "Hollow Cylindrical",
     hasInnerWidth: true,
+    chinese: "圓管",
     abbreviation: "",
     widthLabel: "Diameter",
+    chineseWidth: "直徑",
     area: (width, innerWidth) => (Math.PI * width * width / 4) - (Math.PI * innerWidth * innerWidth / 4),
   },
   {
     name: "Square",
     hasInnerWidth: false,
+    chinese: "四角",
     abbreviation: "四角",
     widthLabel: "Side",
+    chineseWidth: "角",
     area: (width) => width * width,
   },
   {
     name: "Hollow Square",
     hasInnerWidth: true,
+    chinese: "空心四角",
     abbreviation: "四角",
     widthLabel: "Side",
+    chineseWidth: "角",
     area: (width, innerWidth) => (width * width) - (innerWidth * innerWidth),
   },
   {
     name: "Hexagonal",
     hasInnerWidth: false,
+    chinese: "六角",
     abbreviation: "六角",
     widthLabel: "Side",
+    chineseWidth: "角",
     area: (width) => Math.sqrt(3) / 2 * width * width,
   },
 ];
@@ -231,23 +241,23 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
   });
 
   const shapeSelectOptions = Shapes.map(s => {
-     return <option value={s.name} key={s.name}>{s.name}</option>;
+     return <option value={s.name} key={s.name}>{s.chinese} {s.name}</option>;
   });
 
   const allMaterialsFrag = (
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Metal</th>
-          <th>Shape</th>
-          <th>Width (mm)</th>
-          <th>Inner Width (mm)</th>
-          <th>Weight per mm (g/mm)</th>
-          <th>Raw Cost ($/kg)</th>
-          <th>Markup %</th>
-          <th>Effective Cost ($/kg)</th>
-          <th>Load</th>
+          <th>{Labels.wastage.chinese} Name</th>
+          <th>{Labels.metal.chinese} Metal</th>
+          <th>{Labels.shape.chinese} Shape</th>
+          <th>{Labels.width.chinese} Width (mm)</th>
+          <th>{Labels.innerWidth.chinese} Inner Width (mm)</th>
+          <th>{Labels.gramsPerMm.chinese}<br/>Weight per mm (g/mm)</th>
+          <th>{Labels.pricePerKgManufacturer.chinese}<br/>Raw Cost ($/kg)</th>
+          <th>{Labels.surchargePercentage.chinese} Markup %</th>
+          <th>{Labels.pricePerKgSurcharge.chinese}<br/>Effective Cost ($/kg)</th>
+          <th>{Labels.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>

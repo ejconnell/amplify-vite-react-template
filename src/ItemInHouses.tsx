@@ -1,4 +1,5 @@
 import Table from 'react-bootstrap/Table';
+import Labels from './Labels'
 
 export class ItemInHousesModel {
   constructor(inHouses, itemInHouses) {
@@ -123,12 +124,12 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Quantity</th>
-          <th>Cost Per 1k</th>
-          <th>Cost Per Unit</th>
-          <th>Delete</th>
-          <th>Add</th>
+          <th>{Labels.name.chinese} Name</th>
+          <th>{Labels.quantity.chinese} Quantity</th>
+          <th>{Labels.costPerThousand.chinese} Cost Per 1k</th>
+          <th>{Labels.costPerUnit.chinese} Cost Per Unit</th>
+          <th>{Labels.remove.chinese} Delete</th>
+          <th>{Labels.add.chinese} Add</th>
         </tr>
       </thead>
       <tbody>
