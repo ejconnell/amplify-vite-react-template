@@ -61,6 +61,7 @@ export class MaterialModel {
     this.density = Number(metal?.density);
     this.hasInnerWidth = shape?.hasInnerWidth || false;
     this.widthLabel = shape?.widthLabel || "-";
+    this.chineseWidth = shape?.chineseWidth;
     this.crossSectionArea = width === "" ? Number.NaN : Number(shape?.area(width, innerWidth));
     this.weightPerMm = Number(this.density * this.crossSectionArea);
     this.effectiveCost = rawCost === "" ? Number.NaN : Number(Number(rawCost) + (rawCost * markup / 100));
@@ -229,7 +230,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
 
   const innerWidthFragment = (
    <>
-    <label>Inner {materialModel.widthLabel} (mm):</label>
+    <label>{Labels.inner.chinese}{materialModel.chineseWidth} Inner {materialModel.widthLabel} (mm):</label>
     <input
       value={innerWidth}
       onChange={(e) => setInnerWidth(e.target.value)}
@@ -267,14 +268,14 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
   );
 
   const currentMaterialFrag = (<>
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={mergedName}
       onChange={(e) => setName(e.target.value)}
       disabled={!isNameManual}
     />
     &nbsp;
-    <label>Use Manual Name:</label>
+    <label>{Labels.useManualName.chinese} Use Manual Name:</label>
     <input
       type="checkbox"
       name="isNameManual"
@@ -283,7 +284,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
     />
     <br/>
 
-    <label>Metal:</label>
+    <label>{Labels.metal.chinese} Metal:</label>
     <select
       value={metalName}
       onChange={e => setMetalName(e.target.value)}
@@ -292,10 +293,10 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
       {metalSelectOptions}
     </select>
     &nbsp;
-    <label>Density: {materialModel.density || "-"} g/mm^3</label>
+    <label>{Labels.density.chinese} Density: {materialModel.density || "-"} g/mm<sup>3</sup></label>
     <br/>
 
-    <label>Shape:</label>
+    <label>{Labels.shape.chinese} Shape:</label>
     <select
       value={shapeName}
       onChange={e => setShapeName(e.target.value)}
@@ -304,33 +305,33 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
     </select>
     <br/>
 
-    <label>{materialModel.widthLabel} (mm):</label>
+    <label>{materialModel.chineseWidth} {materialModel.widthLabel} (mm):</label>
     <input
       value={width}
       onChange={(e) => setWidth(e.target.value)}
     />
     {materialModel.hasInnerWidth && innerWidthFragment}
     &nbsp; &nbsp;
-    <label>Cross section area (mm^2): {materialModel.crossSectionArea.toFixed(4)}</label>
+    <label>{Labels.crossSectionArea.chinese} Cross section area (mm<sup>2</sup>): {materialModel.crossSectionArea.toFixed(4)}</label>
     &nbsp; &nbsp;
-    <label>Weight per mm (g/mm): {materialModel.weightPerMm.toFixed(4)}</label>
+    <label>{Labels.gramsPerMm.chinese} Weight per mm (g/mm): {materialModel.weightPerMm.toFixed(4)}</label>
     <br/>
 
-    <label>Raw Cost:</label>
+    <label>{Labels.pricePerKgManufacturer.chinese} Raw Cost:</label>
     <input
       value={rawCost}
       onChange={(e) => setRawCost(e.target.value)}
     />
-    <label>Markup %:</label>
+    <label>{Labels.surchargePercentage.chinese} Markup %:</label>
     <input
       value={markup}
       onChange={(e) => setMarkup(e.target.value)}
     />
-    <label>Effective Cost: {materialModel.effectiveCost}</label>
+    <label>{Labels.pricePerKgSurcharge.chinese} Effective Cost: {materialModel.effectiveCost}</label>
     <br/>
 
     <button type="submit" onClick={handleSaveMaterial}>
-      Save Material
+      {Labels.save.chinese}{Labels.material.chinese} Save Material
     </button>
   </>);
 
