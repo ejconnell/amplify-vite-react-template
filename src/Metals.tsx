@@ -71,10 +71,10 @@ function Metals({metals, metalFamilies, saveMetal}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Metal Family</th>
-          <th>Density (g/mm^3)</th>
-          <th>Load</th>
+          <th>{Labels.name.chinese} Name</th>
+          <th>{Labels.metalFamily.chinese} Metal Family</th>
+          <th>{Labels.density.chinese}Density (g/mm<sup>3</sup>)</th>
+          <th>{Labels.load.chinese}Load</th>
         </tr>
       </thead>
       <tbody>
@@ -84,13 +84,13 @@ function Metals({metals, metalFamilies, saveMetal}) {
   </>);
 
   const currentMetalFrag = (<>
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
     />
 
-    <label>Metal Family:</label>
+    <label>{Labels.metalFamily.chinese}Metal Family:</label>
     <select
       value={metalFamilyName}
       onChange={e => setMetalFamilyName(e.target.value)}
@@ -99,14 +99,14 @@ function Metals({metals, metalFamilies, saveMetal}) {
       {mfSelectOptionsFrag}
     </select>
 
-    <label>Density:</label>
+    <label>{Labels.density.chinese} Density (g/mm<sup>3</sup>):</label>
     <input
       value={density}
       onChange={e => setDensity(e.target.value)}
     />
 
     <button type="submit" onClick={handleSaveMetal}>
-      Save Metal
+      {Labels.save.chinese}{Labels.metal.chinese} Save Metal
     </button>
   </>);
 

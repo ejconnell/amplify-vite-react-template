@@ -10,7 +10,8 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
   const [variableCost, setVariableCost] = useState(0);
   const [minCostPerJob, setMinCostPerJob] = useState(0);
 
-  const variableCostLabel = isPricedByUnit ? "unit" : "kilogram";
+  const variableCostStr = isPricedByUnit ? "unit" : "kilogram";
+  const variableCostLabel = isPricedByUnit ? Labels.minCostPerUnit.chinese + "Minimum cost per unit" : Labels.minCostPerKg.chinese + "Minimum cost per kilogram";
 
   function handleSaveOutsourcing() {
     if (!name) {
@@ -18,7 +19,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       return;
     }
     if (!variableCost || isNaN(variableCost)) {
-      alert(`Need a numeric cost per ${variableCostLabel}`);
+      alert(`Need a numeric cost per ${variableCostStr}`);
       return;
     }
     if (isNaN(minCostPerJob)) {
@@ -91,11 +92,11 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Minimum cost per job</th>
-          <th>Priced by</th>
-          <th>Cost per kg/unit</th>
-          <th>Load</th>
+          <th>{Labels.name.chinese} Name</th>
+          <th>{Labels.minCostPerJob.chinese} Minimum cost per job</th>
+          <th>{Labels.pricedBy.chinese} Priced by</th>
+          <th>{Labels.costPerKgUnit.chinese} Cost per kg/unit</th>
+          <th>{Labels.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -105,21 +106,21 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
   </>);
 
   const currentOutsourcingFrag = (<>
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
     <br/>
 
-    <label>Minimum Cost per job:</label>
+    <label>{Labels.minCostPerJob.chinese} Minimum Cost per job:</label>
     <input
       value={minCostPerJob}
       onChange={(e) => setMinCostPerJob(e.target.value)}
     />
     <br/>
 
-    <label>Priced by unit:</label>
+    <label>{Labels.pricedByUnit.chinese} Priced by unit:</label>
     <input
       type="checkbox"
       name="isPricedByUnit"
@@ -128,7 +129,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     />
     <br/>
 
-    <label>Minimum cost per {variableCostLabel}:</label>
+    <label>{variableCostLabel}:</label>
     <input
       value={variableCost}
       onChange={(e) => setVariableCost(e.target.value)}
@@ -136,7 +137,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     <br/>
 
     <button type="submit" onClick={handleSaveOutsourcing}>
-      Save Outsourcing
+      {Labels.save.chinese}{Labels.outsourcing.chinese} Save Outsourcing
     </button>
   </>);
 

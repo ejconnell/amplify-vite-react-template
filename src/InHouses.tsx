@@ -74,9 +74,9 @@ function InHouses({inHouses, saveInHouse}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Cost per 1k</th>
-          <th>Load</th>
+          <th>{Labels.name.chinese} Name</th>
+          <th>{Labels.costPerThousand.chinese} Cost per 1k</th>
+          <th>{Labels.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -86,14 +86,14 @@ function InHouses({inHouses, saveInHouse}) {
   </>);
 
   const currentInHouseFrag = (<>
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input value={name} onChange={(e) => setName(e.target.value)}/>
     <br/>
-    <label>Cost per 1k:</label>
+    <label>{Labels.costPerThousand.chinese} Cost per 1k:</label>
     <input value={cost} onChange={(e) => setCost(e.target.value)}/>
     <br/>
     <button type="submit" onClick={handleSaveInHouse}>
-      Save In House
+      {Labels.save.chinese}{Labels.inHouse.chinese} Save In House
     </button>
   </>);
 

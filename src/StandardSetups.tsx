@@ -50,7 +50,7 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>Name</th>
+          <th>{Labels.name.chinese} Name</th>
         </tr>
       </thead>
       <tbody>
@@ -60,14 +60,14 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
   </>);
 
   const currentStandardSetupFrag = (<>
-    <label>Name:</label>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
     <br/>
     <button type="submit" onClick={handleSaveStandardSetup}>
-      Save Standard Setup
+      {Labels.save.chinese}{Labels.standardSetup.chinese} Save Standard Setup
     </button>
   </>);
 

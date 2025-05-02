@@ -27,7 +27,7 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
     <Table bordered striped>
       <thead>
          <tr>
-           <th>Name</th>
+           <th>{Labels.name.chinese} Name</th>
          </tr>
       </thead>
       <tbody>
@@ -37,13 +37,14 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
   </>);
 
   const currentMetalFamilyFrag = (<>
+    <label>{Labels.name.chinese} Name:</label>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
     />
     <br/>
     <button type="submit" onClick={handleSaveMetalFamily}>
-      Save Metal Family
+      {Labels.save.chinese}{Labels.metalFamily.chinese} Save Metal Family
     </button>
   </>);
 

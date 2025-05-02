@@ -195,14 +195,14 @@ const Labels = {
   density: {
     chinese: "密度",
   },
-  s: {
-    chinese: "",
+  pricedByUnit: {
+    chinese: "按單位定價",
   },
-  s: {
-    chinese: "",
+  pricedBy: {
+    chinese: "定價由",
   },
-  s: {
-    chinese: "",
+  costPerKgUnit: {
+    chinese: "每公斤/單位成本",
   },
   s: {
     chinese: "",
