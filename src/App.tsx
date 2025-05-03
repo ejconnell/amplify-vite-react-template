@@ -16,7 +16,7 @@ function App() {
 */
 
   if (auth.isLoading) {
-    return <div>Loading...</div>;
+    return <div>載入中 Loading...</div>;
   }
 
   if (auth.error) {

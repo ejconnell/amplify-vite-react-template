@@ -204,12 +204,6 @@ const Labels = {
   costPerKgUnit: {
     chinese: "每公斤/單位成本",
   },
-  s: {
-    chinese: "",
-  },
-  s: {
-    chinese: "",
-  },
 }
 
 export default Labels;
