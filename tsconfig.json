@@ -15,9 +15,7 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": false,
-    "noImplicitAny": false,
-    "noCheck": true,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true

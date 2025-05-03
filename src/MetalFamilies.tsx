@@ -4,7 +4,7 @@ import Trifold from "./Trifold";
 import Labels from "./Labels";
 
 function MetalFamilies({metalFamilies, saveMetalFamily}) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState<string>("");
 
   function handleSaveMetalFamily() {
     if (!name) {

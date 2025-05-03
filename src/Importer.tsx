@@ -1,14 +1,14 @@
 import { useState } from "react";
 
-function Importer({instructionsText, buttonText, processorFunc}) {
+function Importer({instructionsText, buttonText, processorFunc}: {instructionsText: string, buttonText: string, processorFunc: (grid: string[][]) => void}) {
   const [userText, setUserText] = useState("");
 
   function handleButtonClick() {
     // When a Google Sheet cell has a line break, it is pasted as a quoted
     // string with an internal newline.  We dequote and merge these lines
     // to get intended TSV data.
-    function dequoteAndMergeLines(lines) {
-      const dequotedLines = [];
+    function dequoteAndMergeLines(lines: string[]) {
+      const dequotedLines: string[] = [];
       let arePreviousLinesMatched = true;
       lines.forEach(line => {
         //const noQuotesLine = line.replaceAll("\"", "");
@@ -39,8 +39,8 @@ function Importer({instructionsText, buttonText, processorFunc}) {
   return (
    <>
      <textarea
-       rows="14"
-       cols="60"
+       rows={14}
+       cols={60}
        placeholder={instructionsText}
        onChange={e => setUserText(e.target.value)}
        style={{fontFamily: "monospace"}}

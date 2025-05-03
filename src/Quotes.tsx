@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
-import { ItemModel } from "./Items"
+import { ItemModel } from "./ItemModel";
 import Trifold from "./Trifold";
 import Labels from "./Labels";
 
@@ -13,6 +13,19 @@ function blankQuoteItem() {
 };
 
 class QuoteItemModel {
+  materialCostPerUnit: number;
+  inHouseCostPerUnit: any;
+  outsourcingCostPerUnit: any;
+  baseCostPerUnit: any;
+  wastagePercent: number;
+  postWastageCostPerUnit: number;
+  postLaborCostPerUnit: number;
+  setupCostPerUnit: number;
+  postSetupCostPerUnit: number;
+  postTaxCostPerUnit: number;
+  overheadPercent: number;
+  postOverheadCostPerUnit: number;
+  postProfitCostPerUnit: number;
   constructor({items, materials, metals, inHouses, outsourcings, quoteItem}) {
     const item = items.find(i => i.name === quoteItem.name) || {};
 
@@ -171,7 +184,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     setQuoteItems(nextQuoteItems);
   }
 
-  function formatQuoteItemModelResultsCells(qimr) {
+  function formatQuoteItemModelResultsCells(qimr: IQuoteItemModelResult) {
     return <>
       <td>{qimr.materialCostPerUnit.toFixed(2)}</td>
       <td>{qimr.inHouseCostPerUnit.toFixed(2)}</td>

@@ -7,8 +7,8 @@ import Labels from "./Labels";
 function Outsourcings({outsourcings, saveOutsourcing}) {
   const [name, setName] = useState("");
   const [isPricedByUnit, setIsPricedByUnit] = useState(false);
-  const [variableCost, setVariableCost] = useState(0);
-  const [minCostPerJob, setMinCostPerJob] = useState(0);
+  const [variableCost, setVariableCost] = useState("");
+  const [minCostPerJob, setMinCostPerJob] = useState("");
 
   const variableCostStr = isPricedByUnit ? "unit" : "kilogram";
   const variableCostLabel = isPricedByUnit ? Labels.minCostPerUnit.chinese + "Minimum cost per unit" : Labels.minCostPerKg.chinese + "Minimum cost per kilogram";
@@ -18,11 +18,11 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       alert("Need a Name");
       return;
     }
-    if (!variableCost || isNaN(variableCost)) {
+    if (!variableCost || isNaN(Number(variableCost))) {
       alert(`Need a numeric cost per ${variableCostStr}`);
       return;
     }
-    if (isNaN(minCostPerJob)) {
+    if (isNaN(Number(minCostPerJob))) {
       alert("Need a numeric minimum cost");
       return;
     }
@@ -125,7 +125,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       type="checkbox"
       name="isPricedByUnit"
       checked={isPricedByUnit}
-      onChange={(e) => setIsPricedByUnit(!isPricedByUnit) }
+      onChange={() => setIsPricedByUnit(!isPricedByUnit) }
     />
     <br/>
 

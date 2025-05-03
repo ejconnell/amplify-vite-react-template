@@ -2,7 +2,10 @@ import Table from 'react-bootstrap/Table';
 import Labels from './Labels';
 
 export class ItemOutsourcingsModel {
-  constructor(outsourcings, itemOutsourcings, unitQuantity) {
+  totalCostPerUnit: number;
+  totalCostPerJob: number;
+  rows: IItemOutsourcingModelRow[];
+  constructor(outsourcings: IOutsourcing[], itemOutsourcings: IItemOutsourcing[], unitQuantity: number) {
     this.totalCostPerUnit = 0;
     this.totalCostPerJob = 0;
     this.rows = itemOutsourcings.map(io => {

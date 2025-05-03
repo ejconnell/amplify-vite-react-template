@@ -3,27 +3,28 @@ import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
 import Labels from "./Labels";
+import { IInHouse } from "./types";
 
-function InHouses({inHouses, saveInHouse}) {
-  const [name, setName] = useState("");
-  const [cost, setCost] = useState(0);
+function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (inHouse: IInHouse) => void}) {
+  const [name, setName] = useState<string>("");
+  const [cost, setCost] = useState<string>("");
 
   function handleSaveInHouse() {
     if (!name) {
       alert("Need a name");
       return;
     }
-    if (isNaN(cost)) {
+    if (isNaN(Number(cost))) {
       alert("Need a numeric cost");
       return;
     }
     saveInHouse({
       name: name,
-      cost: Number(cost),
+      cost: cost,
     });
   }
 
-  function handleLoadInHouse(index) {
+  function handleLoadInHouse(index: number) {
     const inHouse = inHouses[index];
     setName(inHouse.name);
     setCost(inHouse.cost);
@@ -46,7 +47,7 @@ function InHouses({inHouses, saveInHouse}) {
       }
       saveInHouse({
         name: name,
-        cost: Number(cost),
+        cost: cost,
       });
     });
   }

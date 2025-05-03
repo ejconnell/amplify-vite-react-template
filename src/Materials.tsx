@@ -3,94 +3,32 @@ import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
 import Labels from './Labels';
+import { MaterialModel } from "./MaterialModel";
+import { Shapes } from "./Shapes";
+import { IMaterial, IMetal } from "./types";
 
-const Shapes = [
-  {
-    name: "Cylindrical",
-    hasInnerWidth: false,
-    chinese: "圓柱",
-    abbreviation: "",
-    widthLabel: "Diameter",
-    chineseWidth: "直徑",
-    area: (width) => Math.PI * width * width / 4,
-  },
-  {
-    name: "Hollow Cylindrical",
-    hasInnerWidth: true,
-    chinese: "圓管",
-    abbreviation: "",
-    widthLabel: "Diameter",
-    chineseWidth: "直徑",
-    area: (width, innerWidth) => (Math.PI * width * width / 4) - (Math.PI * innerWidth * innerWidth / 4),
-  },
-  {
-    name: "Square",
-    hasInnerWidth: false,
-    chinese: "四角",
-    abbreviation: "四角",
-    widthLabel: "Side",
-    chineseWidth: "角",
-    area: (width) => width * width,
-  },
-  {
-    name: "Hollow Square",
-    hasInnerWidth: true,
-    chinese: "空心四角",
-    abbreviation: "四角",
-    widthLabel: "Side",
-    chineseWidth: "角",
-    area: (width, innerWidth) => (width * width) - (innerWidth * innerWidth),
-  },
-  {
-    name: "Hexagonal",
-    hasInnerWidth: false,
-    chinese: "六角",
-    abbreviation: "六角",
-    widthLabel: "Side",
-    chineseWidth: "角",
-    area: (width) => Math.sqrt(3) / 2 * width * width,
-  },
-];
-
-export class MaterialModel {
-  constructor({metals, metalName, shapeName, width, innerWidth, rawCost, markup}) {
-    const metal = metals.find(m => m.name === metalName)
-    const shape = Shapes.find(s => s.name === shapeName)
-
-    this.autoName = this.buildAutoName(metalName, shape, width, innerWidth);
-    this.density = Number(metal?.density);
-    this.hasInnerWidth = shape?.hasInnerWidth || false;
-    this.widthLabel = shape?.widthLabel || "-";
-    this.chineseWidth = shape?.chineseWidth;
-    this.crossSectionArea = width === "" ? Number.NaN : Number(shape?.area(width, innerWidth));
-    this.weightPerMm = Number(this.density * this.crossSectionArea);
-    this.effectiveCost = rawCost === "" ? Number.NaN : Number(Number(rawCost) + (rawCost * markup / 100));
-  }
-
-  buildAutoName(metalName, shape, width, innerWidth) {
-    if (!metalName) return "-";
-    let str = `${metalName} ${Number(width).toFixed(1)}`;
-    if (!shape) return str;
-    if (shape.hasInnerWidth) {
-      str += `-${Number(innerWidth).toFixed(1)}`
-    }
-    str += "mm"
-    if (shape.abbreviation) {
-      str += ` ${shape.abbreviation}`
-    }
-    return str;
-  }
+export function blankMaterial(): IMaterial {
+  return {
+    name: "",
+    isNameManual: false,
+    metalName: "",
+    shapeName: "",
+    width: 0,
+    innerWidth: 0,
+    rawCost: 0,
+    markup: 0,
+  };
 }
 
-function Materials({materials, metals, metalFamilies, saveMaterial}) {
-  const [isNameManual, setIsNameManual] = useState(false);
-  const [name, setName] = useState("");
-  const [metalName, setMetalName] = useState("");
-  const [shapeName, setShapeName] = useState(Shapes[0].name);
-  const [width, setWidth] = useState("");
-  const [innerWidth, setInnerWidth] = useState("");
-  const [rawCost, setRawCost] = useState("");
-  const [markup, setMarkup] = useState(6.5);
+function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], metals: IMetal[], saveMaterial: (material: IMaterial) => void}) {
+  const [isNameManual, setIsNameManual] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [metalName, setMetalName] = useState<string>("");
+  const [shapeName, setShapeName] = useState<string>(Shapes[0].name);
+  const [width, setWidth] = useState<string>("");
+  const [innerWidth, setInnerWidth] = useState<string>("");
+  const [rawCost, setRawCost] = useState<string>("");
+  const [markup, setMarkup] = useState<string>("6.5");
 
   const materialModel = new MaterialModel({
     metals: metals,
@@ -123,39 +61,37 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
       alert("Need a Shape");
       return;
     }
-    if (!width || isNaN(width)) {
+    if (!width || isNaN(Number(width))) {
       alert("Need a numeric Width");
       return;
     }
-    if (!rawCost || isNaN(rawCost)) {
+    if (!rawCost || isNaN(Number(rawCost))) {
       alert("Need a numeric Raw Cost");
       return;
     }
-    if (!markup || isNaN(markup)) {
+    if (!markup || isNaN(Number(markup))) {
       alert("Need a numeric Markup");
       return;
     }
-    if (materialModel.hasInnerWidth && (!innerWidth || isNaN(innerWidth))) {
+    if (materialModel.hasInnerWidth && (!innerWidth || isNaN(Number(innerWidth)))) {
       alert("Need a numeric Inner Width");
       return;
     }
 
-    const material = {
+    const material: IMaterial = {
       name: mergedName,
       isNameManual: isNameManual,
       metalName: metalName,
       shapeName: shapeName,
       width: Number(width),
+      innerWidth: materialModel.hasInnerWidth ? Number(innerWidth) : 0,
       rawCost: Number(rawCost),
       markup: Number(markup),
     };
-    if (materialModel.hasInnerWidth) {
-      material.innerWidth = Number(innerWidth);
-    }
     saveMaterial(material);
   };
 
-  function importerProcessorFunc(grid) {
+  function importerProcessorFunc(grid: string[][]) {
     const metalNames = metals.map(m => m.name);
 
     grid.forEach((row, i) => {
@@ -168,15 +104,15 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
         alert(`Import failed on row ${i+1}.  Metal ${metalName} not found.`);
         return;
       }
-      if (!width || isNaN(width)) {
+      if (!width || isNaN(Number(width))) {
         alert(`Import failed on row ${i+1}.  Need a numeric width.`);
         return;
       }
-      if (isNaN(rawCost)) {
+      if (isNaN(Number(rawCost))) {
         alert(`Import failed on row ${i+1}.  Need a numeric raw cost.`);
         return;
       }
-      if (isNaN(markup)) {
+      if (isNaN(Number(markup))) {
         alert(`Import failed on row ${i+1}.  Need a numeric markup.`);
         return;
       }
@@ -195,22 +131,23 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
         metalName: metalName,
         shapeName: Shapes[0].name,
         width: Number(width),
+        innerWidth: 0,
         rawCost: Number(rawCost),
         markup: Number(markup),
       });
     });
   }
 
-  function handleLoadMaterial(index) {
+  function handleLoadMaterial(index: number) {
      const material = materials[index];
      setName(material.name);
      setIsNameManual(material.isNameManual);
      setMetalName(material.metalName);
      setShapeName(material.shapeName);
-     setWidth(material.width);
-     setInnerWidth(material.innerWidth || 0);
-     setRawCost(material.rawCost);
-     setMarkup(material.markup);
+     setWidth(String(material.width));
+     setInnerWidth(String(material.innerWidth));
+     setRawCost(String(material.rawCost));
+     setMarkup(String(material.markup));
   };
 
   const tableRows = materials.map((m, i) =>
@@ -280,7 +217,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}) {
       type="checkbox"
       name="isNameManual"
       checked={isNameManual}
-      onChange={(e) => setIsNameManual(!isNameManual) }
+      onChange={() => setIsNameManual(!isNameManual) }
     />
     <br/>
 

@@ -2,6 +2,8 @@ import Table from 'react-bootstrap/Table';
 import Labels from './Labels'
 
 export class ItemInHousesModel {
+  totalCostPerUnit: number;
+  rows: IItemInHouseModelRow[];
   constructor(inHouses, itemInHouses) {
     this.rows = itemInHouses.map(iih => {
       const costPer1k = inHouses.find(ih => ih.name === iih.name)?.cost;

@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Authenticator } from '@aws-amplify/ui-react';
 import App from "./App.tsx";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
@@ -12,7 +11,6 @@ const remoteCognitoAuthConfig = {
   authority: "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_VQ0eXINVn",
   client_id: "6dmaip976mpqdf8tjs0q6n15qj",
   redirect_uri: "https://main.d2c06f7nh1jalc.amplifyapp.com",
-  /* redirect_uri: "https://d84l1y8p4kdic.cloudfront.net", */
   response_type: "code",
   scope: "phone openid email",
 };

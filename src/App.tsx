@@ -16,10 +16,11 @@ function App() {
 */
 
   if (auth.isLoading) {
-    return <div>載入中 Loading...</div>;
+    return <div>載入中 Auth loading...</div>;
   }
 
   if (auth.error) {
+
     return <div>Encountering error... {auth.error.message}</div>;
   }
 

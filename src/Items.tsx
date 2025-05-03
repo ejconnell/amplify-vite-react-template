@@ -8,42 +8,21 @@ import ItemWastage from "./ItemWastage"
 import ItemOverhead from "./ItemOverhead"
 import ItemOutsourcings from "./ItemOutsourcings"
 import Labels from "./Labels"
-import { MaterialModel } from "./Materials"
-import { ItemSetupsModel } from "./ItemSetups"
-import { ItemInHousesModel } from "./ItemInHouses"
-import { ItemWastageModel, ItemWastageInitialRange } from "./ItemWastage"
-import { ItemOverheadModel, ItemOverheadInitialRange } from "./ItemOverhead"
-import { ItemOutsourcingsModel } from "./ItemOutsourcings"
+import { ItemWastageInitialRange } from "./ItemWastage"
+import { ItemOverheadInitialRange } from "./ItemOverhead"
+import { ItemModel } from "./ItemModel";
+import { IInHouse, IItem, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing, IStandardSetup } from "./types";
 
-export class ItemModel {
-  constructor({materials, metals, inHouses, outsourcings, materialName, unitLength, itemSetups=[], itemInHouses=[], itemWastageRanges=[], itemOverheadRanges=[], itemOutsourcings=[], unitQuantity}) {
-    const material = materials.find(m => m.name === materialName) || {};
-    const materialModel = new MaterialModel({metals: metals, ...material});
-    const itemInHousesModel = new ItemInHousesModel(inHouses, itemInHouses);
-    const itemOutsourcingsModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, unitQuantity);
-    const itemWastageModel = new ItemWastageModel(itemWastageRanges, unitQuantity);
-    const itemSetupsModel = new ItemSetupsModel(itemSetups, unitQuantity);
-    const itemOverheadModel = new ItemOverheadModel(itemOverheadRanges, unitQuantity);
-    this.gramsPerUnit = unitLength === "" ? Number.NaN : unitLength * materialModel.weightPerMm;
-    this.materialCostPerUnit = this.gramsPerUnit * materialModel.effectiveCost / 1000;
-    this.inHouseCostPerUnit = itemInHousesModel.totalCostPerUnit;
-    this.outsourcingCostPerUnit = itemOutsourcingsModel.totalCostPerUnit;
-    this.wastagePercent = Number(itemWastageModel.value);
-    this.setupCostPerUnit = itemSetupsModel.totalCostPerUnit;
-    this.overheadPercent = Number(itemOverheadModel.value);
-  }
-}
-
-function Items({items, materials, metals, standardSetups, inHouses, outsourcings, saveItem}) {
-  const [exampleUnitQuantity, setExampleUnitQuantity] = useState(300);
-  const [name, setName] = useState("");
-  const [materialName, setMaterialName] = useState("");
-  const [unitLength, setUnitLength] = useState("");
-  const [itemSetups, setItemSetups] = useState([]);
-  const [itemInHouses, setItemInHouses] = useState([]);
-  const [itemWastageRanges, setItemWastageRanges] = useState([ItemWastageInitialRange()]);
-  const [itemOverheadRanges, setItemOverheadRanges] = useState([ItemOverheadInitialRange()]);
-  const [itemOutsourcings, setItemOutsourcings] = useState([]);
+function Items({items, materials, metals, standardSetups, inHouses, outsourcings, saveItem}: {items: IItem[], materials: IMaterial[], metals: IMetal[], standardSetups: IStandardSetup[], inHouses: IInHouse[], outsourcings: IOutsourcing[], saveItem: (item: IItem) => void}) {
+  const [exampleUnitQuantity, setExampleUnitQuantity] = useState<string>("1000");
+  const [name, setName] = useState<string>("");
+  const [materialName, setMaterialName] = useState<string>("");
+  const [unitLength, setUnitLength] = useState<string>("");
+  const [itemSetups, setItemSetups] = useState<IItemSetup[]>([]);
+  const [itemInHouses, setItemInHouses] = useState<IItemInHouse[]>([]);
+  const [itemWastageRanges, setItemWastageRanges] = useState<IItemWastageRange[]>([ItemWastageInitialRange()]);
+  const [itemOverheadRanges, setItemOverheadRanges] = useState<IItemOverheadRange[]>([ItemOverheadInitialRange()]);
+  const [itemOutsourcings, setItemOutsourcings] = useState<IItemOutsourcing[]>([]);
 
   const lookupTables = {
     materials: materials,
@@ -61,14 +40,14 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     itemWastageRanges: itemWastageRanges,
     itemOverheadRanges: itemOverheadRanges,
     itemOutsourcings: itemOutsourcings,
-    unitQuantity: exampleUnitQuantity,
+    unitQuantity: Number(exampleUnitQuantity),
   });
 
   const itemsModels = items.map(item => {
     return new ItemModel({
        ...lookupTables,
        ...item,
-       unitQuantity: exampleUnitQuantity,
+       unitQuantity: Number(exampleUnitQuantity),
     });
   });
 
@@ -110,22 +89,21 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     const item = {
       name: name,
       materialName: materialName,
-      unitLength: unitLength,
+      unitLength: Number(unitLength),
       itemSetups: itemSetups,
       itemInHouses: itemInHouses,
       itemWastageRanges: itemWastageRanges,
       itemOverheadRanges: itemOverheadRanges,
       itemOutsourcings: itemOutsourcings,
     };
-    console.log(JSON.stringify(item, (k, v) => v === undefined ? "AAAA" : v));
     saveItem(item);
   }
 
-  function handleLoadItem(index) {
+  function handleLoadItem(index: number) {
     const item = items[index];
     setName(item.name);
     setMaterialName(item.materialName);
-    setUnitLength(item.unitLength);
+    setUnitLength(String(item.unitLength));
     setItemSetups(item.itemSetups);
     setItemInHouses(item.itemInHouses);
     setItemWastageRanges(item.itemWastageRanges);
@@ -260,7 +238,7 @@ and drag back to cell A1.  Copy and then paste the
 whole thing here.
   `;
 
-  function importerProcessorFunc(grid) {
+  function importerProcessorFunc(grid: string[][]) {
     const materialNames = materials.map(m => m.name);
     const standardSetupNames = standardSetups.map(m => m.name);
     const inHouseNames = inHouses.map(m => m.name);
@@ -273,7 +251,7 @@ whole thing here.
       return;
     }
     console.log(grid);
-    function doAlert(str) {
+    function doAlert(str: string) {
       if (numErrors < MaxErrors) {
         if (numErrors < MaxErrors - 1) {
           alert(str);
@@ -299,7 +277,7 @@ whole thing here.
     const unitLength = grid[3][13];
     setUnitLength(unitLength);
 
-    const itemSetups = [];
+    const itemSetups: IItemSetup[] = [];
     for (let row = 2; row <= 7; row++) {
       const standardSetupName = grid[row][5];
       const costPerJob = grid[row][6];
@@ -352,7 +330,7 @@ whole thing here.
     const itemWastageRanges = [];
     let nextEnding = ItemWastageInitialRange().ending;
     for (let row = 21; row <= 30; row++) {
-      const starting = grid[row][0];
+      const starting = Number(grid[row][0]);
       const value = grid[row][1];
       if (!starting) continue;
       itemWastageRanges.push({
@@ -368,7 +346,7 @@ whole thing here.
         key: crypto.randomUUID(),
         starting: 0,
         ending: nextEnding,
-        value: 1000000,
+        value: "1000000",
       });
     }
     setItemWastageRanges(itemWastageRanges);
@@ -376,7 +354,7 @@ whole thing here.
     const itemOverheadRanges = [];
     nextEnding = ItemOverheadInitialRange().ending;
     for (let row = 21; row <= 30; row++) {
-      const starting = grid[row][3];
+      const starting = Number(grid[row][3]);
       const value = grid[row][4];
       if (!starting) continue;
       itemOverheadRanges.push({
@@ -392,7 +370,7 @@ whole thing here.
         key: crypto.randomUUID(),
         starting: 0,
         ending: nextEnding,
-        value: 1000000,
+        value: "1000000",
       });
     }
     setItemOverheadRanges(itemOverheadRanges);

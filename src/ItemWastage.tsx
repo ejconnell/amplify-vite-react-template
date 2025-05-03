@@ -5,7 +5,7 @@ import Labels from './Labels'
 export class ItemWastageModel extends LookupRangesModel {
 }
 
-export function ItemWastageInitialRange() {
+export function ItemWastageInitialRange(): IItemWastageRange{
   return LookupRangesInitialRange();
 }
 

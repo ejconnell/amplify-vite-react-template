@@ -5,12 +5,11 @@ import Labels from './Labels'
 export class ItemOverheadModel extends LookupRangesModel {
 }
 
-export function ItemOverheadInitialRange() {
+export function ItemOverheadInitialRange(): IItemOverheadRange {
   return LookupRangesInitialRange();
 }
 
 function ItemOverhead({itemOverheadRanges, exampleUnitQuantity, setItemOverheadRanges}) {
-
   return (
     <LookupRanges
        ranges={itemOverheadRanges}

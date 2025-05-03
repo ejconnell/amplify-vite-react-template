@@ -3,13 +3,14 @@ import Table from 'react-bootstrap/Table';
 import Labels from './Labels';
 
 export class LookupRangesModel {
+  value: number
   constructor(ranges, quantity) {
     const range = ranges.find(r => (r.starting <= quantity) && (quantity <= r.ending))
-    this.value = range?.value || Number.NaN;
+    this.value = Number(range?.value) || Number.NaN;
   }
 }
 
-export function LookupRangesInitialRange() {
+export function LookupRangesInitialRange(): ILookupRange {
   return {
     key: crypto.randomUUID(),
     starting: 0,
@@ -146,8 +147,8 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
     <button type="button" onClick={handleSplitRange}>{Labels.splitRangeAt.chinese}Split Range At</button>
     <br/>
     {rangePairSelectFrag}
-    <button type="button" onClick={e => handleMergeRanges(true)}>{Labels.mergeRangesKeepUpper.chinese}Merge Ranges (keep upper)</button>
-    <button type="button" onClick={e => handleMergeRanges(false)}>{Labels.mergeRangesKeepLower.chinese}Merge Ranges (keep lower)</button>
+    <button type="button" onClick={() => handleMergeRanges(true)}>{Labels.mergeRangesKeepUpper.chinese}Merge Ranges (keep upper)</button>
+    <button type="button" onClick={() => handleMergeRanges(false)}>{Labels.mergeRangesKeepLower.chinese}Merge Ranges (keep lower)</button>
    </>
   );
 }

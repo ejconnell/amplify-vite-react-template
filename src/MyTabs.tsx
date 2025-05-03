@@ -17,21 +17,12 @@ import {fromCognitoIdentityPool} from "@aws-sdk/credential-providers";
 const log = (msg) => console.log(`[MyTabs] ${msg}`);
 
 import {
-  BillingMode,
-  CreateTableCommand,
-  DeleteTableCommand,
   DynamoDBClient,
-  ListTablesCommand,
 } from "@aws-sdk/client-dynamodb";
 
 import {
-  BatchWriteCommand,
-  DeleteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
   PutCommand,
-  UpdateCommand,
-  paginateQuery,
   paginateScan,
 } from "@aws-sdk/lib-dynamodb";
 
@@ -72,7 +63,7 @@ async function loadQuotes(ddbDocClient, setQuotes) {
   await loadTable(ddbDocClient, setQuotes, "Quotes", sortCompare)
 };
 
-async function loadTable(ddbDocClient, setter, tableName, sortCompare) {
+async function loadTable(ddbDocClient, setter: Function, tableName: string, sortCompare: (a: any, b: any) => number = null) {
   log(`loadTable("${tableName}")`)
   const paginatedScan = paginateScan(
     { client: ddbDocClient },
@@ -103,19 +94,21 @@ function getAwsCreds(auth) {
     logins: {
        [COGNITO_ID]: auth.user?.id_token,
     },
-  })  
+  })
 }
 
+
+
 function MyTabs() {
-  const [loadsComplete, setFetchesComplete] = useState(false);
-  const [materials, setMaterials] = useState([]);
-  const [metals, setMetals] = useState([]);
-  const [metalFamilies, setMetalFamilies] = useState([]);
-  const [standardSetups, setStandardSetups] = useState([]);
-  const [inHouses, setInHouses] = useState([]);
-  const [outsourcings, setOutsourcings] = useState([]);
-  const [items, setItems] = useState([]);
-  const [quotes, setQuotes] = useState([]);
+  const [loadsComplete, setFetchesComplete] = useState<boolean>(false);
+  const [materials, setMaterials] = useState<Array<IMaterial>>([]);
+  const [metals, setMetals] = useState<Array<IMetal>>([]);
+  const [metalFamilies, setMetalFamilies] = useState<Array<IMetalFamily>>([]);
+  const [standardSetups, setStandardSetups] = useState<Array<IStandardSetup>>([]);
+  const [inHouses, setInHouses] = useState<Array<IInHouse>>([]);
+  const [outsourcings, setOutsourcings] = useState<Array<IOutsourcing>>([]);
+  const [items, setItems] = useState<Array<IItem>>([]);
+  const [quotes, setQuotes] = useState<Array<IQuote>>([]);
 
   const auth = useAuth();
 
@@ -138,7 +131,7 @@ function MyTabs() {
     ]).then(() => setFetchesComplete(true));
   }, [])
 
-  async function saveMetalFamily(metalFamily) {
+  async function saveMetalFamily(metalFamily: IMetalFamily) {
     log("saveMetalFamily() " + metalFamily.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "MetalFamilies",
@@ -150,7 +143,7 @@ function MyTabs() {
     loadMetalFamilies(ddbDocClient, setMetalFamilies);
   }
 
-  async function saveMetal(metal) {
+  async function saveMetal(metal: IMetal) {
     log("saveMetal() " + metal.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Metals",
@@ -160,7 +153,7 @@ function MyTabs() {
     loadMetals(ddbDocClient, setMetals)
   }
 
-  async function saveMaterial(material) {
+  async function saveMaterial(material: IMaterial) {
     log("saveMaterial() " + material.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Materials",
@@ -170,7 +163,7 @@ function MyTabs() {
     loadMaterials(ddbDocClient, setMaterials)
   }
 
-  async function saveStandardSetup(standardSetup) {
+  async function saveStandardSetup(standardSetup: IStandardSetup) {
     log("saveStandardSetup() " + standardSetup.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "StandardSetups",
@@ -180,7 +173,7 @@ function MyTabs() {
     loadStandardSetups(ddbDocClient, setStandardSetups);
   }
 
-  async function saveInHouse(inHouse) {
+  async function saveInHouse(inHouse: IInHouse) {
     log("saveInHouse() " + inHouse.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "InHouses",
@@ -190,7 +183,7 @@ function MyTabs() {
     loadInHouses(ddbDocClient, setInHouses);
   }
 
-  async function saveOutsourcing(outsourcing) {
+  async function saveOutsourcing(outsourcing: IOutsourcing) {
     log("saveOutsourcing() " + outsourcing.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Outsourcings",
@@ -200,7 +193,7 @@ function MyTabs() {
     loadOutsourcings(ddbDocClient, setOutsourcings);
   }
 
-  async function saveItem(item) {
+  async function saveItem(item: IItem) {
     log("saveItem() " + item.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Items",
@@ -210,9 +203,8 @@ function MyTabs() {
     loadItems(ddbDocClient, setItems);
   }
 
-  async function saveQuote(quote) {
+  async function saveQuote(quote: IQuote) {
     log(`saveQuote() ${quote.name} - ${quote.timestamp}`);
-log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Quotes",
       Item: quote,
@@ -222,7 +214,7 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
   }
 
   if (!loadsComplete) {
-    return <h1>Loading...</h1>
+    return <h1>載入中 Loading...</h1>
   }
 
   function tabTitle(label) {
@@ -259,7 +251,6 @@ log(JSON.stringify(quote, (k, v) => v === null ? "AAAAA" : v));
         <Materials
           materials={materials}
           metals={metals}
-          metalFamilies={metalFamilies}
           saveMaterial={saveMaterial}
         />
       </Tab>

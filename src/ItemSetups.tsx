@@ -2,8 +2,10 @@ import Table from 'react-bootstrap/Table';
 import Labels from './Labels'
 
 export class ItemSetupsModel {
-  constructor(itemSetups, unitQuantity) {
-    this.totalCostPerJob = itemSetups.map(s => s.costPerJob === "" ? Number.NaN : Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
+  totalCostPerJob: number;
+  totalCostPerUnit: number;
+  constructor(itemSetups: IItemSetup[], unitQuantity: number) {
+    this.totalCostPerJob = itemSetups.map(s => s.costPerJob).reduce((acc, cost) => acc+cost, 0);
     this.totalCostPerUnit = this.totalCostPerJob / unitQuantity;;
   }
 }

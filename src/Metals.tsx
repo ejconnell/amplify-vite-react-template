@@ -5,9 +5,9 @@ import Trifold from "./Trifold";
 import Labels from './Labels';
 
 function Metals({metals, metalFamilies, saveMetal}) {
-  const [name, setName] = useState("");
-  const [metalFamilyName, setMetalFamilyName] = useState("");
-  const [density, setDensity] = useState(0);
+  const [name, setName] = useState<string>("");
+  const [metalFamilyName, setMetalFamilyName] = useState<string>("");
+  const [density, setDensity] = useState<string>("");
 
   function importerProcessorFunc(grid) {
     grid.forEach((row, i) => {
@@ -21,7 +21,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
       }
       saveMetal({
         name: name,
-        metalFamilyName: metalFamilyName || metalFamilies[0].name,
+        metalFamilyName: metalFamilyName,
         density: Number(density),
       });
     });
@@ -36,7 +36,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
       alert("Need to select a Metal Family");
       return;
     }
-    if (!density || isNaN(density)) {
+    if (!density || isNaN(Number(density))) {
       alert("Need a numeric density");
       return;
     }
