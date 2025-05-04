@@ -14,7 +14,7 @@ export class MaterialModel {
   crossSectionArea: number;
   weightPerMm: number;
   effectiveCost: number;
-  constructor({ metals, metalName, shapeName, width, innerWidth, rawCost, markup }:{metals: IMetal[], metalName: string, shapeName: string, width: number | string, innerWidth: number | string, rawCost: number | string, markup: number | string}) {
+  constructor({ metals, metalName, shapeName, width, innerWidth, rawCost, markup }:{metals: IMetal[], metalName: string, shapeName: string, width: string, innerWidth: string, rawCost: string, markup: string}) {
     this.width = Number(width);
     this.innerWidth = Number(innerWidth);
     this.rawCost = Number(rawCost);
@@ -33,7 +33,7 @@ export class MaterialModel {
   }
 
   buildAutoName(metalName: string, shape: IShape | undefined, width: number, innerWidth: number) {
-    if (!metalName) return "-";
+    if (!metalName) return "---";
     let str = `${metalName} ${Number(width).toFixed(1)}`;
     if (!shape) return str;
     if (shape.hasInnerWidth) {

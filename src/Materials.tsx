@@ -21,11 +21,13 @@ export function blankMaterial(): IMaterial {
   };
 }
 
+const CylindricalShape = Shapes[0];
+
 function Materials({materials, metals, metalFamilies, saveMaterial}: {materials: IMaterial[], metals: IMetal[], metalFamilies: IMetalFamily[], saveMaterial: (material: IMaterial) => void}) {
   const [isNameManual, setIsNameManual] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [metalName, setMetalName] = useState<string>("");
-  const [shapeName, setShapeName] = useState<string>(Shapes[0].name);
+  const [shapeName, setShapeName] = useState<string>(CylindricalShape.name);
   const [width, setWidth] = useState<string>("");
   const [innerWidth, setInnerWidth] = useState<string>("");
   const [rawCost, setRawCost] = useState<string>("");
@@ -87,7 +89,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
       return;
     }
     if (!rawCost || isNaN(Number(rawCost))) {
-      alert("Need a numeric Raw Cost");
+      alert("Need a numeric Manufacturer Cost");
       return;
     }
     if (!markup || isNaN(Number(markup))) {
@@ -144,7 +146,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
       const materialModel = new MaterialModel({
         metals: metals,
         metalName: metalName,
-        shapeName: Shapes[0].name,
+        shapeName: CylindricalShape.name,
         width: width,
         innerWidth: "0",
         rawCost: rawCost,
@@ -154,7 +156,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
         name: materialModel.autoName,
         isNameManual: false,
         metalName: metalName,
-        shapeName: Shapes[0].name,
+        shapeName: CylindricalShape.name,
         width: width,
         innerWidth: "",
         rawCost: rawCost,
@@ -254,7 +256,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
           <th>{L10n.width.chinese} Width (mm)</th>
           <th>{L10n.innerWidth.chinese} Inner Width (mm)</th>
           <th>{L10n.gramsPerMm.chinese}<br/>Weight per mm (g/mm)</th>
-          <th>{L10n.pricePerKgManufacturer.chinese}<br/>Raw Cost ($/kg)</th>
+          <th>{L10n.pricePerKgManufacturer.chinese}<br/>Manufacturer Cost ($/kg)</th>
           <th>{L10n.surchargePercentage.chinese} Markup %</th>
           <th>{L10n.pricePerKgSurcharge.chinese}<br/>Effective Cost ($/kg)</th>
           <th>{L10n.load.chinese} Load</th>
@@ -316,7 +318,7 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
     <label>{L10n.gramsPerMm.chinese} Weight per mm (g/mm): {materialModel.weightPerMm.toFixed(4)}</label>
     <br/>
 
-    <label>{L10n.pricePerKgManufacturer.chinese} Raw Cost:</label>
+    <label>{L10n.pricePerKgManufacturer.chinese} Manufacturer Cost:</label>
     <input
       value={rawCost}
       onChange={(e) => setRawCost(e.target.value)}
