@@ -1,12 +1,13 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
-import Labels from './Labels';
+import L10n from './L10n';
+import { ILookupRange } from "./Types";
 
 export class LookupRangesModel {
   value: number
-  constructor(ranges, quantity) {
+  constructor(ranges: ILookupRange[], quantity: number) {
     const range = ranges.find(r => (r.starting <= quantity) && (quantity <= r.ending))
-    this.value = Number(range?.value) || Number.NaN;
+    this.value = Number(range?.value);
   }
 }
 
@@ -19,13 +20,13 @@ export function LookupRangesInitialRange(): ILookupRange {
   };
 }
 
-function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
+function LookupRanges({ranges, quantity, setRanges, title, valueLabel}: {ranges: ILookupRange[], quantity: string, setRanges: (ranges: ILookupRange[]) => void, title: string, valueLabel: string}) {
   const [splitRangeAt, setSplitRangeAt] = useState("");
   const [rangePairSelectIndex, setRangePairSelectIndex] = useState(-1);
 
-  const lookupRangesModel = new LookupRangesModel(ranges, quantity);
+  const lookupRangesModel = new LookupRangesModel(ranges, Number(quantity));
 
-  function handleValueChange(value, index) {
+  function handleValueChange(value: string, index: number) {
     const nextLookupRanges = ranges.map((iw, i) => {
       if (i === index) {
         return {
@@ -69,11 +70,11 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
     setRanges(nextLookupRanges);
   };
 
-  function handleMergeRanges(isKeepUpper) {
+  function handleMergeRanges(isKeepUpper: boolean) {
     if (rangePairSelectIndex === -1) {
       return;  // No range selected
     }
-    const nextLookupRanges = [];
+    const nextLookupRanges: ILookupRange[] = [];
     ranges.forEach((range, i) => {
       if (rangePairSelectIndex === i) {
         nextLookupRanges.push({
@@ -126,12 +127,12 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
   return (
    <>
     <h4>{title}:</h4>
-    <p>{Labels.exampleUnitQuantity.chinese} Example unit quantity {quantity || 0} &rarr; {valueLabel}: {lookupRangesModel.value}</p>
+    <p>{L10n.exampleUnitQuantity.chinese} Example unit quantity {quantity || 0} &rarr; {valueLabel}: {lookupRangesModel.value}</p>
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.rangeStart.chinese} Range Start</th>
-          <th>{Labels.rangeEnd.chinese} Range End</th>
+          <th>{L10n.rangeStart.chinese} Range Start</th>
+          <th>{L10n.rangeEnd.chinese} Range End</th>
           <th>{valueLabel}</th>
         </tr>
       </thead>
@@ -144,11 +145,11 @@ function LookupRanges({ranges, quantity, setRanges, title, valueLabel}) {
       value={splitRangeAt}
       onChange={e => setSplitRangeAt(e.target.value)}
     />
-    <button type="button" onClick={handleSplitRange}>{Labels.splitRangeAt.chinese}Split Range At</button>
+    <button type="button" onClick={handleSplitRange}>{L10n.splitRangeAt.chinese}Split Range At</button>
     <br/>
     {rangePairSelectFrag}
-    <button type="button" onClick={() => handleMergeRanges(true)}>{Labels.mergeRangesKeepUpper.chinese}Merge Ranges (keep upper)</button>
-    <button type="button" onClick={() => handleMergeRanges(false)}>{Labels.mergeRangesKeepLower.chinese}Merge Ranges (keep lower)</button>
+    <button type="button" onClick={() => handleMergeRanges(true)}>{L10n.mergeRangesKeepUpper.chinese}Merge Ranges (keep upper)</button>
+    <button type="button" onClick={() => handleMergeRanges(false)}>{L10n.mergeRangesKeepLower.chinese}Merge Ranges (keep lower)</button>
    </>
   );
 }

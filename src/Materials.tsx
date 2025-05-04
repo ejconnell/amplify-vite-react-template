@@ -2,10 +2,11 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
-import Labels from './Labels';
+import L10n from './L10n';
+import { TabLabels } from "./TabLabels";
 import { MaterialModel } from "./MaterialModel";
 import { Shapes } from "./Shapes";
-import { IMaterial, IMetal } from "./types";
+import { IMaterial, IMetal } from "./Types";
 
 export function blankMaterial(): IMaterial {
   return {
@@ -13,10 +14,10 @@ export function blankMaterial(): IMaterial {
     isNameManual: false,
     metalName: "",
     shapeName: "",
-    width: 0,
-    innerWidth: 0,
-    rawCost: 0,
-    markup: 0,
+    width: "",
+    innerWidth: "",
+    rawCost: "",
+    markup: "",
   };
 }
 
@@ -77,16 +78,20 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
       alert("Need a numeric Inner Width");
       return;
     }
+    if (isNaN(materialModel.weightPerMm)) {
+      alert("There is a problem with the weight per mm");
+      return
+    }
 
     const material: IMaterial = {
       name: mergedName,
       isNameManual: isNameManual,
       metalName: metalName,
       shapeName: shapeName,
-      width: Number(width),
-      innerWidth: materialModel.hasInnerWidth ? Number(innerWidth) : 0,
-      rawCost: Number(rawCost),
-      markup: Number(markup),
+      width: width,
+      innerWidth: materialModel.hasInnerWidth ? innerWidth : "",
+      rawCost: rawCost,
+      markup: markup,
     };
     saveMaterial(material);
   };
@@ -130,10 +135,10 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
         isNameManual: false,
         metalName: metalName,
         shapeName: Shapes[0].name,
-        width: Number(width),
-        innerWidth: 0,
-        rawCost: Number(rawCost),
-        markup: Number(markup),
+        width: width,
+        innerWidth: "",
+        rawCost: rawCost,
+        markup: markup,
       });
     });
   }
@@ -144,10 +149,10 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
      setIsNameManual(material.isNameManual);
      setMetalName(material.metalName);
      setShapeName(material.shapeName);
-     setWidth(String(material.width));
-     setInnerWidth(String(material.innerWidth));
-     setRawCost(String(material.rawCost));
-     setMarkup(String(material.markup));
+     setWidth(material.width);
+     setInnerWidth(material.innerWidth);
+     setRawCost(material.rawCost);
+     setMarkup(material.markup);
   };
 
   const tableRows = materials.map((m, i) =>
@@ -155,10 +160,10 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
       <td>{m.name}</td>
       <td>{m.metalName}</td>
       <td>{m.shapeName}</td>
-      <td style={{textAlign: "right"}}>{m.width.toFixed(1)}</td>
-      <td style={{textAlign: "right"}}>{m.innerWidth ? m.innerWidth.toFixed(1) : "---"}</td>
+      <td style={{textAlign: "right"}}>{Number(m.width).toFixed(1)}</td>
+      <td style={{textAlign: "right"}}>{m.innerWidth ? Number(m.innerWidth).toFixed(1) : "---"}</td>
       <td style={{textAlign: "right"}}>{materialsModels[i].weightPerMm.toFixed(4)}</td>
-      <td style={{textAlign: "right"}}>{m.rawCost.toFixed(4)}</td>
+      <td style={{textAlign: "right"}}>{Number(m.rawCost).toFixed(4)}</td>
       <td style={{textAlign: "right"}}>{m.markup}</td>
       <td style={{textAlign: "right"}}>{materialsModels[i].effectiveCost.toFixed(4)}</td>
       <td><button type="button" onClick={() => handleLoadMaterial(i)}>Load</button></td>
@@ -167,7 +172,7 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
 
   const innerWidthFragment = (
    <>
-    <label>{Labels.inner.chinese}{materialModel.chineseWidth} Inner {materialModel.widthLabel} (mm):</label>
+    <label>{L10n.inner.chinese}{materialModel.chineseWidth} Inner {materialModel.widthLabel} (mm):</label>
     <input
       value={innerWidth}
       onChange={(e) => setInnerWidth(e.target.value)}
@@ -179,23 +184,23 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
   });
 
   const shapeSelectOptions = Shapes.map(s => {
-     return <option value={s.name} key={s.name}>{s.chinese} {s.name}</option>;
+     return <option value={s.name} key={s.name}>{s.name}</option>;
   });
 
   const allMaterialsFrag = (
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.wastage.chinese} Name</th>
-          <th>{Labels.metal.chinese} Metal</th>
-          <th>{Labels.shape.chinese} Shape</th>
-          <th>{Labels.width.chinese} Width (mm)</th>
-          <th>{Labels.innerWidth.chinese} Inner Width (mm)</th>
-          <th>{Labels.gramsPerMm.chinese}<br/>Weight per mm (g/mm)</th>
-          <th>{Labels.pricePerKgManufacturer.chinese}<br/>Raw Cost ($/kg)</th>
-          <th>{Labels.surchargePercentage.chinese} Markup %</th>
-          <th>{Labels.pricePerKgSurcharge.chinese}<br/>Effective Cost ($/kg)</th>
-          <th>{Labels.load.chinese} Load</th>
+          <th>{L10n.wastage.chinese} Name</th>
+          <th>{L10n.metal.chinese} Metal</th>
+          <th>{L10n.shape.chinese} Shape</th>
+          <th>{L10n.width.chinese} Width (mm)</th>
+          <th>{L10n.innerWidth.chinese} Inner Width (mm)</th>
+          <th>{L10n.gramsPerMm.chinese}<br/>Weight per mm (g/mm)</th>
+          <th>{L10n.pricePerKgManufacturer.chinese}<br/>Raw Cost ($/kg)</th>
+          <th>{L10n.surchargePercentage.chinese} Markup %</th>
+          <th>{L10n.pricePerKgSurcharge.chinese}<br/>Effective Cost ($/kg)</th>
+          <th>{L10n.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -205,14 +210,14 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
   );
 
   const currentMaterialFrag = (<>
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input
       value={mergedName}
       onChange={(e) => setName(e.target.value)}
       disabled={!isNameManual}
     />
     &nbsp;
-    <label>{Labels.useManualName.chinese} Use Manual Name:</label>
+    <label>{L10n.useManualName.chinese} Use Manual Name:</label>
     <input
       type="checkbox"
       name="isNameManual"
@@ -221,7 +226,7 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
     />
     <br/>
 
-    <label>{Labels.metal.chinese} Metal:</label>
+    <label>{L10n.metal.chinese} Metal:</label>
     <select
       value={metalName}
       onChange={e => setMetalName(e.target.value)}
@@ -230,10 +235,10 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
       {metalSelectOptions}
     </select>
     &nbsp;
-    <label>{Labels.density.chinese} Density: {materialModel.density || "-"} g/mm<sup>3</sup></label>
+    <label>{L10n.density.chinese} Density: {materialModel.density || "-"} g/mm<sup>3</sup></label>
     <br/>
 
-    <label>{Labels.shape.chinese} Shape:</label>
+    <label>{L10n.shape.chinese} Shape:</label>
     <select
       value={shapeName}
       onChange={e => setShapeName(e.target.value)}
@@ -249,26 +254,26 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
     />
     {materialModel.hasInnerWidth && innerWidthFragment}
     &nbsp; &nbsp;
-    <label>{Labels.crossSectionArea.chinese} Cross section area (mm<sup>2</sup>): {materialModel.crossSectionArea.toFixed(4)}</label>
+    <label>{L10n.crossSectionArea.chinese} Cross section area (mm<sup>2</sup>): {materialModel.crossSectionArea.toFixed(4)}</label>
     &nbsp; &nbsp;
-    <label>{Labels.gramsPerMm.chinese} Weight per mm (g/mm): {materialModel.weightPerMm.toFixed(4)}</label>
+    <label>{L10n.gramsPerMm.chinese} Weight per mm (g/mm): {materialModel.weightPerMm.toFixed(4)}</label>
     <br/>
 
-    <label>{Labels.pricePerKgManufacturer.chinese} Raw Cost:</label>
+    <label>{L10n.pricePerKgManufacturer.chinese} Raw Cost:</label>
     <input
       value={rawCost}
       onChange={(e) => setRawCost(e.target.value)}
     />
-    <label>{Labels.surchargePercentage.chinese} Markup %:</label>
+    <label>{L10n.surchargePercentage.chinese} Markup %:</label>
     <input
       value={markup}
       onChange={(e) => setMarkup(e.target.value)}
     />
-    <label>{Labels.pricePerKgSurcharge.chinese} Effective Cost: {materialModel.effectiveCost}</label>
+    <label>{L10n.pricePerKgSurcharge.chinese} Effective Cost: {materialModel.effectiveCost}</label>
     <br/>
 
     <button type="submit" onClick={handleSaveMaterial}>
-      {Labels.save.chinese}{Labels.material.chinese} Save Material
+      {L10n.save.chinese}{L10n.material.chinese} Save Material
     </button>
   </>);
 
@@ -300,7 +305,7 @@ Paste 4 columns with no header:
       top={allMaterialsFrag}
       middle={currentMaterialFrag}
       bottom={administrationFrag}
-      label={Labels.material}
+      label={TabLabels.material}
     />
   );
 }

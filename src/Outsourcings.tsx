@@ -2,16 +2,18 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
-import Labels from "./Labels";
+import L10n from "./L10n";
+import { TabLabels } from "./TabLabels";
+import { IOutsourcing } from "./Types";
 
-function Outsourcings({outsourcings, saveOutsourcing}) {
+function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourcing[], saveOutsourcing: (outsourcing: IOutsourcing) => void}) {
   const [name, setName] = useState("");
   const [isPricedByUnit, setIsPricedByUnit] = useState(false);
   const [variableCost, setVariableCost] = useState("");
   const [minCostPerJob, setMinCostPerJob] = useState("");
 
   const variableCostStr = isPricedByUnit ? "unit" : "kilogram";
-  const variableCostLabel = isPricedByUnit ? Labels.minCostPerUnit.chinese + "Minimum cost per unit" : Labels.minCostPerKg.chinese + "Minimum cost per kilogram";
+  const variableCostLabel = isPricedByUnit ? L10n.minCostPerUnit.chinese + "Minimum cost per unit" : L10n.minCostPerKg.chinese + "Minimum cost per kilogram";
 
   function handleSaveOutsourcing() {
     if (!name) {
@@ -29,13 +31,13 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     const outsourcing = {
       name: name,
       isPricedByUnit: isPricedByUnit,
-      variableCost: Number(variableCost),
-      minCostPerJob: Number(minCostPerJob),
+      variableCost: variableCost,
+      minCostPerJob: minCostPerJob,
     };
     saveOutsourcing(outsourcing);
   };
 
-  function handleLoadOutsourcing(index) {
+  function handleLoadOutsourcing(index: number) {
      const os = outsourcings[index];
      setName(os.name);
      setIsPricedByUnit(os.isPricedByUnit);
@@ -43,7 +45,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
      setMinCostPerJob(os.minCostPerJob);
   }
 
-  function importerProcessorFunc(grid) {
+  function importerProcessorFunc(grid: string[][]) {
     grid.forEach((row, i) => {
       if ((row.length < 3) || (row.length > 4)) {
         alert(`Import failed on row ${i+1}.  Expected exactly 3-4 columns`);
@@ -55,8 +57,8 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       }
       saveOutsourcing({
         name: name,
-        variableCost: Number(variableCost),
-        minCostPerJob: Number(minCostPerJob),
+        variableCost: variableCost,
+        minCostPerJob: minCostPerJob,
         isPricedByUnit: isPricedByUnit?.toLowerCase() === "true",
       });
     });
@@ -92,11 +94,11 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.name.chinese} Name</th>
-          <th>{Labels.minCostPerJob.chinese} Minimum cost per job</th>
-          <th>{Labels.pricedBy.chinese} Priced by</th>
-          <th>{Labels.costPerKgUnit.chinese} Cost per kg/unit</th>
-          <th>{Labels.load.chinese} Load</th>
+          <th>{L10n.name.chinese} Name</th>
+          <th>{L10n.minCostPerJob.chinese} Minimum cost per job</th>
+          <th>{L10n.pricedBy.chinese} Priced by</th>
+          <th>{L10n.costPerKgUnit.chinese} Cost per kg/unit</th>
+          <th>{L10n.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -106,21 +108,21 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
   </>);
 
   const currentOutsourcingFrag = (<>
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
     <br/>
 
-    <label>{Labels.minCostPerJob.chinese} Minimum Cost per job:</label>
+    <label>{L10n.minCostPerJob.chinese} Minimum Cost per job:</label>
     <input
       value={minCostPerJob}
       onChange={(e) => setMinCostPerJob(e.target.value)}
     />
     <br/>
 
-    <label>{Labels.pricedByUnit.chinese} Priced by unit:</label>
+    <label>{L10n.pricedByUnit.chinese} Priced by unit:</label>
     <input
       type="checkbox"
       name="isPricedByUnit"
@@ -137,7 +139,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
     <br/>
 
     <button type="submit" onClick={handleSaveOutsourcing}>
-      {Labels.save.chinese}{Labels.outsourcing.chinese} Save Outsourcing
+      {L10n.save.chinese}{L10n.outsourcing.chinese} Save Outsourcing
     </button>
   </>);
 
@@ -154,7 +156,7 @@ function Outsourcings({outsourcings, saveOutsourcing}) {
       top={allOutsourcingsFrag}
       middle={currentOutsourcingFrag}
       bottom={administrationFrag}
-      label={Labels.outsourcing}
+      label={TabLabels.outsourcing}
     />
   </>);
 }

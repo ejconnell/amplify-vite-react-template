@@ -2,8 +2,9 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
-import Labels from "./Labels";
-import { IInHouse } from "./types";
+import L10n from "./L10n";
+import { TabLabels } from "./TabLabels";
+import { IInHouse } from "./Types";
 
 function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (inHouse: IInHouse) => void}) {
   const [name, setName] = useState<string>("");
@@ -30,7 +31,7 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
     setCost(inHouse.cost);
   }
 
-  function importerProcessorFunc(grid) {
+  function importerProcessorFunc(grid: string[][]) {
     grid.forEach((row, i) => {
       if (row.length !== 2) {
         alert(`Import failed on row ${i+1}.  Expected exactly 2 columns`);
@@ -41,7 +42,7 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
         alert(`Import failed on row ${i+1}.  Need a name.`);
         return;
       }
-      if (isNaN(cost)) {
+      if (isNaN(Number(cost))) {
         alert(`Import failed on row ${i+1}.  Need a numeric cost.`);
         return;
       }
@@ -75,9 +76,9 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.name.chinese} Name</th>
-          <th>{Labels.costPerThousand.chinese} Cost per 1k</th>
-          <th>{Labels.load.chinese} Load</th>
+          <th>{L10n.name.chinese} Name</th>
+          <th>{L10n.costPerThousand.chinese} Cost per 1k</th>
+          <th>{L10n.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -87,14 +88,14 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
   </>);
 
   const currentInHouseFrag = (<>
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input value={name} onChange={(e) => setName(e.target.value)}/>
     <br/>
-    <label>{Labels.costPerThousand.chinese} Cost per 1k:</label>
+    <label>{L10n.costPerThousand.chinese} Cost per 1k:</label>
     <input value={cost} onChange={(e) => setCost(e.target.value)}/>
     <br/>
     <button type="submit" onClick={handleSaveInHouse}>
-      {Labels.save.chinese}{Labels.inHouse.chinese} Save In House
+      {L10n.save.chinese}{L10n.inHouse.chinese} Save In House
     </button>
   </>);
 
@@ -111,7 +112,7 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
       top={allInHousesFrag}
       middle={currentInHouseFrag}
       bottom={administrationFrag}
-      label={Labels.inHouse}
+      label={TabLabels.inHouse}
     />
   </>);
 }

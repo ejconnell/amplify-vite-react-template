@@ -2,14 +2,16 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
-import Labels from './Labels';
+import L10n from './L10n';
+import { TabLabels } from "./TabLabels";
+import { IMetal, IMetalFamily } from "./Types";
 
-function Metals({metals, metalFamilies, saveMetal}) {
+function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFamilies: IMetalFamily[], saveMetal: (metal: IMetal) => void}) {
   const [name, setName] = useState<string>("");
   const [metalFamilyName, setMetalFamilyName] = useState<string>("");
   const [density, setDensity] = useState<string>("");
 
-  function importerProcessorFunc(grid) {
+  function importerProcessorFunc(grid: string[][]) {
     grid.forEach((row, i) => {
       if ((row.length < 2) || (row.length > 3)) {
         alert(`Import failed on row ${i+1}.  Expected exactly 2-3 columns`);
@@ -22,7 +24,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
       saveMetal({
         name: name,
         metalFamilyName: metalFamilyName,
-        density: Number(density),
+        density: density,
       });
     });
   }
@@ -43,11 +45,11 @@ function Metals({metals, metalFamilies, saveMetal}) {
     saveMetal({
       name: name,
       metalFamilyName: metalFamilyName,
-      density: Number(density),
+      density: density,
     })
   };
 
-  function handleLoadMetal(index) {
+  function handleLoadMetal(index: number) {
      const metal = metals[index];
      setName(metal.name);
      setMetalFamilyName(metal.metalFamilyName);
@@ -71,10 +73,10 @@ function Metals({metals, metalFamilies, saveMetal}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.name.chinese} Name</th>
-          <th>{Labels.metalFamily.chinese} Metal Family</th>
-          <th>{Labels.density.chinese}Density (g/mm<sup>3</sup>)</th>
-          <th>{Labels.load.chinese}Load</th>
+          <th>{L10n.name.chinese} Name</th>
+          <th>{L10n.metalFamily.chinese} Metal Family</th>
+          <th>{L10n.density.chinese}Density (g/mm<sup>3</sup>)</th>
+          <th>{L10n.load.chinese}Load</th>
         </tr>
       </thead>
       <tbody>
@@ -84,13 +86,14 @@ function Metals({metals, metalFamilies, saveMetal}) {
   </>);
 
   const currentMetalFrag = (<>
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
     />
+    <br/>
 
-    <label>{Labels.metalFamily.chinese}Metal Family:</label>
+    <label>{L10n.metalFamily.chinese}Metal Family:</label>
     <select
       value={metalFamilyName}
       onChange={e => setMetalFamilyName(e.target.value)}
@@ -98,15 +101,17 @@ function Metals({metals, metalFamilies, saveMetal}) {
       <option value=""></option>
       {mfSelectOptionsFrag}
     </select>
+    <br/>
 
-    <label>{Labels.density.chinese} Density (g/mm<sup>3</sup>):</label>
+    <label>{L10n.density.chinese} Density (g/mm<sup>3</sup>):</label>
     <input
       value={density}
       onChange={e => setDensity(e.target.value)}
     />
+    <br/>
 
     <button type="submit" onClick={handleSaveMetal}>
-      {Labels.save.chinese}{Labels.metal.chinese} Save Metal
+      {L10n.save.chinese}{L10n.metal.chinese} Save Metal
     </button>
   </>);
 
@@ -135,7 +140,7 @@ function Metals({metals, metalFamilies, saveMetal}) {
       top={allMetalsFrag}
       middle={currentMetalFrag}
       bottom={administrationFrag}
-      label={Labels.metal}
+      label={TabLabels.metal}
     />
   </>);
 }

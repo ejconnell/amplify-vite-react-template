@@ -1,5 +1,5 @@
 import { IShape, Shapes } from "./Shapes";
-import { IMetal } from "./types";
+import { IMetal } from "./Types";
 
 export class MaterialModel {
   width: number;

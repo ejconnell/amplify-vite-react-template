@@ -1,19 +1,20 @@
 import Table from 'react-bootstrap/Table';
-import Labels from './Labels'
+import L10n from './L10n'
+import { IItemSetup, IStandardSetup } from './Types';
 
 export class ItemSetupsModel {
   totalCostPerJob: number;
   totalCostPerUnit: number;
   constructor(itemSetups: IItemSetup[], unitQuantity: number) {
-    this.totalCostPerJob = itemSetups.map(s => s.costPerJob).reduce((acc, cost) => acc+cost, 0);
+    this.totalCostPerJob = itemSetups.map(s => Number(s.costPerJob)).reduce((acc, cost) => acc+cost, 0);
     this.totalCostPerUnit = this.totalCostPerJob / unitQuantity;;
   }
 }
 
-function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSetups}) {
-  const isModel = new ItemSetupsModel(itemSetups, exampleUnitQuantity);
+function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSetups}:{standardSetups: IStandardSetup[], itemSetups: IItemSetup[], exampleUnitQuantity: string, setItemSetups: (itemSetups: IItemSetup[]) => void}) {
+  const isModel = new ItemSetupsModel(itemSetups, Number(exampleUnitQuantity));
 
-  function handleStandardNameChange(value, index) {
+  function handleStandardNameChange(value: string, index: number) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -30,7 +31,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     setItemSetups(nextItemSetups);
   }
 
-  function handleCustomNameChange(value, index) {
+  function handleCustomNameChange(value: string, index: number) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -47,7 +48,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     setItemSetups(nextItemSetups);
   }
 
-  function handleCustomNameCheckboxChange(index) {
+  function handleCustomNameCheckboxChange(index: number) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -64,7 +65,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     setItemSetups(nextItemSetups);
   }
 
-  function handleCostChange(value, index) {
+  function handleCostChange(value: string, index: number) {
     const nextItemSetups = itemSetups.map((s, i) => {
       if (i === index) {
         return {
@@ -81,7 +82,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     setItemSetups(nextItemSetups);
   }
 
-  function addItemSetup(index) {
+  function addItemSetup(index: number) {
     const nextItemSetups = [
       ...itemSetups.slice(0, index+1),
       {
@@ -96,7 +97,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     setItemSetups(nextItemSetups);
   }
 
-  function deleteItemSetup(index) {
+  function deleteItemSetup(index: number) {
     const nextItemSetups = [
       ...itemSetups.slice(0, index),
       ...itemSetups.slice(index+1),
@@ -104,14 +105,14 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
     setItemSetups(nextItemSetups);
   }
 
-  function standardSetupSelectFrag(i) {
+  function standardSetupSelectFrag(index: number) {
     const standardSetupsSelectOptions = standardSetups.map(ss => {
       return <option value={ss.name} key={ss.name}>{ss.name}</option>;
     });
     return (
       <select
-        value={itemSetups[i].standardName}
-        onChange={e => handleStandardNameChange(e.target.value, i)}
+        value={itemSetups[index].standardName}
+        onChange={e => handleStandardNameChange(e.target.value, index)}
         style={{width: "157px"}}
       >
         <option value="" key="blank option"></option>
@@ -127,7 +128,7 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
       onChange={(e) => handleCustomNameChange(e.target.value, i)}
       style={{width: "150px"}}
     />
-    const rowCostPerUnit = is.costPerJob / exampleUnitQuantity;
+    const rowCostPerUnit = Number(is.costPerJob) / Number(exampleUnitQuantity);
     return <tr key={is.key}>
       <td>
         {is.isCustomName ? setupCustomNameInputFrag : standardSetupSelectFrag(i)}
@@ -166,15 +167,15 @@ function ItemSetups({standardSetups, itemSetups, exampleUnitQuantity, setItemSet
   return (
    <>
     <h4>Setup:</h4>
-    <p>{Labels.exampleUnitQuantity.chinese} Example unit quantity: {exampleUnitQuantity || 0} &rarr; {Labels.costPerUnit.chinese} Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
+    <p>{L10n.exampleUnitQuantity.chinese} Example unit quantity: {exampleUnitQuantity || 0} &rarr; {L10n.costPerUnit.chinese} Cost per unit: {isModel.totalCostPerUnit.toFixed(2)}</p>
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.name.chinese} {Labels.checkBoxForCustom.chinese} Name (check box for custom)</th>
-          <th>{Labels.costPerJob.chinese} Cost per job</th>
-          <th>{Labels.costPerUnit.chinese} Cost per unit</th>
-          <th>{Labels.remove.chinese} Delete</th>
-          <th>{Labels.add.chinese} Add</th>
+          <th>{L10n.name.chinese} {L10n.checkBoxForCustom.chinese} Name (check box for custom)</th>
+          <th>{L10n.costPerJob.chinese} Cost per job</th>
+          <th>{L10n.costPerUnit.chinese} Cost per unit</th>
+          <th>{L10n.remove.chinese} Delete</th>
+          <th>{L10n.add.chinese} Add</th>
         </tr>
       </thead>
       <tbody>

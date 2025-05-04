@@ -2,13 +2,16 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import { ItemModel } from "./ItemModel";
 import Trifold from "./Trifold";
-import Labels from "./Labels";
+import L10n from "./L10n";
+import { TabLabels } from "./TabLabels";
+import { IInHouse, IItem, IMaterial, IMetal, IOutsourcing, IQuote, IQuoteItem, IQuoteItemModelResult } from "./Types";
+import { blankItem } from "./Items";
 
 function blankQuoteItem() {
   return {
     key: crypto.randomUUID(),
     name: "",
-    quantity: 0,
+    quantity: "",
   };
 };
 
@@ -26,8 +29,8 @@ class QuoteItemModel {
   overheadPercent: number;
   postOverheadCostPerUnit: number;
   postProfitCostPerUnit: number;
-  constructor({items, materials, metals, inHouses, outsourcings, quoteItem}) {
-    const item = items.find(i => i.name === quoteItem.name) || {};
+  constructor({items, materials, metals, inHouses, outsourcings, quoteItem}: {items: IItem[], materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], quoteItem: IQuoteItem}) {
+    const item = items.find(i => i.name === quoteItem.name) || blankItem();
 
     const im = new ItemModel({
       materials: materials,
@@ -41,7 +44,9 @@ class QuoteItemModel {
     this.materialCostPerUnit = im.materialCostPerUnit
     this.inHouseCostPerUnit = im.inHouseCostPerUnit
     this.outsourcingCostPerUnit = im.outsourcingCostPerUnit
-    this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.inHouseCostPerUnit
+    this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.outsourcingCostPerUnit;
+    debugger
+    console.log(`baseCostPerUnit: ${this.baseCostPerUnit}`);
     this.wastagePercent = im.wastagePercent
     this.postWastageCostPerUnit = this.baseCostPerUnit * (1 + (this.wastagePercent / 100));
     this.postLaborCostPerUnit = this.postWastageCostPerUnit * 1.03;
@@ -72,15 +77,15 @@ class QuoteItemModel {
   }
 }
 
-function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQuote}) {
+function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQuote}: {quotes: IQuote[], items: IItem[], materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], saveQuote: (quote: IQuote) => void}) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [quoteItems, setQuoteItems] = useState([blankQuoteItem()]);
+  const [quoteItems, setQuoteItems] = useState<IQuoteItem[]>([blankQuoteItem()]);
   const [fixedName, setFixedName] = useState("");
-  const [fixedTimestamp, setFixedTimestamp] = useState("");
+  const [fixedTimestamp, setFixedTimestamp] = useState<number>(0);
   const [fixedDescription, setFixedDescription] = useState("");
-  const [fixedQuoteItems, setFixedQuoteItems] = useState([]);
-  const [quoteItemsModelResults, setQuoteItemsModelResults] = useState([]);
+  const [fixedQuoteItems, setFixedQuoteItems] = useState<IQuoteItem[]>([]);
+  const [quoteItemsModelResults, setQuoteItemsModelResults] = useState<IQuoteItemModelResult[]>([]);
 
   const quoteItemsModels = quoteItems.map(qi => {
     return new QuoteItemModel({
@@ -103,7 +108,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
         alert(`Quote row ${i+1} needs a name`);
         return;
       }
-      if (!qi.quantity || isNaN(qi.quantity)) {
+      if (!qi.quantity || isNaN(Number(qi.quantity))) {
         alert(`Quote row ${i+1} needs a numeric quantity`);
         return;
       }
@@ -118,7 +123,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     saveQuote(quote);
   }
 
-  function handleLoadQuote(i) {
+  function handleLoadQuote(i: number) {
     const quote = quotes[i];
     setName(quote.name);
     setDescription(quote.description);
@@ -130,7 +135,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     setQuoteItemsModelResults(quote.quoteItemsModelResults);
   }
 
-  function handleQuoteItemNameChange(value, index) {
+  function handleQuoteItemNameChange(value: string, index: number) {
     console.log(`handleQuoteItemNameChange(${value}, ${index})`);
     const nextQuoteItems = quoteItems.map((qi, i) => {
       if (i === index) {
@@ -147,9 +152,9 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     setQuoteItems(nextQuoteItems);
   }
 
-  function handleQuoteItemQuantityChange(value, index) {
+  function handleQuoteItemQuantityChange(value: string, index: number) {
     console.log(`handleQuoteItemQuantityChange(${value}, ${index})`);
-    const nextQuoteItems = quoteItems.map((qi, i) => {
+    const nextQuoteItems: IQuoteItem[] = quoteItems.map((qi, i) => {
       if (i === index) {
         return {
           name: qi.name,
@@ -164,9 +169,9 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     setQuoteItems(nextQuoteItems);
   }
 
-  function addQuoteItem(index) {
+  function addQuoteItem(index: number) {
     console.log(`addQuoteItem(${index})`);
-    const nextQuoteItems = [
+    const nextQuoteItems: IQuoteItem[] = [
       ...quoteItems.slice(0, index+1),
       blankQuoteItem(),
       ...quoteItems.slice(index+1),
@@ -175,7 +180,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     setQuoteItems(nextQuoteItems);
   }
 
-  function deleteQuoteItem(index) {
+  function deleteQuoteItem(index: number) {
     if (quoteItems.length === 1) return;
     const nextQuoteItems = [
       ...quoteItems.slice(0, index),
@@ -212,29 +217,29 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
   });
 
   const columnHeadersFrag = (<>
-    <th>{Labels.item.chinese} Item</th>
-    <th>{Labels.quantity.chinese} Quantity</th>
-    <th>{Labels.material.chinese} {Labels.cost.chinese} Material Cost</th>
-    <th>{Labels.inHouse.chinese} {Labels.cost.chinese} In House Cost</th>
-    <th>{Labels.outsourcing.chinese} {Labels.cost.chinese} Oustsourcing cost</th>
-    <th>{Labels.baseUnit.chinese} Base unit cost</th>
-    <th>{Labels.wastage.chinese} Wastage percent</th>
-    <th>{Labels.wastageIncluded.chinese} Wastage included</th>
-    <th>{Labels.laborIncluded.chinese} Labor included 3%</th>
-    <th>{Labels.setupCost.chinese} Setup Cost</th>
-    <th>{Labels.setupIncluded.chinese} Setup included</th>
-    <th>{Labels.taxIncluded.chinese} Tax included</th>
-    <th>{Labels.overhead.chinese} Overhead percent</th>
-    <th>{Labels.overheadIncluded.chinese} Overhead included</th>
-    <th>{Labels.profitIncluded.chinese} Profit included 6%</th>
+    <th>{L10n.item.chinese} Item</th>
+    <th>{L10n.quantity.chinese} Quantity</th>
+    <th>{L10n.material.chinese} {L10n.cost.chinese} Material Cost</th>
+    <th>{L10n.inHouse.chinese} {L10n.cost.chinese} In House Cost</th>
+    <th>{L10n.outsourcing.chinese} {L10n.cost.chinese} Oustsourcing cost</th>
+    <th>{L10n.baseUnit.chinese} Base unit cost</th>
+    <th>{L10n.wastage.chinese} Wastage percent</th>
+    <th>{L10n.wastageIncluded.chinese} Wastage included</th>
+    <th>{L10n.laborIncluded.chinese} Labor included 3%</th>
+    <th>{L10n.setupCost.chinese} Setup Cost</th>
+    <th>{L10n.setupIncluded.chinese} Setup included</th>
+    <th>{L10n.taxIncluded.chinese} Tax included</th>
+    <th>{L10n.overhead.chinese} Overhead percent</th>
+    <th>{L10n.overheadIncluded.chinese} Overhead included</th>
+    <th>{L10n.profitIncluded.chinese} Profit included 6%</th>
   </>);
 
   const loadedQuoteSectionFrag = <>
-    <label>{Labels.name.chinese} Name: {fixedName}</label>
+    <label>{L10n.name.chinese} Name: {fixedName}</label>
     <br/>
-    <label>{Labels.description.chinese} Description: {fixedDescription}</label>
+    <label>{L10n.description.chinese} Description: {fixedDescription}</label>
     <br/>
-    <label>{Labels.createdAt.chinese} Created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
+    <label>{L10n.createdAt.chinese} Created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
     <Table bordered striped>
       <thead>
         <tr>
@@ -304,11 +309,11 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.material.chinese} Name</th>
-          <th>{Labels.timestamp.chinese} Timestamp</th>
-          <th>{Labels.description.chinese} Description</th>
-          <th>{Labels.summary.chinese} Summary</th>
-          <th>{Labels.load.chinese} Load</th>
+          <th>{L10n.material.chinese} Name</th>
+          <th>{L10n.timestamp.chinese} Timestamp</th>
+          <th>{L10n.description.chinese} Description</th>
+          <th>{L10n.summary.chinese} Summary</th>
+          <th>{L10n.load.chinese} Load</th>
         </tr>
       </thead>
       <tbody>
@@ -320,13 +325,13 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
   const currentQuoteFrag = (<>
     {fixedName && loadedQuoteSectionFrag }
 
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
     />
 
-    <label>{Labels.description.chinese} Description:</label>
+    <label>{L10n.description.chinese} Description:</label>
     <input
       value={description}
       onChange={e => setDescription(e.target.value)}
@@ -337,8 +342,8 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       <thead>
         <tr>
           {columnHeadersFrag}
-          <th>{Labels.remove.chinese} Delete</th>
-          <th>{Labels.add.chinese} Add</th>
+          <th>{L10n.remove.chinese} Delete</th>
+          <th>{L10n.add.chinese} Add</th>
         </tr>
       </thead>
       <tbody>
@@ -347,18 +352,18 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </Table>
 
     <button type="submit" onClick={handleSaveQuote}>
-      {Labels.save.chinese} {Labels.quote.chinese} Save New Quote
+      {L10n.save.chinese} {L10n.quote.chinese} Save New Quote
     </button>
   </>);
 
-  const administrationFrag = "";
+  const administrationFrag = <></>;
 
   return (
     <Trifold
       top={allQuotesFrag}
       middle={currentQuoteFrag}
       bottom={administrationFrag}
-      label={Labels.quote}
+      label={TabLabels.quote}
     />
   );
 }

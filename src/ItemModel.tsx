@@ -1,11 +1,11 @@
 import { ItemInHousesModel } from "./ItemInHouses";
 import { ItemOutsourcingsModel } from "./ItemOutsourcings";
-import { ItemOverheadInitialRange, ItemOverheadModel } from "./ItemOverhead";
+import { ItemOverheadModel } from "./ItemOverhead";
 import { ItemSetupsModel } from "./ItemSetups";
-import { ItemWastageInitialRange, ItemWastageModel } from "./ItemWastage";
+import { ItemWastageModel } from "./ItemWastage";
 import { MaterialModel } from "./MaterialModel";
 import { blankMaterial } from "./Materials";
-import { IInHouse, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing } from "./types";
+import { IInHouse, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing } from "./Types";
 
 
 export class ItemModel {
@@ -17,7 +17,7 @@ export class ItemModel {
   setupCostPerUnit: number;
   wastagePercent: number;
   overheadPercent: number;
-  constructor({ materials, metals, inHouses, outsourcings, materialName, unitLength, itemSetups = [], itemInHouses = [], itemWastageRanges = [ItemWastageInitialRange()], itemOverheadRanges = [ItemOverheadInitialRange()], itemOutsourcings = [], unitQuantity }:{ materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], materialName: string, unitLength: number | string, itemSetups: IItemSetup[], itemInHouses: IItemInHouse[], itemWastageRanges: IItemWastageRange[], itemOverheadRanges: IItemOverheadRange[], itemOutsourcings: IItemOutsourcing[], unitQuantity: number }) {
+  constructor({ materials, metals, inHouses, outsourcings, materialName, unitLength, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity }:{ materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], materialName: string, unitLength: number | string, itemSetups: IItemSetup[], itemInHouses: IItemInHouse[], itemWastageRanges: IItemWastageRange[], itemOverheadRanges: IItemOverheadRange[], itemOutsourcings: IItemOutsourcing[], unitQuantity: number }) {
     this.unitLength = Number(unitLength);
     const material = materials.find(m => m.name === materialName) || blankMaterial();
     const materialModel = new MaterialModel({ metals: metals, ...material });

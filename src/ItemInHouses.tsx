@@ -1,13 +1,15 @@
 import Table from 'react-bootstrap/Table';
-import Labels from './Labels'
+import L10n from './L10n'
+import { IInHouse, IItemInHouse, IItemInHouseModelRow } from './Types';
 
 export class ItemInHousesModel {
   totalCostPerUnit: number;
   rows: IItemInHouseModelRow[];
-  constructor(inHouses, itemInHouses) {
+  constructor(inHouses: IInHouse[], itemInHouses: IItemInHouse[]) {
     this.rows = itemInHouses.map(iih => {
-      const costPer1k = inHouses.find(ih => ih.name === iih.name)?.cost;
-      const costPerUnit = iih.quantity === "" ? Number.NaN : costPer1k * iih.quantity / 1000;
+      const quantity = Number(iih.quantity);
+      const costPer1k = Number(inHouses.find(ih => ih.name === iih.name)?.cost);
+      const costPerUnit = iih.quantity === "" ? Number.NaN : costPer1k * quantity / 1000;
       return {
         costPer1k: costPer1k,
         costPerUnit: costPerUnit,
@@ -18,10 +20,10 @@ export class ItemInHousesModel {
   }
 }
 
-function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
+function ItemInHouses({inHouses, itemInHouses, setItemInHouses}: {inHouses: IInHouse[], itemInHouses: IItemInHouse[], setItemInHouses: (itemInHouses: IItemInHouse[]) => void}) {
   const iihModel = new ItemInHousesModel(inHouses, itemInHouses);
 
-  function handleItemInHouseNameChange(value, index) {
+  function handleItemInHouseNameChange(value: string, index: number) {
     const nextItemInHouses = itemInHouses.map((iih, i) => {
       if (i === index) {
         return {
@@ -36,7 +38,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     setItemInHouses(nextItemInHouses);
   }
 
-  function handleItemInHouseQuantityChange(value, index) {
+  function handleItemInHouseQuantityChange(value: string, index: number) {
     const nextItemInHouses = itemInHouses.map((iih, i) => {
       if (i === index) {
         return {
@@ -51,11 +53,12 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     setItemInHouses(nextItemInHouses);
   }
 
-  function addItemInHouse(index) {
-    const nextItemInHouses = [
+  function addItemInHouse(index: number) {
+    const nextItemInHouses: IItemInHouse[] = [
       ...itemInHouses.slice(0, index+1),
       {
         key: crypto.randomUUID(),
+        name: "",
         quantity: "",
       },
       ...itemInHouses.slice(index+1),
@@ -63,7 +66,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     setItemInHouses(nextItemInHouses);
   }
 
-  function deleteItemInHouse(index) {
+  function deleteItemInHouse(index: number) {
     const nextItemInHouses = [
       ...itemInHouses.slice(0, index),
       ...itemInHouses.slice(index+1),
@@ -71,14 +74,14 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     setItemInHouses(nextItemInHouses);
   }
 
-  function itemInHouseSelectFrag(i) {
+  function itemInHouseSelectFrag(index: number) {
     const inHousesSelectOptions = inHouses.map(ih => {
       return <option value={ih.name} key={ih.name}>{ih.name}</option>;
     });
     return <>
       <select
-        value={itemInHouses[i].name}
-        onChange={e => handleItemInHouseNameChange(e.target.value, i)}
+        value={itemInHouses[index].name}
+        onChange={e => handleItemInHouseNameChange(e.target.value, index)}
         style={{width: "157px"}}
       >
         <option value=""></option>
@@ -126,12 +129,12 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.name.chinese} Name</th>
-          <th>{Labels.quantity.chinese} Quantity</th>
-          <th>{Labels.costPerThousand.chinese} Cost Per 1k</th>
-          <th>{Labels.costPerUnit.chinese} Cost Per Unit</th>
-          <th>{Labels.remove.chinese} Delete</th>
-          <th>{Labels.add.chinese} Add</th>
+          <th>{L10n.name.chinese} Name</th>
+          <th>{L10n.quantity.chinese} Quantity</th>
+          <th>{L10n.costPerThousand.chinese} Cost Per 1k</th>
+          <th>{L10n.costPerUnit.chinese} Cost Per Unit</th>
+          <th>{L10n.remove.chinese} Delete</th>
+          <th>{L10n.add.chinese} Add</th>
         </tr>
       </thead>
       <tbody>

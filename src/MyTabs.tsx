@@ -10,11 +10,11 @@ import Quotes from './Quotes.tsx';
 import InHouses from './InHouses.tsx';
 import Outsourcings from './Outsourcings.tsx';
 import StandardSetups from './StandardSetups.tsx';
-import Labels from './Labels';
+import { TabLabel, TabLabels } from "./TabLabels.tsx";
 
 import {fromCognitoIdentityPool} from "@aws-sdk/credential-providers";
 
-const log = (msg) => console.log(`[MyTabs] ${msg}`);
+const log = (msg: string) => console.log(`[MyTabs] ${msg}`);
 
 import {
   DynamoDBClient,
@@ -26,44 +26,71 @@ import {
   paginateScan,
 } from "@aws-sdk/lib-dynamodb";
 
-import { useAuth } from "react-oidc-context";
+import { AuthContextProps, useAuth } from "react-oidc-context";
+import { IInHouse, IItem, IMaterial, IMetal, IMetalFamily, IOutsourcing, IQuote, IStandardSetup } from "./Types";
 
-async function loadMetalFamilies(ddbDocClient, setMetalFamilies) {
+async function loadMetalFamilies(ddbDocClient: DynamoDBDocumentClient, setMetalFamilies: (metalFamilies: IMetalFamily[]) => void) {
   await loadTable(ddbDocClient, setMetalFamilies, "MetalFamilies")
 };
 
-async function loadMetals(ddbDocClient, setMetals) {
+async function loadMetals(ddbDocClient: DynamoDBDocumentClient, setMetals: (metals: IMetal[]) => void) {
   await loadTable(ddbDocClient, setMetals, "Metals")
 };
 
-async function loadMaterials(ddbDocClient, setMaterials) {
-  await loadTable(ddbDocClient, setMaterials, "Materials")
+async function loadMaterials(
+  ddbDocClient: DynamoDBDocumentClient,
+  setMaterials: (materials: IMaterial[]) => void
+) {
+  await loadTable(ddbDocClient, setMaterials, "Materials");
 };
 
-async function loadStandardSetups(ddbDocClient, setStandardSetups) {
-  await loadTable(ddbDocClient, setStandardSetups, "StandardSetups")
+async function loadStandardSetups(
+  ddbDocClient: DynamoDBDocumentClient,
+  setStandardSetups: (standardSetups: IStandardSetup[]) => void
+) {
+  await loadTable(ddbDocClient, setStandardSetups, "StandardSetups");
 };
 
-async function loadInHouses(ddbDocClient, setInHouses) {
-  await loadTable(ddbDocClient, setInHouses, "InHouses")
+async function loadInHouses(
+  ddbDocClient: DynamoDBDocumentClient,
+  setInHouses: (inHouses: IInHouse[]) => void
+) {
+  await loadTable(ddbDocClient, setInHouses, "InHouses");
 };
 
-async function loadOutsourcings(ddbDocClient, setOutsourcings) {
-  await loadTable(ddbDocClient, setOutsourcings, "Outsourcings")
+async function loadOutsourcings(
+  ddbDocClient: DynamoDBDocumentClient,
+  setOutsourcings: (outsourcings: IOutsourcing[]) => void
+) {
+  await loadTable(ddbDocClient, setOutsourcings, "Outsourcings");
 };
 
-async function loadItems(ddbDocClient, setItems) {
-  await loadTable(ddbDocClient, setItems, "Items")
+async function loadItems(
+  ddbDocClient: DynamoDBDocumentClient,
+  setItems: (items: IItem[]) => void
+) {
+  await loadTable(ddbDocClient, setItems, "Items");
 };
 
-async function loadQuotes(ddbDocClient, setQuotes) {
-  function sortCompare(a, b) {
+async function loadQuotes(
+  ddbDocClient: DynamoDBDocumentClient,
+  setQuotes: (quotes: IQuote[]) => void
+) {
+  function sortCompare(a: IQuote, b: IQuote): number {
     return b.timestamp - a.timestamp;
-  };
-  await loadTable(ddbDocClient, setQuotes, "Quotes", sortCompare)
+  }
+  await loadTable(ddbDocClient, setQuotes, "Quotes", sortCompare);
 };
 
-async function loadTable(ddbDocClient, setter: Function, tableName: string, sortCompare: (a: any, b: any) => number = null) {
+interface hasName {
+  name: string;
+}
+
+function nameSortCompare(a: hasName, b: hasName): number {
+  return a.name.localeCompare(b.name)
+}
+
+async function loadTable<T>(ddbDocClient: DynamoDBDocumentClient, setter: (things: T[]) => void, tableName: string, sortCompare: (a: any, b: any) => number = nameSortCompare) {
   log(`loadTable("${tableName}")`)
   const paginatedScan = paginateScan(
     { client: ddbDocClient },
@@ -72,27 +99,23 @@ async function loadTable(ddbDocClient, setter: Function, tableName: string, sort
       ConsistentRead: true,
     },
   );
-  const acc = [];
+  const acc: T[] = [];
   for await (const page of paginatedScan) {
-    acc.push(...page.Items);
+    acc.push(...(page.Items as T[]));
   }
-  if (sortCompare) {
-    acc.sort(sortCompare);
-  } else {
-    acc.sort((a, b) => a.name.localeCompare(b.name));
-  }
+  acc.sort(sortCompare);
   setter(acc);
 }
 
-function getAwsCreds(auth) {
+function getAwsCreds(auth: AuthContextProps) {
   //const auth = useAuth();
-  const COGNITO_ID = "cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_VQ0eXINVn";
+  const COGNITO_ID: string = "cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_VQ0eXINVn";
 
   return fromCognitoIdentityPool({
     clientConfig: { region: "ap-southeast-2"},
     identityPoolId: 'ap-southeast-2:17fb9941-a165-4da3-ba04-66cf16623c07',
     logins: {
-       [COGNITO_ID]: auth.user?.id_token,
+       [COGNITO_ID]: String(auth.user?.id_token),
     },
   })
 }
@@ -149,7 +172,7 @@ function MyTabs() {
       TableName: "Metals",
       Item: metal,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadMetals(ddbDocClient, setMetals)
   }
 
@@ -159,7 +182,7 @@ function MyTabs() {
       TableName: "Materials",
       Item: material,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadMaterials(ddbDocClient, setMaterials)
   }
 
@@ -169,7 +192,7 @@ function MyTabs() {
       TableName: "StandardSetups",
       Item: standardSetup,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadStandardSetups(ddbDocClient, setStandardSetups);
   }
 
@@ -179,7 +202,7 @@ function MyTabs() {
       TableName: "InHouses",
       Item: inHouse,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadInHouses(ddbDocClient, setInHouses);
   }
 
@@ -189,7 +212,7 @@ function MyTabs() {
       TableName: "Outsourcings",
       Item: outsourcing,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadOutsourcings(ddbDocClient, setOutsourcings);
   }
 
@@ -209,7 +232,7 @@ function MyTabs() {
       TableName: "Quotes",
       Item: quote,
     }));
-    log(response);
+    log(JSON.stringify(response));
     loadQuotes(ddbDocClient, setQuotes);
   }
 
@@ -217,7 +240,7 @@ function MyTabs() {
     return <h1>載入中 Loading...</h1>
   }
 
-  function tabTitle(label) {
+  function tabTitle(label: TabLabel) {
     return `${label.chinese} ${label.plural}`;
   }
 
@@ -225,7 +248,7 @@ function MyTabs() {
     <Tabs
       defaultActiveKey="quotes"
     >
-      <Tab eventKey="quotes" title={tabTitle(Labels.quote)}>
+      <Tab eventKey="quotes" title={tabTitle(TabLabels.quote)}>
         <Quotes
           quotes={quotes}
           items={items}
@@ -236,7 +259,7 @@ function MyTabs() {
           saveQuote={saveQuote}
         />
       </Tab>
-      <Tab eventKey="items" title={tabTitle(Labels.item)}>
+      <Tab eventKey="items" title={tabTitle(TabLabels.item)}>
         <Items
           items={items}
           materials={materials}
@@ -247,39 +270,39 @@ function MyTabs() {
           saveItem={saveItem}
         />
       </Tab>
-      <Tab eventKey="materials" title={tabTitle(Labels.material)}>
+      <Tab eventKey="materials" title={tabTitle(TabLabels.material)}>
         <Materials
           materials={materials}
           metals={metals}
           saveMaterial={saveMaterial}
         />
       </Tab>
-      <Tab eventKey="metals" title={tabTitle(Labels.metal)}>
+      <Tab eventKey="metals" title={tabTitle(TabLabels.metal)}>
         <Metals
           metals={metals}
           metalFamilies={metalFamilies}
           saveMetal={saveMetal}
         />
       </Tab>
-      <Tab eventKey="metalFamilies" title={tabTitle(Labels.metalFamily)}>
+      <Tab eventKey="metalFamilies" title={tabTitle(TabLabels.metalFamily)}>
         <MetalFamilies
           metalFamilies={metalFamilies}
           saveMetalFamily={saveMetalFamily}
         />
       </Tab>
-      <Tab eventKey="inHouses" title={tabTitle(Labels.inHouse)}>
+      <Tab eventKey="inHouses" title={tabTitle(TabLabels.inHouse)}>
         <InHouses
           inHouses={inHouses}
           saveInHouse={saveInHouse}
         />
       </Tab>
-      <Tab eventKey="outsourcings" title={tabTitle(Labels.outsourcing)}>
+      <Tab eventKey="outsourcings" title={tabTitle(TabLabels.outsourcing)}>
         <Outsourcings
           outsourcings={outsourcings}
           saveOutsourcing={saveOutsourcing}
         />
       </Tab>
-      <Tab eventKey="standardSetups" title={tabTitle(Labels.standardSetup)}>
+      <Tab eventKey="standardSetups" title={tabTitle(TabLabels.standardSetup)}>
         <StandardSetups
           standardSetups={standardSetups}
           saveStandardSetup={saveStandardSetup}

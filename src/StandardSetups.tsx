@@ -2,9 +2,11 @@ import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
 import Trifold from "./Trifold";
-import Labels from "./Labels";
+import L10n from "./L10n";
+import { TabLabels } from "./TabLabels";
+import { IStandardSetup } from "./Types";
 
-function StandardSetups({standardSetups, saveStandardSetup}) {
+function StandardSetups({standardSetups, saveStandardSetup}: {standardSetups: IStandardSetup[], saveStandardSetup: (standardSetup: IStandardSetup) => void}) {
   const [name, setName] = useState("");
 
   function handleSaveStandardSetup() {
@@ -17,7 +19,7 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
     });
   }
 
-  function importerProcessorFunc(grid) {
+  function importerProcessorFunc(grid: string[][]) {
     grid.forEach((row, i) => {
       if (row.length !== 1) {
         alert(`Import failed on row ${i+1}.  Expected exactly 1 columns`);
@@ -50,7 +52,7 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{Labels.name.chinese} Name</th>
+          <th>{L10n.name.chinese} Name</th>
         </tr>
       </thead>
       <tbody>
@@ -60,14 +62,14 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
   </>);
 
   const currentStandardSetupFrag = (<>
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
     <br/>
     <button type="submit" onClick={handleSaveStandardSetup}>
-      {Labels.save.chinese}{Labels.standardSetup.chinese} Save Standard Setup
+      {L10n.save.chinese}{L10n.standardSetup.chinese} Save Standard Setup
     </button>
   </>);
 
@@ -84,7 +86,7 @@ function StandardSetups({standardSetups, saveStandardSetup}) {
       top={allStandardSetupsFrag}
       middle={currentStandardSetupFrag}
       bottom={administrationFrag}
-      label={Labels.standardSetup}
+      label={TabLabels.standardSetup}
     />
   </>);
 }

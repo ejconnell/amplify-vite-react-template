@@ -1,7 +1,6 @@
 export interface IShape {
   name: string;
   hasInnerWidth: boolean;
-  chinese: string;
   abbreviation: string;
   widthLabel: string;
   chineseWidth: string;
@@ -10,45 +9,40 @@ export interface IShape {
 
 export const Shapes: IShape[] = [
   {
-    name: "Cylindrical",
+    name: "圓柱 Cylindrical",
     hasInnerWidth: false,
-    chinese: "圓柱",
     abbreviation: "",
     widthLabel: "Diameter",
     chineseWidth: "直徑",
     area: (width: number, _: number) => Math.PI * width * width / 4,
   },
   {
-    name: "Hollow Cylindrical",
+    name: "圓管 Hollow Cylindrical",
     hasInnerWidth: true,
-    chinese: "圓管",
     abbreviation: "",
     widthLabel: "Diameter",
     chineseWidth: "直徑",
     area: (width: number, innerWidth: number) => (Math.PI * width * width / 4) - (Math.PI * innerWidth * innerWidth / 4),
   },
   {
-    name: "Square",
+    name: "四角 Square",
     hasInnerWidth: false,
-    chinese: "四角",
     abbreviation: "四角",
     widthLabel: "Side",
     chineseWidth: "角",
     area: (width: number, _: number) => width * width,
   },
   {
-    name: "Hollow Square",
+    name: "空心四角 Hollow Square",
     hasInnerWidth: true,
-    chinese: "空心四角",
     abbreviation: "四角",
     widthLabel: "Side",
     chineseWidth: "角",
     area: (width: number, innerWidth: number) => (width * width) - (innerWidth * innerWidth),
   },
   {
-    name: "Hexagonal",
+    name: "六角 Hexagonal",
     hasInnerWidth: false,
-    chinese: "六角",
     abbreviation: "六角",
     widthLabel: "Side",
     chineseWidth: "角",

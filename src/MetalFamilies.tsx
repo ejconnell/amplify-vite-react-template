@@ -1,9 +1,11 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Trifold from "./Trifold";
-import Labels from "./Labels";
+import L10n from "./L10n";
+import { TabLabels } from "./TabLabels";
+import { IMetalFamily } from "./Types";
 
-function MetalFamilies({metalFamilies, saveMetalFamily}) {
+function MetalFamilies({metalFamilies, saveMetalFamily}: {metalFamilies: IMetalFamily[], saveMetalFamily: (metalFamily: IMetalFamily) => void}) {
   const [name, setName] = useState<string>("");
 
   function handleSaveMetalFamily() {
@@ -27,7 +29,7 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
     <Table bordered striped>
       <thead>
          <tr>
-           <th>{Labels.name.chinese} Name</th>
+           <th>{L10n.name.chinese} Name</th>
          </tr>
       </thead>
       <tbody>
@@ -37,14 +39,14 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
   </>);
 
   const currentMetalFamilyFrag = (<>
-    <label>{Labels.name.chinese} Name:</label>
+    <label>{L10n.name.chinese} Name:</label>
     <input
       value={name}
       onChange={e => setName(e.target.value)}
     />
     <br/>
     <button type="submit" onClick={handleSaveMetalFamily}>
-      {Labels.save.chinese}{Labels.metalFamily.chinese} Save Metal Family
+      {L10n.save.chinese}{L10n.metalFamily.chinese} Save Metal Family
     </button>
   </>);
 
@@ -52,8 +54,8 @@ function MetalFamilies({metalFamilies, saveMetalFamily}) {
     <Trifold
       top={allMetalFamiliesFrag}
       middle={currentMetalFamilyFrag}
-      bottom=""
-      label={Labels.metalFamily}
+      bottom={<></>}
+      label={TabLabels.metalFamily}
     />
   );
 }

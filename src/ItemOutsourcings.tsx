@@ -1,5 +1,6 @@
 import Table from 'react-bootstrap/Table';
-import Labels from './Labels';
+import L10n from './L10n';
+import { IItemOutsourcing, IItemOutsourcingModelRow, IOutsourcing } from './Types';
 
 export class ItemOutsourcingsModel {
   totalCostPerUnit: number;
@@ -11,26 +12,27 @@ export class ItemOutsourcingsModel {
     this.rows = itemOutsourcings.map(io => {
       const outsourcing = outsourcings.find(o => o.name === io.name);
 
-      let minCostPerUnit;
-      let minCostPerKilogram;
-      let costCutoverUnitQuantity;
+      let minCostPerUnit: number;
+      let minCostPerKilogram: number;
+      let costCutoverUnitQuantity: number;
       if (outsourcing?.isPricedByUnit) {
-        minCostPerUnit = outsourcing?.variableCost;
-        costCutoverUnitQuantity = outsourcing?.minCostPerJob / minCostPerUnit;
+        minCostPerUnit = Number(outsourcing?.variableCost);
+        costCutoverUnitQuantity = Number(outsourcing?.minCostPerJob) / minCostPerUnit;
+        minCostPerKilogram = Number.NaN
       } else {
-        minCostPerKilogram = outsourcing?.variableCost;
-        minCostPerUnit = minCostPerKilogram / 1000 * io.gramsPerUnit;
-        costCutoverUnitQuantity = outsourcing?.minCostPerJob / minCostPerUnit;
+        minCostPerKilogram = Number(outsourcing?.variableCost);
+        minCostPerUnit = minCostPerKilogram / 1000 * Number(io.gramsPerUnit);
+        costCutoverUnitQuantity = Number(outsourcing?.minCostPerJob) / minCostPerUnit;
       }
 
-      let costPerUnit;
-      let costPerJob;
+      let costPerUnit: number;
+      let costPerJob: number;
       if (unitQuantity > costCutoverUnitQuantity) {
         costPerUnit = minCostPerUnit;
         costPerJob = costPerUnit * unitQuantity;
       } else {
-        costPerJob = outsourcing?.minCostPerJob;
-        costPerUnit = outsourcing?.minCostPerJob / unitQuantity;
+        costPerJob = Number(outsourcing?.minCostPerJob);
+        costPerUnit = costPerJob / unitQuantity;
       }
       if (!minCostPerUnit) {
         costPerJob = Number.NaN;
@@ -51,11 +53,11 @@ export class ItemOutsourcingsModel {
   }
 }
 
-function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, startingGramsPerUnit, setItemOutsourcings}) {
+function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, startingGramsPerUnit, setItemOutsourcings}:{outsourcings: IOutsourcing[], itemOutsourcings: IItemOutsourcing[], exampleUnitQuantity: string, startingGramsPerUnit: number, setItemOutsourcings: (itemOutsourcings: IItemOutsourcing[]) => void}) {
 
-  const ioModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, exampleUnitQuantity);
+  const ioModel = new ItemOutsourcingsModel(outsourcings, itemOutsourcings, Number(exampleUnitQuantity));
 
-  function addItemOutsourcing(index) {
+  function addItemOutsourcing(index: number) {
     const nextItemOutsourcings = [
       ...itemOutsourcings.slice(0, index+1),
       {
@@ -68,7 +70,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
     setItemOutsourcings(nextItemOutsourcings);
   }
 
-  function deleteItemOutsourcing(index) {
+  function deleteItemOutsourcing(index: number) {
     const nextItemOutsourcings = [
       ...itemOutsourcings.slice(0, index),
       ...itemOutsourcings.slice(index+1),
@@ -76,7 +78,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
     setItemOutsourcings(nextItemOutsourcings);
   }
 
-  function handleNameChange(value, index) {
+  function handleNameChange(value: string, index: number) {
     const nextItemOutsourcings = itemOutsourcings.map((io, i) => {
       if (i === index) {
         return {
@@ -91,7 +93,7 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
     setItemOutsourcings(nextItemOutsourcings);
   }
 
-  function handleGramsPerUnitChange(value, index) {
+  function handleGramsPerUnitChange(value: string, index: number) {
     const nextItemOutsourcings = itemOutsourcings.map((io, i) => {
       if (i === index) {
         return {
@@ -170,22 +172,22 @@ function ItemOutsourcings({outsourcings, itemOutsourcings, exampleUnitQuantity, 
 
   return (
     <>
-      <h4>{Labels.outsourcing.chinese} Outsourcing:</h4>
-      <p>{Labels.exampleUnitQuantity.chinese} Example unit quantity: {exampleUnitQuantity || 0} &rarr; {Labels.costPerUnit.chinese} Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
-      <p>{Labels.starting.chinese}{Labels.gramsPerUnit.chinese} Starting grams per unit: {startingGramsPerUnit.toFixed(4)}</p>
+      <h4>{L10n.outsourcing.chinese} Outsourcing:</h4>
+      <p>{L10n.exampleUnitQuantity.chinese} Example unit quantity: {exampleUnitQuantity || 0} &rarr; {L10n.costPerUnit.chinese} Cost per unit: {ioModel.totalCostPerUnit.toFixed(2)}</p>
+      <p>{L10n.starting.chinese}{L10n.gramsPerUnit.chinese} Starting grams per unit: {startingGramsPerUnit.toFixed(4)}</p>
       <Table bordered striped>
         <thead>
           <tr>
-            <th>{Labels.name.chinese} Name</th>
-            <th>{Labels.gramsPerUnit.chinese} Grams per Unit</th>
-            <th>{Labels.minCostPerKg.chinese} Minimum Cost per kg</th>
-            <th>{Labels.minCostPerUnit.chinese} Minimum Cost per unit</th>
-            <th>{Labels.minCostPerJob.chinese} Minimum Cost per job</th>
-            <th>{Labels.costcutoverUnitQuantity.chinese} Cost cutover unit quantity</th>
-            <th>{Labels.costPerUnit.chinese} Cost per unit</th>
-            <th>{Labels.cost.chinese} / {exampleUnitQuantity || 0} {Labels.unit.chinese} Cost per {exampleUnitQuantity || 0}<br/>unit job</th>
-            <th>{Labels.remove.chinese} Delete</th>
-            <th>{Labels.add.chinese} Add</th>
+            <th>{L10n.name.chinese} Name</th>
+            <th>{L10n.gramsPerUnit.chinese} Grams per Unit</th>
+            <th>{L10n.minCostPerKg.chinese} Minimum Cost per kg</th>
+            <th>{L10n.minCostPerUnit.chinese} Minimum Cost per unit</th>
+            <th>{L10n.minCostPerJob.chinese} Minimum Cost per job</th>
+            <th>{L10n.costcutoverUnitQuantity.chinese} Cost cutover unit quantity</th>
+            <th>{L10n.costPerUnit.chinese} Cost per unit</th>
+            <th>{L10n.cost.chinese} / {exampleUnitQuantity || 0} {L10n.unit.chinese} Cost per {exampleUnitQuantity || 0}<br/>unit job</th>
+            <th>{L10n.remove.chinese} Delete</th>
+            <th>{L10n.add.chinese} Add</th>
           </tr>
         </thead>
         <tbody>

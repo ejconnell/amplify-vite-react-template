@@ -1,6 +1,6 @@
-interface IMetal {
+export interface IMetal {
   name: string;
-  density: number;
+  density: string;
   metalFamilyName: string;
 }
 
@@ -13,10 +13,10 @@ export interface IMaterial {
   isNameManual: boolean;
   metalName: string;
   shapeName: string;
-  width: number;
-  innerWidth: number;
-  rawCost: number;
-  markup: number;
+  width: string;
+  innerWidth: string;
+  rawCost: string;
+  markup: string;
 }
 
 export interface IStandardSetup {
@@ -25,14 +25,14 @@ export interface IStandardSetup {
 
 export interface IInHouse {
   name: string;
-  cost: number;
+  cost: string;
 }
 
 export interface IOutsourcing {
   name: string;
   isPricedByUnit: boolean;
-  minCostPerJob: number;
-  variableCost: number;
+  minCostPerJob: string;
+  variableCost: string;
 }
 
 export interface IItem {
@@ -55,14 +55,14 @@ export interface IItemInHouse {
 export interface IItemOutsourcing {
   name: string;
   key: string;
-  gramsPerUnit: number;
+  gramsPerUnit: string;
 }
 
 export interface ILookupRange {
   key: string;
   starting: number;
   ending: number;
-  value: string | number;
+  value: string;
 }
 
 export interface IItemOverheadRange extends ILookupRange {}
@@ -100,7 +100,7 @@ export interface IQuote {
 
 export interface IQuoteItem {
   name: string;
-  quantity: number;
+  quantity: string;
   key: string
 }
 
