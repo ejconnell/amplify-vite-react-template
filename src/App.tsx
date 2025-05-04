@@ -32,12 +32,11 @@ function App() {
     );
   }
 
-  return (
-    <div>
-      <button onClick={() => auth.signinRedirect()}>Sign in</button>
-      <button onClick={() => void auth.removeUser()}>Log out</button>
-    </div>
-  );
+  return (<>
+    <h1>川榮引用 Welcome to Quote Central!</h1>
+    <button onClick={() => auth.signinRedirect()}>登入 Sign in</button>
+  </>);
+  //      <button onClick={() => void auth.removeUser()}>Log out</button>
 }
 
 export default App;
