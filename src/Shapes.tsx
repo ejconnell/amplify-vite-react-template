@@ -49,3 +49,5 @@ export const Shapes: IShape[] = [
     area: (width: number, _: number) => Math.sqrt(3) / 2 * width * width,
   },
 ];
+
+export default Shapes;

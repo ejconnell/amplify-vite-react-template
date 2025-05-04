@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-
+import InHouses from './InHouses.tsx';
 import Items from './Items.tsx';
 import Materials from './Materials.tsx';
 import MetalFamilies from './MetalFamilies.tsx';
 import Metals from './Metals.tsx';
-import Quotes from './Quotes.tsx';
-import InHouses from './InHouses.tsx';
 import Outsourcings from './Outsourcings.tsx';
+import Quotes from './Quotes.tsx';
 import StandardSetups from './StandardSetups.tsx';
-import { TabLabel, TabLabels } from "./TabLabels.tsx";
+import { ITabLabel, TabLabels } from "./TabLabels.tsx";
 
-import {fromCognitoIdentityPool} from "@aws-sdk/credential-providers";
+import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
 
 const log = (msg: string) => console.log(`[MyTabs] ${msg}`);
 
@@ -240,7 +239,7 @@ function MyTabs() {
     return <h1>載入中 Loading...</h1>
   }
 
-  function tabTitle(label: TabLabel) {
+  function tabTitle(label: ITabLabel) {
     return `${label.chinese} ${label.plural}`;
   }
 

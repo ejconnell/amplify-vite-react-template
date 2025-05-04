@@ -1,10 +1,10 @@
-export interface TabLabel {
+export interface ITabLabel {
   chinese: string;
   plural: string;
   singular: string;
 }
 
-export const TabLabels: Record<string, TabLabel> = {
+export const TabLabels: Record<string, ITabLabel> = {
   quote: {
     singular: "Quote",
     plural: "Quotes",

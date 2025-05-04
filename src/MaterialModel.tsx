@@ -46,3 +46,5 @@ export class MaterialModel {
     return str;
   }
 }
+
+export default MaterialModel;

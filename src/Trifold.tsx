@@ -1,11 +1,11 @@
 import Accordion from 'react-bootstrap/Accordion';
-import { TabLabel } from './TabLabels';
+import { ITabLabel } from './TabLabels';
 
-function Trifold({top, middle, bottom, label}: {top: JSX.Element, middle: JSX.Element, bottom: JSX.Element, label: TabLabel}) {
-  function allLabel(label: TabLabel) {
+function Trifold({top, middle, bottom, label}: {top: JSX.Element, middle: JSX.Element, bottom: JSX.Element, label: ITabLabel}) {
+  function allLabel(label: ITabLabel) {
     return `所有${label.chinese} All ${label.plural}`
   }
-  function currentLabel(label: TabLabel) {
+  function currentLabel(label: ITabLabel) {
     return `當前${label.chinese} Current ${label.singular}`
   }
   return <>

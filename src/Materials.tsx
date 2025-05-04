@@ -1,11 +1,11 @@
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Importer from "./Importer";
-import Trifold from "./Trifold";
 import L10n from './L10n';
-import { TabLabels } from "./TabLabels";
 import { MaterialModel } from "./MaterialModel";
 import { Shapes } from "./Shapes";
+import { TabLabels } from "./TabLabels";
+import Trifold from "./Trifold";
 import { IMaterial, IMetal, IMetalFamily } from "./Types";
 
 export function blankMaterial(): IMaterial {
