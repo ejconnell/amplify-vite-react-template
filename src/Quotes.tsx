@@ -45,8 +45,6 @@ class QuoteItemModel {
     this.inHouseCostPerUnit = im.inHouseCostPerUnit
     this.outsourcingCostPerUnit = im.outsourcingCostPerUnit
     this.baseCostPerUnit = this.materialCostPerUnit + this.inHouseCostPerUnit + this.outsourcingCostPerUnit;
-    debugger
-    console.log(`baseCostPerUnit: ${this.baseCostPerUnit}`);
     this.wastagePercent = im.wastagePercent
     this.postWastageCostPerUnit = this.baseCostPerUnit * (1 + (this.wastagePercent / 100));
     this.postLaborCostPerUnit = this.postWastageCostPerUnit * 1.03;

@@ -9,7 +9,6 @@ import { IInHouse, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetu
 
 
 export class ItemModel {
-  unitLength: number;
   gramsPerUnit: number;
   materialCostPerUnit: number;
   inHouseCostPerUnit: number;
@@ -17,8 +16,7 @@ export class ItemModel {
   setupCostPerUnit: number;
   wastagePercent: number;
   overheadPercent: number;
-  constructor({ materials, metals, inHouses, outsourcings, materialName, unitLength, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity }:{ materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], materialName: string, unitLength: number | string, itemSetups: IItemSetup[], itemInHouses: IItemInHouse[], itemWastageRanges: IItemWastageRange[], itemOverheadRanges: IItemOverheadRange[], itemOutsourcings: IItemOutsourcing[], unitQuantity: number }) {
-    this.unitLength = Number(unitLength);
+  constructor({ materials, metals, inHouses, outsourcings, materialName, unitLength, itemSetups, itemInHouses, itemWastageRanges, itemOverheadRanges, itemOutsourcings, unitQuantity }:{ materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], materialName: string, unitLength: string, itemSetups: IItemSetup[], itemInHouses: IItemInHouse[], itemWastageRanges: IItemWastageRange[], itemOverheadRanges: IItemOverheadRange[], itemOutsourcings: IItemOutsourcing[], unitQuantity: number }) {
     const material = materials.find(m => m.name === materialName) || blankMaterial();
     const materialModel = new MaterialModel({ metals: metals, ...material });
     const itemInHousesModel = new ItemInHousesModel(inHouses, itemInHouses);
@@ -26,7 +24,7 @@ export class ItemModel {
     const itemWastageModel = new ItemWastageModel(itemWastageRanges, unitQuantity);
     const itemSetupsModel = new ItemSetupsModel(itemSetups, unitQuantity);
     const itemOverheadModel = new ItemOverheadModel(itemOverheadRanges, unitQuantity);
-    this.gramsPerUnit = unitLength === "" ? Number.NaN : this.unitLength * materialModel.weightPerMm;
+    this.gramsPerUnit = unitLength === "" ? Number.NaN : Number(unitLength) * materialModel.weightPerMm;
     this.materialCostPerUnit = this.gramsPerUnit * materialModel.effectiveCost / 1000;
     this.inHouseCostPerUnit = itemInHousesModel.totalCostPerUnit;
     this.outsourcingCostPerUnit = itemOutsourcingsModel.totalCostPerUnit;

@@ -19,7 +19,7 @@ export function blankItem(): IItem {
   return {
     name: "",
     materialName: "",
-    unitLength: 0,
+    unitLength: "",
     itemInHouses: [],
     itemOutsourcings: [],
     itemOverheadRanges: [ItemOverheadInitialRange()],
@@ -104,7 +104,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     const item = {
       name: name,
       materialName: materialName,
-      unitLength: Number(unitLength),
+      unitLength: unitLength,
       itemSetups: itemSetups,
       itemInHouses: itemInHouses,
       itemWastageRanges: itemWastageRanges,
@@ -118,7 +118,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     const item = items[index];
     setName(item.name);
     setMaterialName(item.materialName);
-    setUnitLength(String(item.unitLength));
+    setUnitLength(item.unitLength);
     setItemSetups(item.itemSetups);
     setItemInHouses(item.itemInHouses);
     setItemWastageRanges(item.itemWastageRanges);

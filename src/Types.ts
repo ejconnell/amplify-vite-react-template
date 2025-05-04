@@ -38,7 +38,7 @@ export interface IOutsourcing {
 export interface IItem {
   name: string;
   materialName: string;
-  unitLength: number;
+  unitLength: string;
   itemInHouses: IItemInHouse[];
   itemOutsourcings: IItemOutsourcing[];
   itemOverheadRanges: IItemOverheadRange[];
