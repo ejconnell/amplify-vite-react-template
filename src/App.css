@@ -36,7 +36,21 @@ h4 {
   border: 1px solid black;
 }
 
+div.filterBox {
+  background-color: #f0f0f0;
+  border: 1px solid black;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  width: fit-content;
+  display: flex;
+}
+
+div.filterItem {
+  margin-left: 1rem;
+  margin-right: 0.5rem;
+}
+
 button.accordion-button {
-  width: 800px;
+  width: 1200px;
   padding: 0.5rem;
 }

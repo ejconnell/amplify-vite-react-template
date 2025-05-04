@@ -28,8 +28,8 @@ export class MaterialModel {
     this.widthLabel = shape?.widthLabel || "-";
     this.chineseWidth = shape?.chineseWidth || "";
     this.crossSectionArea = width === "" ? Number.NaN : Number(shape?.area(this.width, this.innerWidth));
-    this.weightPerMm = Number(this.density * this.crossSectionArea);
-    this.effectiveCost = rawCost === "" ? Number.NaN : Number(this.rawCost + (this.rawCost * this.markup / 100));
+    this.weightPerMm = this.density * this.crossSectionArea;
+    this.effectiveCost = rawCost === "" ? Number.NaN : this.rawCost + (this.rawCost * this.markup / 100);
   }
 
   buildAutoName(metalName: string, shape: IShape | undefined, width: number, innerWidth: number) {

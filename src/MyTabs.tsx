@@ -274,6 +274,7 @@ function MyTabs() {
         <Materials
           materials={materials}
           metals={metals}
+          metalFamilies={metalFamilies}
           saveMaterial={saveMaterial}
         />
       </Tab>

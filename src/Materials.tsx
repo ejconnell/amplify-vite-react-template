@@ -6,7 +6,7 @@ import L10n from './L10n';
 import { TabLabels } from "./TabLabels";
 import { MaterialModel } from "./MaterialModel";
 import { Shapes } from "./Shapes";
-import { IMaterial, IMetal } from "./Types";
+import { IMaterial, IMetal, IMetalFamily } from "./Types";
 
 export function blankMaterial(): IMaterial {
   return {
@@ -21,7 +21,7 @@ export function blankMaterial(): IMaterial {
   };
 }
 
-function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], metals: IMetal[], saveMaterial: (material: IMaterial) => void}) {
+function Materials({materials, metals, metalFamilies, saveMaterial}: {materials: IMaterial[], metals: IMetal[], metalFamilies: IMetalFamily[], saveMaterial: (material: IMaterial) => void}) {
   const [isNameManual, setIsNameManual] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [metalName, setMetalName] = useState<string>("");
@@ -30,6 +30,9 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
   const [innerWidth, setInnerWidth] = useState<string>("");
   const [rawCost, setRawCost] = useState<string>("");
   const [markup, setMarkup] = useState<string>("6.5");
+  const [filterMetalFamilyName, setFilterMetalFamilyName] = useState<string>("");
+  const [filterMetalName, setFilterMetalName] = useState<string>("");
+  const [filterShapeName, setFilterShapeName] = useState<string>("");
 
   const materialModel = new MaterialModel({
     metals: metals,
@@ -42,7 +45,24 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
   });
   const mergedName = isNameManual ? name : materialModel.autoName;
 
-  const materialsModels = materials.map(material => {
+  const filteredMaterials = materials.filter(material => {
+    if (filterMetalName && material.metalName !== filterMetalName) {
+      return false;
+    }
+    const metal = metals.find(metal => metal.name === material.metalName);
+    if (!metal) {
+      return true;
+    }
+    if (filterMetalFamilyName && metal.metalFamilyName !== filterMetalFamilyName) {
+      return false;
+    }
+    if (filterShapeName && material.shapeName !== filterShapeName) {
+      return false;
+    }
+    return true;
+  });
+
+  const materialsModels = filteredMaterials.map(material => {
     return new MaterialModel({
       metals: metals,
       ...material,
@@ -144,7 +164,7 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
   }
 
   function handleLoadMaterial(index: number) {
-     const material = materials[index];
+     const material = filteredMaterials[index];
      setName(material.name);
      setIsNameManual(material.isNameManual);
      setMetalName(material.metalName);
@@ -155,7 +175,7 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
      setMarkup(material.markup);
   };
 
-  const tableRows = materials.map((m, i) =>
+  const tableRows = filteredMaterials.map((m, i) =>
     <tr key={m.name}>
       <td>{m.name}</td>
       <td>{m.metalName}</td>
@@ -183,11 +203,48 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
      return <option value={m.name} key={m.name}>{m.name}</option>;
   });
 
+  const metalFamilySelectOptions = metalFamilies.map(mf => {
+    return <option value={mf.name} key={mf.name}>{mf.name}</option>;
+  });
+
   const shapeSelectOptions = Shapes.map(s => {
      return <option value={s.name} key={s.name}>{s.name}</option>;
   });
 
-  const allMaterialsFrag = (
+  const allMaterialsFrag = (<>
+    <div className="filterBox">
+      <label><b>{L10n.filters.chinese} Filters</b> </label>
+      <div className="filterItem">
+        <label>{L10n.metalFamily.chinese} Metal Family:</label>
+        <select
+          value={filterMetalFamilyName}
+          onChange={e => setFilterMetalFamilyName(e.target.value)}
+        >
+          <option value="" key="">{} </option>;
+          {metalFamilySelectOptions}
+        </select>
+      </div>
+      <div className="filterItem">
+        <label>{L10n.metal.chinese} Metal:</label>
+        <select
+          value={filterMetalName}
+          onChange={e => setFilterMetalName(e.target.value)}
+        >
+          <option value="" key=""></option>;
+          {metalSelectOptions}
+        </select>
+      </div>
+      <div className="filterItem">
+        <label>{L10n.shape.chinese} Shape:</label>
+        <select
+          value={filterShapeName}
+          onChange={e => setFilterShapeName(e.target.value)}
+        >
+          <option value="" key=""></option>;
+          {shapeSelectOptions}
+        </select>
+      </div>
+    </div>
     <Table bordered striped>
       <thead>
         <tr>
@@ -207,7 +264,7 @@ function Materials({materials, metals, saveMaterial}: {materials: IMaterial[], m
         {tableRows}
       </tbody>
     </Table>
-  );
+  </>);
 
   const currentMaterialFrag = (<>
     <label>{L10n.name.chinese} Name:</label>

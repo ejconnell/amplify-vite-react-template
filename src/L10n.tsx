@@ -171,6 +171,12 @@ const L10n: Record<string, L10nEntry> = {
   costPerKgUnit: {
     chinese: "每公斤/單位成本",
   },
+  filters: {
+    chinese: "過濾器",
+  },
+  noFilter: {
+    chinese: "無濾鏡",
+  }
 }
 
 export default L10n;
