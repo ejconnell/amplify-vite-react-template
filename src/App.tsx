@@ -20,7 +20,6 @@ function App() {
   }
 
   if (auth.error) {
-
     return <div>Encountering error... {auth.error.message}</div>;
   }
 

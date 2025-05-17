@@ -176,7 +176,13 @@ const L10n: Record<string, L10nEntry> = {
   },
   noFilter: {
     chinese: "無濾鏡",
-  }
+  },
+  kilogram: {
+    chinese: "公斤",
+  },
+  uncheckForPricedByKg: {
+    chinese: "取消勾選按公斤計價",
+  },
 }
 
 export default L10n;

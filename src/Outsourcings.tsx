@@ -68,7 +68,7 @@ function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourci
     return <tr key={os.name}>
       <td>{os.name}</td>
       <td>{os.minCostPerJob}</td>
-      <td>{os.isPricedByUnit ? "Unit" : "Kilogram"}</td>
+      <td>{os.isPricedByUnit ? `${L10n.unit.chinese} Unit` : `${L10n.kilogram.chinese} Kilogram`}</td>
       <td>{os.variableCost}</td>
       <td>
         <button type="button" onClick={() => handleLoadOutsourcing(i)}>Load</button>
@@ -122,7 +122,7 @@ function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourci
     />
     <br/>
 
-    <label>{L10n.pricedByUnit.chinese} Priced by unit:</label>
+    <label>{L10n.pricedByUnit.chinese} ({L10n.uncheckForPricedByKg.chinese}) Priced by unit (uncheck for per kg pricing):</label>
     <input
       type="checkbox"
       name="isPricedByUnit"
