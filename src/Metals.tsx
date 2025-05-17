@@ -10,14 +10,15 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
   const [name, setName] = useState<string>("");
   const [metalFamilyName, setMetalFamilyName] = useState<string>("");
   const [density, setDensity] = useState<string>("");
+  const [latheCostPerThousand, setLatheCostPerThousand] = useState<string>("");
 
   function importerProcessorFunc(grid: string[][]) {
     grid.forEach((row, i) => {
-      if ((row.length < 2) || (row.length > 3)) {
-        alert(`Import failed on row ${i+1}.  Expected exactly 2-3 columns`);
+      if ((row.length < 3) || (row.length > 4)) {
+        alert(`Import failed on row ${i+1}.  Expected exactly 3-4 columns`);
         return;
       }
-      const [name, density, metalFamilyName] = row;
+      const [name, density, latheCostPerThousand, metalFamilyName] = row;
       if (!name) {
         return;
       }
@@ -25,6 +26,7 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
         name: name,
         metalFamilyName: metalFamilyName,
         density: density,
+        latheCostPerThousand: latheCostPerThousand,
       });
     });
   }
@@ -42,10 +44,15 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
       alert("Need a numeric density");
       return;
     }
+    if (!latheCostPerThousand || isNaN(Number(latheCostPerThousand))) {
+      alert("Need a numeric lathe cost per 1k seconds");
+      return;
+    }
     saveMetal({
       name: name,
       metalFamilyName: metalFamilyName,
       density: density,
+      latheCostPerThousand: latheCostPerThousand,
     })
   };
 
@@ -54,6 +61,7 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
      setName(metal.name);
      setMetalFamilyName(metal.metalFamilyName);
      setDensity(metal.density);
+     setLatheCostPerThousand(metal.latheCostPerThousand);
   };
 
   const tableRows = metals.map((m, i) =>
@@ -61,6 +69,7 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
       <td>{m.name}</td>
       <td>{m.metalFamilyName}</td>
       <td>{m.density}</td>
+      <td>{m.latheCostPerThousand}</td>
       <td><button type="button" onClick={() => handleLoadMetal(i)}>Load</button></td>
     </tr>
   );
@@ -76,6 +85,7 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
           <th>{L10n.name.chinese} Name</th>
           <th>{L10n.metalFamily.chinese} Metal Family</th>
           <th>{L10n.density.chinese}Density (g/mm<sup>3</sup>)</th>
+          <th>{L10n.latheCostPerThousand.chinese} Lathe cost per 1k seconds</th>
           <th>{L10n.load.chinese}Load</th>
         </tr>
       </thead>
@@ -110,20 +120,29 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
     />
     <br/>
 
+    <label>{L10n.latheCostPerThousand.chinese} Lathe cost per 1k seconds</label>
+    <input
+      value={latheCostPerThousand}
+      onChange={e => setLatheCostPerThousand(e.target.value)
+      }
+    />
+    <br/>
+
     <button type="submit" onClick={handleSaveMetal}>
       {L10n.save.chinese}{L10n.metal.chinese} Save Metal
     </button>
   </>);
 
-  const importerInstructionsText = `Paste 2-3 columns with no header:
+  const importerInstructionsText = `Paste 3-4 columns with no header:
   Column 1: name
   Column 2: density
+  COlumn 3: lathe cost per 1k seconds
   Column 3: metal family (optional).  Defaults to
             alphabetically first metal family.
 
-    --------------------------|
-    | C3604B | 50   |         |
-    | C2700T | 150  | Copper  |
+    ---------------------------------|
+    | C3604B | 50   | 20   |         |
+    | C2700T | 150  | 30   | Copper  |
     | ...    |      
   `;
 

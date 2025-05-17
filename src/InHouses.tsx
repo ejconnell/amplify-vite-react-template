@@ -63,7 +63,7 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
 
   const importerInstructionsText = `Paste 2 columns with no header:
   Column 1: name
-  Column 2: cost per 1k
+  Column 2: cost per 1k seconds
 
     ----------------
     | name1 | 25   |
@@ -77,7 +77,7 @@ function InHouses({inHouses, saveInHouse}: {inHouses: IInHouse[], saveInHouse: (
       <thead>
         <tr>
           <th>{L10n.name.chinese} Name</th>
-          <th>{L10n.costPerThousand.chinese} Cost per 1k</th>
+          <th>{L10n.costPerThousand.chinese} Cost Per 1k Seconds</th>
           <th>{L10n.load.chinese} Load</th>
         </tr>
       </thead>

@@ -2,13 +2,15 @@ import Table from 'react-bootstrap/Table';
 import L10n from './L10n'
 import { IInHouse, IItemInHouse, IItemInHouseModelRow } from './Types';
 
+const Lathe = "lathe";
+
 export class ItemInHousesModel {
   totalCostPerUnit: number;
   rows: IItemInHouseModelRow[];
-  constructor(inHouses: IInHouse[], itemInHouses: IItemInHouse[]) {
+  constructor(inHouses: IInHouse[], itemInHouses: IItemInHouse[], latheCostPerThousand: number) {
     this.rows = itemInHouses.map(iih => {
       const quantity = Number(iih.quantity);
-      const costPer1k = Number(inHouses.find(ih => ih.name === iih.name)?.cost);
+      const costPer1k = iih.name === Lathe ? latheCostPerThousand : Number(inHouses.find(ih => ih.name === iih.name)?.cost);
       const costPerUnit = iih.quantity === "" ? Number.NaN : costPer1k * quantity / 1000;
       return {
         costPer1k: costPer1k,
@@ -20,8 +22,8 @@ export class ItemInHousesModel {
   }
 }
 
-function ItemInHouses({inHouses, itemInHouses, setItemInHouses}: {inHouses: IInHouse[], itemInHouses: IItemInHouse[], setItemInHouses: (itemInHouses: IItemInHouse[]) => void}) {
-  const iihModel = new ItemInHousesModel(inHouses, itemInHouses);
+function ItemInHouses({inHouses, itemInHouses, metalName, latheCostPerThousand, setItemInHouses}: {inHouses: IInHouse[], itemInHouses: IItemInHouse[], metalName: string, latheCostPerThousand: number, setItemInHouses: (itemInHouses: IItemInHouse[]) => void}) {
+  const iihModel = new ItemInHousesModel(inHouses, itemInHouses, latheCostPerThousand);
 
   function handleItemInHouseNameChange(value: string, index: number) {
     const nextItemInHouses = itemInHouses.map((iih, i) => {
@@ -85,6 +87,7 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}: {inHouses: IInH
         style={{width: "157px"}}
       >
         <option value=""></option>
+        <option value={Lathe}>{L10n.lathe.chinese} Lathe ({metalName})</option>
         {inHousesSelectOptions}
       </select>
     </>;
@@ -130,8 +133,8 @@ function ItemInHouses({inHouses, itemInHouses, setItemInHouses}: {inHouses: IInH
       <thead>
         <tr>
           <th>{L10n.name.chinese} Name</th>
-          <th>{L10n.quantity.chinese} Quantity</th>
-          <th>{L10n.costPerThousand.chinese} Cost Per 1k</th>
+          <th>{L10n.numberOfSeconds.chinese} Number of Seconds</th>
+          <th>{L10n.costPerThousand.chinese} Cost Per 1k Seconds</th>
           <th>{L10n.costPerUnit.chinese} Cost Per Unit</th>
           <th>{L10n.remove.chinese} Delete</th>
           <th>{L10n.add.chinese} Add</th>

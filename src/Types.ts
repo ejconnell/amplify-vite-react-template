@@ -2,6 +2,7 @@ export interface IMetal {
   name: string;
   density: string;
   metalFamilyName: string;
+  latheCostPerThousand: string;
 }
 
 export interface IMetalFamily {

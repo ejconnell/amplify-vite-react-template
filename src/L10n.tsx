@@ -91,7 +91,10 @@ const L10n: Record<string, L10nEntry> = {
     chinese: "每份工作的成本",
   },
   costPerThousand: {
-    chinese: "每千人成本",
+    chinese: "每千秒成本",
+  },
+  latheCostPerThousand: {
+    chinese: "每千秒車床成本",
   },
   gramsPerUnit: {
     chinese: "克每單位",
@@ -183,6 +186,11 @@ const L10n: Record<string, L10nEntry> = {
   uncheckForPricedByKg: {
     chinese: "取消勾選按公斤計價",
   },
+  numberOfSeconds: {
+    chinese: "秒數",
+  },
+  lathe: {
+    chinese: "車床",}
 }
 
 export default L10n;

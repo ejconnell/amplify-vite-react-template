@@ -205,6 +205,8 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     <ItemInHouses
       inHouses={inHouses}
       itemInHouses={itemInHouses}
+      metalName={itemModel.metalName}
+      latheCostPerThousand={itemModel.latheCostPerThousand}
       setItemInHouses={setItemInHouses}
     />
 
