@@ -9,6 +9,7 @@ import Metals from './Metals.tsx';
 import Outsourcings from './Outsourcings.tsx';
 import Quotes from './Quotes.tsx';
 import StandardSetups from './StandardSetups.tsx';
+import Customers from "./Customers.tsx";
 import { ITabLabel, TabLabels } from "./TabLabels.tsx";
 
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
@@ -22,11 +23,12 @@ import {
 import {
   DynamoDBDocumentClient,
   PutCommand,
+  DeleteCommand,
   paginateScan,
 } from "@aws-sdk/lib-dynamodb";
 
 import { AuthContextProps, useAuth } from "react-oidc-context";
-import { IInHouse, IItem, IMaterial, IMetal, IMetalFamily, IOutsourcing, IQuote, IStandardSetup } from "./Types";
+import { IInHouse, IItem, IMaterial, IMetal, IMetalFamily, IOutsourcing, IQuote, IStandardSetup, ICustomer } from "./Types";
 
 async function loadMetalFamilies(ddbDocClient: DynamoDBDocumentClient, setMetalFamilies: (metalFamilies: IMetalFamily[]) => void) {
   await loadTable(ddbDocClient, setMetalFamilies, "MetalFamilies")
@@ -69,6 +71,13 @@ async function loadItems(
   setItems: (items: IItem[]) => void
 ) {
   await loadTable(ddbDocClient, setItems, "Items");
+};
+
+async function loadCustomers(
+  ddbDocClient: DynamoDBDocumentClient,
+  setCustomers: (customers: ICustomer[]) => void
+) {
+  await loadTable(ddbDocClient, setCustomers, "Customers");
 };
 
 async function loadQuotes(
@@ -123,6 +132,7 @@ function getAwsCreds(auth: AuthContextProps) {
 
 function MyTabs() {
   const [loadsComplete, setFetchesComplete] = useState<boolean>(false);
+  const [customers, setCustomers] = useState<Array<ICustomer>>([]);
   const [materials, setMaterials] = useState<Array<IMaterial>>([]);
   const [metals, setMetals] = useState<Array<IMetal>>([]);
   const [metalFamilies, setMetalFamilies] = useState<Array<IMetalFamily>>([]);
@@ -142,6 +152,7 @@ function MyTabs() {
 
   useEffect(() => {
     Promise.all([
+      loadCustomers(ddbDocClient, setCustomers),
       loadMetalFamilies(ddbDocClient, setMetalFamilies),
       loadMetals(ddbDocClient, setMetals),
       loadMaterials(ddbDocClient, setMaterials),
@@ -195,6 +206,27 @@ function MyTabs() {
     loadStandardSetups(ddbDocClient, setStandardSetups);
   }
 
+  async function saveCustomer(customer: ICustomer) {
+    log("saveCustomers() " + customer.name)
+    const response = await ddbDocClient.send(new PutCommand({
+      TableName: "Customers",
+      Item: customer,
+    }));
+    log(JSON.stringify(response));
+    loadCustomers(ddbDocClient, setCustomers);
+  }
+
+  async function deleteCustomer(customerName: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "Customers",
+      Key: {
+        name: customerName,
+      },
+    }));
+    log(JSON.stringify(response));
+    loadCustomers(ddbDocClient, setCustomers);
+  }
+
   async function saveInHouse(inHouse: IInHouse) {
     log("saveInHouse() " + inHouse.name)
     const response = await ddbDocClient.send(new PutCommand({
@@ -226,7 +258,7 @@ function MyTabs() {
   }
 
   async function saveQuote(quote: IQuote) {
-    log(`saveQuote() ${quote.name} - ${quote.timestamp}`);
+    log(`saveQuote() ${quote.customerName} - ${quote.timestamp}`);
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Quotes",
       Item: quote,
@@ -255,6 +287,7 @@ function MyTabs() {
           metals={metals}
           inHouses={inHouses}
           outsourcings={outsourcings}
+          customers={customers}
           saveQuote={saveQuote}
         />
       </Tab>
@@ -266,6 +299,7 @@ function MyTabs() {
           standardSetups={standardSetups}
           inHouses={inHouses}
           outsourcings={outsourcings}
+          customers={customers}
           saveItem={saveItem}
         />
       </Tab>
@@ -306,6 +340,15 @@ function MyTabs() {
         <StandardSetups
           standardSetups={standardSetups}
           saveStandardSetup={saveStandardSetup}
+        />
+      </Tab>
+      <Tab eventKey="customers" title={tabTitle(TabLabels.customer)}>
+        <Customers
+          customers={customers}
+          quotes={quotes}
+          items={items}
+          saveCustomer={saveCustomer}
+          deleteCustomer={deleteCustomer}
         />
       </Tab>
     </Tabs>

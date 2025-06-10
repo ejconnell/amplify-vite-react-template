@@ -45,6 +45,11 @@ export const TabLabels: Record<string, ITabLabel> = {
     plural: "Standard Setups",
     chinese: "校車",
   },
+  customer: {
+    singular: "Customer",
+    plural: "Customers",
+    chinese: "客戶",
+  },
 };
 
 export default TabLabels;

@@ -12,12 +12,13 @@ import { TabLabels } from "./TabLabels";
 import { ItemWastageInitialRange } from "./ItemWastage"
 import { ItemOverheadInitialRange } from "./ItemOverhead"
 import { ItemModel } from "./ItemModel";
-import { IInHouse, IItem, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing, IStandardSetup } from "./Types";
+import { ICustomer, IInHouse, IItem, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing, IStandardSetup } from "./Types";
 
 
 export function blankItem(): IItem {
   return {
     name: "",
+    customerName: "",
     materialName: "",
     unitLength: "",
     itemInHouses: [],
@@ -28,8 +29,9 @@ export function blankItem(): IItem {
   };
 }
 
-function Items({items, materials, metals, standardSetups, inHouses, outsourcings, saveItem}: {items: IItem[], materials: IMaterial[], metals: IMetal[], standardSetups: IStandardSetup[], inHouses: IInHouse[], outsourcings: IOutsourcing[], saveItem: (item: IItem) => void}) {
+function Items({items, materials, metals, standardSetups, inHouses, outsourcings, customers, saveItem}: {items: IItem[], materials: IMaterial[], metals: IMetal[], standardSetups: IStandardSetup[], inHouses: IInHouse[], outsourcings: IOutsourcing[], customers: ICustomer[], saveItem: (item: IItem) => void}) {
   const [exampleUnitQuantity, setExampleUnitQuantity] = useState<string>("1000");
+  const [customerName, setCustomerName] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [materialName, setMaterialName] = useState<string>("");
   const [unitLength, setUnitLength] = useState<string>("");
@@ -44,6 +46,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
     metals: metals,
     inHouses: inHouses,
     outsourcings: outsourcings,
+    customers: customers,
   };
 
   const itemModel = new ItemModel({
@@ -68,6 +71,10 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
 
   function handleSaveItem() {
     console.log("handleSaveItem()");
+    if (!customerName) {
+      alert("Need a customer name");
+      return;
+    }
     if (!name) {
       alert("Need a name");
       return;
@@ -103,6 +110,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
 
     const item = {
       name: name,
+      customerName: customerName,
       materialName: materialName,
       unitLength: unitLength,
       itemSetups: itemSetups,
@@ -117,6 +125,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   function handleLoadItem(index: number) {
     const item = items[index];
     setName(item.name);
+    setCustomerName(item.customerName || "");
     setMaterialName(item.materialName);
     setUnitLength(item.unitLength);
     setItemSetups(item.itemSetups);
@@ -129,6 +138,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   const itemRowsFrag = items.map((item, i) => {
     return <tr key={item.name}>
       <td>{item.name}</td>
+      <td>{item.customerName}</td>
       <td>{item.materialName}</td>
       <td>{itemsModels[i].materialCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].inHouseCostPerUnit.toFixed(2)}</td>
@@ -136,11 +146,16 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       <td>{itemsModels[i].wastagePercent.toFixed(2)}</td>
       <td>{itemsModels[i].setupCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].overheadPercent.toFixed(2)}</td>
-      <td>
-        <button type="button" onClick={() => handleLoadItem(i)}>Load</button>
-      </td>
+      <td><button type="button" onClick={() => handleLoadItem(i)}>
+        {L10n.load.chinese} Load
+      </button></td>
     </tr>
   });
+
+  const customerSelectOptions = customers.map(c => {
+    return <option value={c.name} key={c.name}>{c.name}</option>;
+  });
+
   const materialSelectOptions = materials.map(m => {
      return <option value={m.name} key={m.name}>{m.name}</option>;
   });
@@ -158,6 +173,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       <thead>
         <tr>
           <th>{L10n.name.chinese} Name</th>
+          <th>{L10n.customer.chinese}{L10n.name.chinese} Customer name</th>
           <th>{L10n.material.chinese}{L10n.name.chinese} Material name</th>
           <th>{L10n.material.chinese}{L10n.cost.chinese} Material cost</th>
           <th>{L10n.inHouse.chinese}{L10n.cost.chinese} In House cost</th>
@@ -181,6 +197,16 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       onChange={(e) => setName(e.target.value)}
     />
     <br/>
+
+    <label>{L10n.customer.chinese}{L10n.name.chinese} Customer name:</label>
+    <select
+      value={customerName}
+      onChange={e => setCustomerName(e.target.value)}
+    >
+      <option value="" key="blank"></option>;
+      {customerSelectOptions}
+    </select>
+
 
     <h4>{L10n.material.chinese} Material:</h4>
     <select

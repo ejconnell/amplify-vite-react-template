@@ -190,7 +190,17 @@ const L10n: Record<string, L10nEntry> = {
     chinese: "秒數",
   },
   lathe: {
-    chinese: "車床",}
+    chinese: "車床",
+  },
+  hideLoadedQuote: {
+    chinese: "隱藏已載入的報價",
+  },
+  delete: {
+    chinese: "刪除",
+  },
+  deleteIfUnused: {
+    chinese: "如果未使用則刪除",
+  },
 }
 
 export default L10n;

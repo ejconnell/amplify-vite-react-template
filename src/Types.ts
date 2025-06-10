@@ -36,8 +36,13 @@ export interface IOutsourcing {
   variableCost: string;
 }
 
+export interface ICustomer {
+  name: string;
+}
+
 export interface IItem {
   name: string;
+  customerName: string;
   materialName: string;
   unitLength: string;
   itemInHouses: IItemInHouse[];
@@ -92,9 +97,8 @@ export interface IItemOutsourcingModelRow {
 }
 
 export interface IQuote {
-  name: string;
+  customerName: string;
   timestamp: number;
-  description: string;
   quoteItems: IQuoteItem[];
   quoteItemsModelResults: IQuoteItemModelResult[];
 }

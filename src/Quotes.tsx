@@ -4,7 +4,7 @@ import { ItemModel } from "./ItemModel";
 import Trifold from "./Trifold";
 import L10n from "./L10n";
 import { TabLabels } from "./TabLabels";
-import { IInHouse, IItem, IMaterial, IMetal, IOutsourcing, IQuote, IQuoteItem, IQuoteItemModelResult } from "./Types";
+import { ICustomer, IInHouse, IItem, IMaterial, IMetal, IOutsourcing, IQuote, IQuoteItem, IQuoteItemModelResult } from "./Types";
 import { blankItem } from "./Items";
 
 function blankQuoteItem() {
@@ -75,15 +75,15 @@ class QuoteItemModel {
   }
 }
 
-function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQuote}: {quotes: IQuote[], items: IItem[], materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], saveQuote: (quote: IQuote) => void}) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+function Quotes({quotes, items, materials, metals, inHouses, outsourcings, customers, saveQuote}: {quotes: IQuote[], items: IItem[], materials: IMaterial[], metals: IMetal[], inHouses: IInHouse[], outsourcings: IOutsourcing[], customers: ICustomer[], saveQuote: (quote: IQuote) => void}) {
+  const [customerName, setCustomerName] = useState("");
   const [quoteItems, setQuoteItems] = useState<IQuoteItem[]>([blankQuoteItem()]);
-  const [fixedName, setFixedName] = useState("");
+  const [fixedCustomerName, setFixedCustomerName] = useState("");
   const [fixedTimestamp, setFixedTimestamp] = useState<number>(0);
-  const [fixedDescription, setFixedDescription] = useState("");
   const [fixedQuoteItems, setFixedQuoteItems] = useState<IQuoteItem[]>([]);
   const [quoteItemsModelResults, setQuoteItemsModelResults] = useState<IQuoteItemModelResult[]>([]);
+
+  const selectableItems = items.filter(i => i.customerName === customerName);
 
   const quoteItemsModels = quoteItems.map(qi => {
     return new QuoteItemModel({
@@ -97,8 +97,8 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
   });
 
   function handleSaveQuote() {
-    if (!name) {
-      alert("Need a name");
+    if (!customerName) {
+      alert("Need a customer name");
       return;
     }
     quoteItems.forEach((qi, i) => {
@@ -112,9 +112,8 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       }
     });
     const quote = {
-      name: name,
+      customerName: customerName,
       timestamp: Date.now(),
-      description: description,
       quoteItems: quoteItems,
       quoteItemsModelResults: quoteItemsModels.map(qim => qim.results()),
     };
@@ -123,12 +122,10 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
 
   function handleLoadQuote(i: number) {
     const quote = quotes[i];
-    setName(quote.name);
-    setDescription(quote.description);
+    setCustomerName(quote.customerName);
     setQuoteItems(quote.quoteItems);
-    setFixedName(quote.name);
+    setFixedCustomerName(quote.customerName);
     setFixedTimestamp(quote.timestamp);
-    setFixedDescription(quote.description);
     setFixedQuoteItems(quote.quoteItems);
     setQuoteItemsModelResults(quote.quoteItemsModelResults);
   }
@@ -232,12 +229,20 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     <th>{L10n.profitIncluded.chinese} Profit included 6%</th>
   </>);
 
+  function handleHideLoadedQuote() {
+    setFixedCustomerName("");
+    setFixedTimestamp(0);
+    setFixedQuoteItems([]);
+    setQuoteItemsModelResults([]);
+  };
+
   const loadedQuoteSectionFrag = <>
-    <label>{L10n.name.chinese} Name: {fixedName}</label>
-    <br/>
-    <label>{L10n.description.chinese} Description: {fixedDescription}</label>
+    <label>{L10n.customer.chinese} Customer Name: {fixedCustomerName}</label>
     <br/>
     <label>{L10n.createdAt.chinese} Created at: {(new Date(fixedTimestamp)).toLocaleString()}</label>
+    <br/>
+    <button type="button" onClick={handleHideLoadedQuote}>{L10n.hideLoadedQuote.chinese} Hide Loaded Quote</button>
+
     <Table bordered striped>
       <thead>
         <tr>
@@ -261,12 +266,11 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
       summary = summary.slice(0, MAX_SUMMARY_LENGTH - 3) + "...";
     }
     return (
-      <tr key={q.name + q.timestamp}>
-        <td>{q.name}</td>
+      <tr key={q.customerName + q.timestamp}>
+        <td>{q.customerName}</td>
         <td>{(new Date(q.timestamp)).toLocaleString()}</td>
-        <td>{q.description}</td>
         <td>{summary}</td>
-        <td><button type="button" onClick={() => handleLoadQuote(i)}>Load</button></td>
+        <td><button type="button" onClick={() => handleLoadQuote(i)}>{L10n.load.chinese} Load</button></td>
       </tr>
     );
   });
@@ -275,7 +279,7 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
 
     const qimr = quoteItemsModels[i].results();
 
-    const itemSelectOptions = items.map(item => {
+    const itemSelectOptions = selectableItems.map(item => {
       return <option value={item.name} key={item.name}>{item.name}</option>;
     });
 
@@ -307,9 +311,8 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     <Table bordered striped>
       <thead>
         <tr>
-          <th>{L10n.material.chinese} Name</th>
+          <th>{L10n.customer.chinese} Customer name</th>
           <th>{L10n.timestamp.chinese} Timestamp</th>
-          <th>{L10n.description.chinese} Description</th>
           <th>{L10n.summary.chinese} Summary</th>
           <th>{L10n.load.chinese} Load</th>
         </tr>
@@ -320,21 +323,21 @@ function Quotes({quotes, items, materials, metals, inHouses, outsourcings, saveQ
     </Table>
   </>);
 
+  const customerSelectOptions = customers.map(c => {
+    return <option value={c.name} key={c.name}>{c.name}</option>;
+  });
+
   const currentQuoteFrag = (<>
-    {fixedName && loadedQuoteSectionFrag }
+    {fixedCustomerName && loadedQuoteSectionFrag }
 
-    <label>{L10n.name.chinese} Name:</label>
-    <input
-      value={name}
-      onChange={e => setName(e.target.value)}
-    />
-
-    <label>{L10n.description.chinese} Description:</label>
-    <input
-      value={description}
-      onChange={e => setDescription(e.target.value)}
-      style={{width: "400px"}}
-    />
+    <label>{L10n.customer.chinese} Customer Name:</label>
+    <select
+      value={customerName}
+      onChange={e => setCustomerName(e.target.value)}
+    >
+      <option value="" key="blank"></option>;
+      {customerSelectOptions}
+    </select>
 
     <Table bordered striped>
       <thead>
