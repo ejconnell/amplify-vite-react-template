@@ -5,7 +5,7 @@ import L10n from "./L10n";
 import { TabLabels } from "./TabLabels";
 import { ICustomer, IItem, IQuote } from "./Types";
 
-function Customers({customers, quotes, items, saveCustomer, deleteCustomer}: {customers: ICustomer[], quotes: IQuote[], items: IItem[], saveCustomer: (customer: ICustomer) => void, deleteCustomer: (customerName: string) => void}) {
+function Customers({customers, quotes, items, saveCustomer, deleteCustomer}: {customers: ICustomer[], quotes: IQuote[], items: IItem[], saveCustomer: (customer: ICustomer) => void, deleteCustomer: (name: string) => void}) {
   const [name, setName] = useState<string>("");
 
   let quoteCounts: { [key: string]: number } = {};
@@ -32,13 +32,8 @@ function Customers({customers, quotes, items, saveCustomer, deleteCustomer}: {cu
     setName(customer.name);
   };
 
-  function handleDeleteCustomer(index: number) {
-    const customer = customers[index];
-    deleteCustomer(customer.name);
-  }
-
   const tableRows = customers.map((customer, i) => {
-    const deleteCustomerButton = <button type="button" onClick={() => handleDeleteCustomer(i)}>{L10n.delete.chinese}Delete</button>;
+    const deleteCustomerButton = <button type="button" onClick={() => deleteCustomer(customer.name)}>{L10n.delete.chinese}Delete</button>;
     return <tr key={customer.name}>
       <td>{customer.name}</td>
       <td><button type="button" onClick={() => handleLoadCustomer(i)}>{L10n.load.chinese}Load</button></td>

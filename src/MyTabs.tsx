@@ -176,6 +176,17 @@ function MyTabs() {
     loadMetalFamilies(ddbDocClient, setMetalFamilies);
   }
 
+  async function deleteMetalFamily(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "MetalFamilies",
+      Key: {
+        name: name,
+      },
+    }));
+    log(JSON.stringify(response));
+    loadMetalFamilies(ddbDocClient, setMetalFamilies);
+  }
+
   async function saveMetal(metal: IMetal) {
     log("saveMetal() " + metal.name)
     const response = await ddbDocClient.send(new PutCommand({
@@ -184,6 +195,17 @@ function MyTabs() {
     }));
     log(JSON.stringify(response));
     loadMetals(ddbDocClient, setMetals)
+  }
+
+  async function deleteMetal(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "Metals",
+      Key: {
+        name: name,
+      },
+    }));
+    log(JSON.stringify(response));
+    loadMetals(ddbDocClient, setMetals);
   }
 
   async function saveMaterial(material: IMaterial) {
@@ -196,11 +218,33 @@ function MyTabs() {
     loadMaterials(ddbDocClient, setMaterials)
   }
 
+  async function deleteMaterial(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "Materials",
+      Key: {
+        name: name,
+      },
+    }));
+    log(JSON.stringify(response));
+    loadMaterials(ddbDocClient, setMaterials);
+  }
+
   async function saveStandardSetup(standardSetup: IStandardSetup) {
     log("saveStandardSetup() " + standardSetup.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "StandardSetups",
       Item: standardSetup,
+    }));
+    log(JSON.stringify(response));
+    loadStandardSetups(ddbDocClient, setStandardSetups);
+  }
+
+  async function deleteStandardSetup(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "StandardSetups",
+      Key: {
+        name: name,
+      },
     }));
     log(JSON.stringify(response));
     loadStandardSetups(ddbDocClient, setStandardSetups);
@@ -216,11 +260,11 @@ function MyTabs() {
     loadCustomers(ddbDocClient, setCustomers);
   }
 
-  async function deleteCustomer(customerName: string) {
+  async function deleteCustomer(name: string) {
     const response = await ddbDocClient.send(new DeleteCommand({
       TableName: "Customers",
       Key: {
-        name: customerName,
+        name: name,
       },
     }));
     log(JSON.stringify(response));
@@ -237,6 +281,17 @@ function MyTabs() {
     loadInHouses(ddbDocClient, setInHouses);
   }
 
+  async function deleteInHouse(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "InHouses",
+      Key: {
+        name: name,
+      },
+    }));
+    log(JSON.stringify(response));
+    loadInHouses(ddbDocClient, setInHouses);
+  }
+
   async function saveOutsourcing(outsourcing: IOutsourcing) {
     log("saveOutsourcing() " + outsourcing.name)
     const response = await ddbDocClient.send(new PutCommand({
@@ -247,11 +302,33 @@ function MyTabs() {
     loadOutsourcings(ddbDocClient, setOutsourcings);
   }
 
+  async function deleteOutsourcing(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "Outsourcings",
+      Key: {
+        name: name,
+      },
+    }));
+    log(JSON.stringify(response));
+    loadOutsourcings(ddbDocClient, setOutsourcings);
+  }
+
   async function saveItem(item: IItem) {
     log("saveItem() " + item.name)
     const response = await ddbDocClient.send(new PutCommand({
       TableName: "Items",
       Item: item,
+    }));
+    log(JSON.stringify(response));
+    loadItems(ddbDocClient, setItems);
+  }
+
+  async function deleteItem(name: string) {
+    const response = await ddbDocClient.send(new DeleteCommand({
+      TableName: "Items",
+      Key: {
+        name: name,
+      },
     }));
     log(JSON.stringify(response));
     loadItems(ddbDocClient, setItems);
@@ -300,7 +377,9 @@ function MyTabs() {
           inHouses={inHouses}
           outsourcings={outsourcings}
           customers={customers}
+          quotes={quotes}
           saveItem={saveItem}
+          deleteItem={deleteItem}
         />
       </Tab>
       <Tab eventKey="materials" title={tabTitle(TabLabels.material)}>
@@ -308,38 +387,50 @@ function MyTabs() {
           materials={materials}
           metals={metals}
           metalFamilies={metalFamilies}
+          items={items}
           saveMaterial={saveMaterial}
+          deleteMaterial={deleteMaterial}
         />
       </Tab>
       <Tab eventKey="metals" title={tabTitle(TabLabels.metal)}>
         <Metals
           metals={metals}
           metalFamilies={metalFamilies}
+          materials={materials}
           saveMetal={saveMetal}
+          deleteMetal={deleteMetal}
         />
       </Tab>
       <Tab eventKey="metalFamilies" title={tabTitle(TabLabels.metalFamily)}>
         <MetalFamilies
           metalFamilies={metalFamilies}
+          metals={metals}
           saveMetalFamily={saveMetalFamily}
+          deleteMetalFamily={deleteMetalFamily}
         />
       </Tab>
       <Tab eventKey="inHouses" title={tabTitle(TabLabels.inHouse)}>
         <InHouses
           inHouses={inHouses}
+          items={items}
           saveInHouse={saveInHouse}
+          deleteInHouse={deleteInHouse}
         />
       </Tab>
       <Tab eventKey="outsourcings" title={tabTitle(TabLabels.outsourcing)}>
         <Outsourcings
           outsourcings={outsourcings}
+          items={items}
           saveOutsourcing={saveOutsourcing}
+          deleteOutsourcing={deleteOutsourcing}
         />
       </Tab>
       <Tab eventKey="standardSetups" title={tabTitle(TabLabels.standardSetup)}>
         <StandardSetups
           standardSetups={standardSetups}
+          items={items}
           saveStandardSetup={saveStandardSetup}
+          deleteStandardSetup={deleteStandardSetup}
         />
       </Tab>
       <Tab eventKey="customers" title={tabTitle(TabLabels.customer)}>

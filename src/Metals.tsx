@@ -4,13 +4,18 @@ import Importer from "./Importer";
 import Trifold from "./Trifold";
 import L10n from './L10n';
 import { TabLabels } from "./TabLabels";
-import { IMetal, IMetalFamily } from "./Types";
+import { IMaterial, IMetal, IMetalFamily } from "./Types";
 
-function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFamilies: IMetalFamily[], saveMetal: (metal: IMetal) => void}) {
+function Metals({metals, metalFamilies, materials, saveMetal, deleteMetal}: {metals: IMetal[], metalFamilies: IMetalFamily[], materials: IMaterial[], saveMetal: (metal: IMetal) => void, deleteMetal: (name: string) => void}) {
   const [name, setName] = useState<string>("");
   const [metalFamilyName, setMetalFamilyName] = useState<string>("");
   const [density, setDensity] = useState<string>("");
   const [latheCostPerThousand, setLatheCostPerThousand] = useState<string>("");
+
+  let materialCounts: { [key: string]: number } = {};
+  materials.forEach((material) => {
+    materialCounts[material.metalName] = (materialCounts[material.metalName] || 0) + 1;
+  });
 
   function importerProcessorFunc(grid: string[][]) {
     grid.forEach((row, i) => {
@@ -64,15 +69,18 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
      setLatheCostPerThousand(metal.latheCostPerThousand);
   };
 
-  const tableRows = metals.map((m, i) =>
-    <tr key={m.name}>
+  const tableRows = metals.map((m, i) => {
+    const deleteMetalButton = <button type="button" onClick={() => deleteMetal(m.name)}>{L10n.delete.chinese}Delete</button>;
+    return <tr key={m.name}>
       <td>{m.name}</td>
       <td>{m.metalFamilyName}</td>
       <td>{m.density}</td>
       <td>{m.latheCostPerThousand}</td>
-      <td><button type="button" onClick={() => handleLoadMetal(i)}>Load</button></td>
+      <td><button type="button" onClick={() => handleLoadMetal(i)}>{L10n.load.chinese}Load</button></td>
+      <td>{materialCounts[m.name] || 0}</td>
+      <td>{!materialCounts[m.name] && deleteMetalButton}</td>
     </tr>
-  );
+});
 
   const mfSelectOptionsFrag = metalFamilies.map(mf => {
      return <option value={mf.name} key={mf.name}>{mf.name}</option>;
@@ -87,6 +95,8 @@ function Metals({metals, metalFamilies, saveMetal}: {metals: IMetal[], metalFami
           <th>{L10n.density.chinese}Density (g/mm<sup>3</sup>)</th>
           <th>{L10n.latheCostPerThousand.chinese} Lathe cost per 1k seconds</th>
           <th>{L10n.load.chinese}Load</th>
+          <th>{L10n.material.chinese}{L10n.quantity.chinese} Num Materials</th>
+          <th>{L10n.deleteIfUnused.chinese}Delete if unused</th>
         </tr>
       </thead>
       <tbody>

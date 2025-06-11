@@ -4,9 +4,9 @@ import Importer from "./Importer";
 import Trifold from "./Trifold";
 import L10n from "./L10n";
 import { TabLabels } from "./TabLabels";
-import { IOutsourcing } from "./Types";
+import { IItem, IOutsourcing } from "./Types";
 
-function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourcing[], saveOutsourcing: (outsourcing: IOutsourcing) => void}) {
+function Outsourcings({outsourcings, items, saveOutsourcing, deleteOutsourcing}: {outsourcings: IOutsourcing[], items: IItem[], saveOutsourcing: (outsourcing: IOutsourcing) => void, deleteOutsourcing: (name: string) => void,}) {
   const [name, setName] = useState("");
   const [isPricedByUnit, setIsPricedByUnit] = useState(false);
   const [variableCost, setVariableCost] = useState("");
@@ -14,6 +14,13 @@ function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourci
 
   const variableCostStr = isPricedByUnit ? "unit" : "kilogram";
   const variableCostLabel = isPricedByUnit ? L10n.minCostPerUnit.chinese + "Minimum cost per unit" : L10n.minCostPerKg.chinese + "Minimum cost per kilogram";
+
+  let itemCounts: { [key: string]: number } = {};
+  items.forEach((item) => {
+    item.itemOutsourcings.forEach((itemOutsourcing) => {
+      itemCounts[itemOutsourcing.name] = (itemCounts[itemOutsourcing.name] || 0) + 1;
+    })
+  });
 
   function handleSaveOutsourcing() {
     if (!name) {
@@ -65,14 +72,17 @@ function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourci
   }
 
   const outsourcingsRowsFrag = outsourcings.map((os, i) => {
+    const deleteOutsourcingButton = <button type="button" onClick={() => deleteOutsourcing(os.name)}>{L10n.delete.chinese}Delete</button>;
     return <tr key={os.name}>
       <td>{os.name}</td>
       <td>{os.minCostPerJob}</td>
       <td>{os.isPricedByUnit ? `${L10n.unit.chinese} Unit` : `${L10n.kilogram.chinese} Kilogram`}</td>
       <td>{os.variableCost}</td>
       <td>
-        <button type="button" onClick={() => handleLoadOutsourcing(i)}>Load</button>
+        <button type="button" onClick={() => handleLoadOutsourcing(i)}>{L10n.load.chinese}Load</button>
       </td>
+      <td>{itemCounts[os.name] || 0}</td>
+      <td>{!itemCounts[os.name] && deleteOutsourcingButton}</td>
     </tr>
   });
 
@@ -99,6 +109,8 @@ function Outsourcings({outsourcings, saveOutsourcing}: {outsourcings: IOutsourci
           <th>{L10n.pricedBy.chinese} Priced by</th>
           <th>{L10n.costPerKgUnit.chinese} Cost per kg/unit</th>
           <th>{L10n.load.chinese} Load</th>
+          <th>{L10n.item.chinese}{L10n.quantity.chinese} Num Items</th>
+          <th>{L10n.deleteIfUnused.chinese}Delete if unused</th>
         </tr>
       </thead>
       <tbody>

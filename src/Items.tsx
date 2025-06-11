@@ -12,7 +12,7 @@ import { TabLabels } from "./TabLabels";
 import { ItemWastageInitialRange } from "./ItemWastage"
 import { ItemOverheadInitialRange } from "./ItemOverhead"
 import { ItemModel } from "./ItemModel";
-import { ICustomer, IInHouse, IItem, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing, IStandardSetup } from "./Types";
+import { ICustomer, IInHouse, IItem, IItemInHouse, IItemOutsourcing, IItemOverheadRange, IItemSetup, IItemWastageRange, IMaterial, IMetal, IOutsourcing, IQuote, IStandardSetup } from "./Types";
 
 
 export function blankItem(): IItem {
@@ -29,7 +29,7 @@ export function blankItem(): IItem {
   };
 }
 
-function Items({items, materials, metals, standardSetups, inHouses, outsourcings, customers, saveItem}: {items: IItem[], materials: IMaterial[], metals: IMetal[], standardSetups: IStandardSetup[], inHouses: IInHouse[], outsourcings: IOutsourcing[], customers: ICustomer[], saveItem: (item: IItem) => void}) {
+function Items({items, materials, metals, standardSetups, inHouses, outsourcings, customers, quotes, saveItem, deleteItem}: {items: IItem[], materials: IMaterial[], metals: IMetal[], standardSetups: IStandardSetup[], inHouses: IInHouse[], outsourcings: IOutsourcing[], customers: ICustomer[], quotes: IQuote[], saveItem: (item: IItem) => void, deleteItem: (name: string) => void}) {
   const [exampleUnitQuantity, setExampleUnitQuantity] = useState<string>("1000");
   const [customerName, setCustomerName] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -40,6 +40,13 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   const [itemWastageRanges, setItemWastageRanges] = useState<IItemWastageRange[]>([ItemWastageInitialRange()]);
   const [itemOverheadRanges, setItemOverheadRanges] = useState<IItemOverheadRange[]>([ItemOverheadInitialRange()]);
   const [itemOutsourcings, setItemOutsourcings] = useState<IItemOutsourcing[]>([]);
+
+  let quoteCounts: { [key: string]: number } = {};
+  quotes.forEach(q => {
+    q.quoteItems.forEach(qi => {
+      quoteCounts[qi.name] = (quoteCounts[qi.name] || 0) + 1;
+    });
+  });
 
   const lookupTables = {
     materials: materials,
@@ -136,6 +143,7 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
   }
 
   const itemRowsFrag = items.map((item, i) => {
+    const deleteItemButton = <button type="button" onClick={() => deleteItem(item.name)}>{L10n.delete.chinese} Delete</button>
     return <tr key={item.name}>
       <td>{item.name}</td>
       <td>{item.customerName}</td>
@@ -147,8 +155,10 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
       <td>{itemsModels[i].setupCostPerUnit.toFixed(2)}</td>
       <td>{itemsModels[i].overheadPercent.toFixed(2)}</td>
       <td><button type="button" onClick={() => handleLoadItem(i)}>
-        {L10n.load.chinese} Load
+        {L10n.load.chinese}Load
       </button></td>
+      <td>{quoteCounts[item.name] || 0}</td>
+      <td>{!quoteCounts[item.name] && deleteItemButton}</td>
     </tr>
   });
 
@@ -182,6 +192,8 @@ function Items({items, materials, metals, standardSetups, inHouses, outsourcings
           <th>{L10n.setupCost.chinese} Setup cost</th>
           <th>{L10n.overhead.chinese} Overhead percent</th>
           <th>{L10n.load.chinese} Load</th>
+          <th>{L10n.quote.chinese}{L10n.quantity.chinese} Num Quotes</th>
+          <th>{L10n.deleteIfUnused.chinese}Delete if unused</th>
         </tr>
       </thead>
       <tbody>

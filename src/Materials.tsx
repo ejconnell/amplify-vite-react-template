@@ -6,7 +6,7 @@ import { MaterialModel } from "./MaterialModel";
 import { Shapes } from "./Shapes";
 import { TabLabels } from "./TabLabels";
 import Trifold from "./Trifold";
-import { IMaterial, IMetal, IMetalFamily } from "./Types";
+import { IMaterial, IMetal, IMetalFamily, IItem } from "./Types";
 
 export function blankMaterial(): IMaterial {
   return {
@@ -23,7 +23,7 @@ export function blankMaterial(): IMaterial {
 
 const CylindricalShape = Shapes[0];
 
-function Materials({materials, metals, metalFamilies, saveMaterial}: {materials: IMaterial[], metals: IMetal[], metalFamilies: IMetalFamily[], saveMaterial: (material: IMaterial) => void}) {
+function Materials({materials, metals, metalFamilies, items, saveMaterial, deleteMaterial}: {materials: IMaterial[], metals: IMetal[], metalFamilies: IMetalFamily[], items: IItem[], saveMaterial: (material: IMaterial) => void, deleteMaterial: (name: string) => void}) {
   const [isNameManual, setIsNameManual] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [metalName, setMetalName] = useState<string>("");
@@ -35,6 +35,11 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
   const [filterMetalFamilyName, setFilterMetalFamilyName] = useState<string>("");
   const [filterMetalName, setFilterMetalName] = useState<string>("");
   const [filterShapeName, setFilterShapeName] = useState<string>("");
+
+  let itemCounts: { [key: string]: number } = {};
+  items.forEach((item) => {
+    itemCounts[item.materialName] = (itemCounts[item.materialName] || 0) + 1;
+  });
 
   const materialModel = new MaterialModel({
     metals: metals,
@@ -177,8 +182,9 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
      setMarkup(material.markup);
   };
 
-  const tableRows = filteredMaterials.map((m, i) =>
-    <tr key={m.name}>
+  const tableRows = filteredMaterials.map((m, i) => {
+    const deleteMaterialButton = <button type="button" onClick={() => deleteMaterial(m.name)}>{L10n.delete.chinese}Delete</button>;
+    return <tr key={m.name}>
       <td>{m.name}</td>
       <td>{m.metalName}</td>
       <td>{m.shapeName}</td>
@@ -188,9 +194,11 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
       <td style={{textAlign: "right"}}>{Number(m.rawCost).toFixed(4)}</td>
       <td style={{textAlign: "right"}}>{m.markup}</td>
       <td style={{textAlign: "right"}}>{materialsModels[i].effectiveCost.toFixed(4)}</td>
-      <td><button type="button" onClick={() => handleLoadMaterial(i)}>Load</button></td>
+      <td><button type="button" onClick={() => handleLoadMaterial(i)}>{L10n.load.chinese}Load</button></td>
+      <td>{itemCounts[m.name] || 0}</td>
+      <td>{!itemCounts[m.name] && deleteMaterialButton}</td>
     </tr>
-  );
+});
 
   const innerWidthFragment = (
    <>
@@ -260,6 +268,8 @@ function Materials({materials, metals, metalFamilies, saveMaterial}: {materials:
           <th>{L10n.surchargePercentage.chinese} Markup %</th>
           <th>{L10n.pricePerKgSurcharge.chinese}<br/>Effective Cost ($/kg)</th>
           <th>{L10n.load.chinese} Load</th>
+          <th>{L10n.item.chinese}{L10n.quantity.chinese} Num Items</th>
+          <th>{L10n.deleteIfUnused.chinese}Delete if unused</th>
         </tr>
       </thead>
       <tbody>
