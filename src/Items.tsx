@@ -166,7 +166,7 @@ function Items({
       return;
     }
 
-    const nextVersion = ivItems ? Math.max(...ivItems.map(iv => iv.version)) + 1 : 1;
+    const nextVersion = ivItems?.length ? Math.max(...ivItems.map(iv => iv.version)) + 1 : 1;
 
     const item = {
       name: name,
