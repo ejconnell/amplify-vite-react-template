@@ -20,6 +20,7 @@ export function blankMaterial(): IMaterial {
     innerWidth: "",
     rawCost: "",
     markup: "",
+    flatMarkup: "0",
   };
 }
 
@@ -34,6 +35,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
   const [innerWidth, setInnerWidth] = useState<string>("");
   const [rawCost, setRawCost] = useState<string>("");
   const [markup, setMarkup] = useState<string>("6.5");
+  const [flatMarkup, setFlatMarkup] = useState<string>("0");
   const [filterMetalFamilyName, setFilterMetalFamilyName] = useState<string>("");
   const [filterMetalName, setFilterMetalName] = useState<string>("");
   const [filterShapeName, setFilterShapeName] = useState<string>("");
@@ -51,6 +53,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
     innerWidth: innerWidth,
     rawCost: rawCost,
     markup: markup,
+    flatMarkup: flatMarkup,
   });
   const mergedName = isNameManual ? name : materialModel.autoName;
 
@@ -103,6 +106,10 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
       alert("Need a numeric Markup");
       return;
     }
+    if (flatMarkup === "" || isNaN(Number(flatMarkup))) {
+      alert("Need a numeric Flat Markup");
+      return;
+    }
     if (materialModel.hasInnerWidth && (!innerWidth || isNaN(Number(innerWidth)))) {
       alert("Need a numeric Inner Width");
       return;
@@ -121,6 +128,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
       innerWidth: materialModel.hasInnerWidth ? innerWidth : "",
       rawCost: rawCost,
       markup: markup,
+      flatMarkup: flatMarkup,
     };
     saveMaterial(material);
   }
@@ -129,11 +137,11 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
     const metalNames = metals.map(m => m.name);
 
     grid.forEach((row, i) => {
-      if (row.length !== 4) {
-        alert(`Import failed on row ${i+1}.  Expected exactly 4 columns`);
+      if (row.length !== 5) {
+        alert(`Import failed on row ${i+1}.  Expected exactly 5 columns`);
         return;
       }
-      const [metalName, width, rawCost, markup] = row;
+      const [metalName, width, rawCost, markup, flatMarkup] = row;
       if (!metalName || !metalNames.includes(metalName)) {
         alert(`Import failed on row ${i+1}.  Metal ${metalName} not found.`);
         return;
@@ -150,6 +158,10 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
         alert(`Import failed on row ${i+1}.  Need a numeric markup.`);
         return;
       }
+      if (!flatMarkup || isNaN(Number(flatMarkup))) {
+        alert(`Import failed on row ${i+1}.  Need a numeric flat markup.`);
+        return;
+      }
       const materialModel = new MaterialModel({
         metals: metals,
         metalName: metalName,
@@ -158,6 +170,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
         innerWidth: "0",
         rawCost: rawCost,
         markup: markup,
+        flatMarkup: flatMarkup,
       });
       saveMaterial({
         name: materialModel.autoName,
@@ -168,6 +181,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
         innerWidth: "",
         rawCost: rawCost,
         markup: markup,
+        flatMarkup: flatMarkup,
       });
     });
   }
@@ -182,6 +196,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
      setInnerWidth(material.innerWidth);
      setRawCost(material.rawCost);
      setMarkup(material.markup);
+     setFlatMarkup(material.flatMarkup);
   }
 
   const tableRows = filteredMaterials.map((m, i) => {
@@ -195,6 +210,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
       <td style={{textAlign: "right"}}>{materialsModels[i].weightPerMm.toFixed(4)}</td>
       <td style={{textAlign: "right"}}>{Number(m.rawCost).toFixed(4)}</td>
       <td style={{textAlign: "right"}}>{m.markup}</td>
+      <td style={{textAlign: "right"}}>{m.flatMarkup}</td>
       <td style={{textAlign: "right"}}>{materialsModels[i].effectiveCost.toFixed(4)}</td>
       <td><button type="button" onClick={() => handleLoadMaterial(i)}>{L10n.load.chinese}Load</button></td>
       <td>{itemCounts[m.name] || 0}</td>
@@ -268,6 +284,7 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
           <th>{L10n.gramsPerMm.chinese}<br/>Weight per mm (g/mm)</th>
           <th>{L10n.pricePerKgManufacturer.chinese}<br/>Manufacturer Cost ($/kg)</th>
           <th>{L10n.surchargePercentage.chinese} Markup %</th>
+          <th>{L10n.flatSurcharge.chinese}<br/>Flat Markup ($/kg)</th>
           <th>{L10n.pricePerKgSurcharge.chinese}<br/>Effective Cost ($/kg)</th>
           <th>{L10n.load.chinese} Load</th>
           <th>{L10n.item.chinese}{L10n.quantity.chinese} Num Items</th>
@@ -335,10 +352,16 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
       value={rawCost}
       onChange={(e) => setRawCost(e.target.value)}
     />
+    <br/>
     <label>{L10n.surchargePercentage.chinese} Markup %:</label>
     <input
       value={markup}
       onChange={(e) => setMarkup(e.target.value)}
+    />
+    <label>{L10n.flatSurcharge.chinese} Flat Markup ($/kg):</label>
+    <input
+      value={flatMarkup}
+      onChange={(e) => setFlatMarkup(e.target.value)}
     />
     <label>{L10n.pricePerKgSurcharge.chinese} Effective Cost: {materialModel.effectiveCost}</label>
     <br/>
@@ -350,16 +373,17 @@ function Materials({materials, metals, metalFamilies, items, saveMaterial, delet
 
   const importerInstructionsText = `This importer only supports cylindrical shaped
 materials.  Manual material names are not supported.
-Paste 4 columns with no header:
+Paste 5 columns with no header:
   Column 1: metal name
   Column 2: diameter
   Column 3: raw cost
   Column 4: markup %
+  Column 5: flat markup ($/kg)
 
-    -----------------------------|
-    | C3604B | 1.8 | 291  | 6.5  |
-    | GS5A-B | 5.0 | 317  | 6.5  |
-    | 1215MS | 2.0 | 77.5 | 35   |
+    -------------------------------------|
+    | C3604B | 1.8 | 291  | 6.5 | 0.50 |
+    | GS5A-B | 5.0 | 317  | 6.5 | 0    |
+    | 1215MS | 2.0 | 77.5 | 35  | 0    |
     | ...    |
   `;
 

@@ -159,6 +159,9 @@ const L10n: Record<string, L10nEntry> = {
   surchargePercentage: {
     chinese: "附加費百分比",
   },
+  flatSurcharge: {
+    chinese: "固定附加費",
+  },
   inner: {
     chinese: "內",
   },

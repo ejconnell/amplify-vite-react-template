@@ -6,6 +6,7 @@ export class MaterialModel {
   innerWidth: number;
   rawCost: number;
   markup: number;
+  flatMarkup: number;
   autoName: string;
   density: number;
   hasInnerWidth: boolean;
@@ -14,11 +15,12 @@ export class MaterialModel {
   crossSectionArea: number;
   weightPerMm: number;
   effectiveCost: number;
-  constructor({ metals, metalName, shapeName, width, innerWidth, rawCost, markup }:{metals: IMetal[], metalName: string, shapeName: string, width: string, innerWidth: string, rawCost: string, markup: string}) {
+  constructor({ metals, metalName, shapeName, width, innerWidth, rawCost, markup, flatMarkup }:{metals: IMetal[], metalName: string, shapeName: string, width: string, innerWidth: string, rawCost: string, markup: string, flatMarkup: string}) {
     this.width = Number(width);
     this.innerWidth = Number(innerWidth);
     this.rawCost = Number(rawCost);
     this.markup = Number(markup);
+    this.flatMarkup = Number(flatMarkup);
     const metal = metals.find(m => m.name === metalName);
     const shape = Shapes.find(s => s.name === shapeName);
 
@@ -29,7 +31,7 @@ export class MaterialModel {
     this.chineseWidth = shape?.chineseWidth || "";
     this.crossSectionArea = width === "" ? Number.NaN : Number(shape?.area(this.width, this.innerWidth));
     this.weightPerMm = this.density * this.crossSectionArea;
-    this.effectiveCost = rawCost === "" ? Number.NaN : this.rawCost + (this.rawCost * this.markup / 100);
+    this.effectiveCost = rawCost === "" ? Number.NaN : this.rawCost + (this.rawCost * this.markup / 100) + this.flatMarkup;
   }
 
   buildAutoName(metalName: string, shape: IShape | undefined, width: number, innerWidth: number) {

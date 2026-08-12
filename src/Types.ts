@@ -18,6 +18,7 @@ export interface IMaterial {
   innerWidth: string;
   rawCost: string;
   markup: string;
+  flatMarkup: string;
 }
 
 export interface IStandardSetup {
